@@ -9,11 +9,19 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   nav_msgs
   mapstitch
+  geographic_msgs
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Boost REQUIRED)
+find_package(OpenCV REQUIRED)
+
+find_package(PkgConfig)
+pkg_check_modules(YAMLCPP REQUIRED yaml-cpp>=0.5)
+if(YAMLCPP_FOUND)
+add_definitions(-DHAVE_YAMLCPP)
+endif(YAMLCPP_FOUND)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -116,6 +124,8 @@ catkin_package(
 # include_directories(include)
 include_directories(
   include
+  ${YAMLCPP_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
@@ -193,6 +203,7 @@ target_link_libraries(preprocessing
 )
 target_link_libraries(known_map_server
   preprocessing
+  ${YAMLCPP_LIBRARIES}
   ${catkin_LIBRARIES}
 )
 target_link_libraries(alignment
