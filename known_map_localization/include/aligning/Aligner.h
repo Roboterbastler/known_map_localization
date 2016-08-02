@@ -8,12 +8,22 @@
 #ifndef KNOWN_MAP_LOCALIZATION_INCLUDE_ALIGNING_ALIGNER_H_
 #define KNOWN_MAP_LOCALIZATION_INCLUDE_ALIGNING_ALIGNER_H_
 
+#include <nav_msgs/OccupancyGrid.h>
+
+#include "alignment/StampedAlignment.h"
+
 namespace known_map_localization {
 namespace aligning {
 
 class Aligner {
+public:
+	virtual ~Aligner();
+
+	virtual alignment::StampedAlignment align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) = 0;
 };
 
+typedef boost::shared_ptr<Aligner> AlignerPtr;
+typedef boost::shared_ptr<Aligner const> AlignerConstPtr;
 } /* namespace aligning */
 } /* namespace known_map_localization */
 

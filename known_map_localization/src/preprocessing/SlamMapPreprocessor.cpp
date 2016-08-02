@@ -10,5 +10,10 @@
 namespace known_map_localization {
 namespace preprocessing {
 
+SlamMapPreprocessor::SlamMapPreprocessor() :
+		MapPreprocessor("processed_slam_map", "slam_preprocessing_enabled") {
+
+}
+
 } /* namespace preprocessing */
 } /* namespace known_map_localization */

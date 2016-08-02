@@ -10,5 +10,9 @@
 namespace known_map_localization {
 namespace alignment {
 
+tf::StampedTransform StampedAlignment::toTfStampedTransform() const {
+	return tf::StampedTransform(toTfTransform(), stamp, from, to);
+}
+
 } /* namespace alignment */
 } /* namespace known_map_localization */
