@@ -21,6 +21,8 @@ namespace alignment {
  */
 class StampedAlignment: public Alignment {
 public:
+	StampedAlignment(const Alignment &a);
+
 	/**
 	 * Converts the alignment to a stamped tf transform.
 	 * @note The scale factor is omitted when converting!

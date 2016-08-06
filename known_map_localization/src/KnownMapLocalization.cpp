@@ -50,8 +50,6 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 					radToDeg(alignment.theta),
 					alignment.scale);
 
-		br.sendTransform(alignment.toTfStampedTransform());
-
 		filter->addAlignment(alignment);
 	} catch(AlignerInternalError &e) {
 		ROS_WARN_STREAM("Internal aligner error: " << e.what());

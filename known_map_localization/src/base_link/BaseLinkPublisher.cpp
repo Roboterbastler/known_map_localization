@@ -31,6 +31,9 @@ void BaseLinkPublisher::updateBaseLink(const ros::WallTimerEvent& event) {
 		return;
 	}
 
+	// publish map transform
+	broadcaster.sendTransform(alignment::StampedAlignment(alignment).toTfStampedTransform());
+
 	tf::StampedTransform slamMapFrame_to_slamBaseLink;
 	tf::Transform slamMapFrame_to_knownMapFrame = alignment.toTfTransform();
 

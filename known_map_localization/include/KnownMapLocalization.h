@@ -59,9 +59,6 @@ private:
 	/// Subscribes to the map topic released by the SLAM package
 	ros::Subscriber slamMapSubscriber;
 
-	/// Broadcaster for the map transform
-	tf::TransformBroadcaster br;
-
 	/// The aligning algorithm
 	aligning::AlignerPtr aligner;
 

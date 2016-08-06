@@ -22,10 +22,8 @@ namespace base_link {
 
 /**
  * # BaseLinkPublisher
- * Publishes a base link on a regular basis using the current filtered alignment.
- *
- * ## Published Topics
- * - __/known_map_localization/base_link__: The current base link.
+ * Publishes a base link and the map transform on a regular basis using the current filtered alignment.
+
  */
 class BaseLinkPublisher {
 public:

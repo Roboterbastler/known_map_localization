@@ -10,6 +10,16 @@
 namespace known_map_localization {
 namespace alignment {
 
+StampedAlignment::StampedAlignment(const Alignment &e) {
+	from = e.from;
+	to = e.to;
+	scale = e.scale;
+	theta = e.theta;
+	x = e.x;
+	y = e.y;
+	stamp = ros::Time::now();
+}
+
 tf::StampedTransform StampedAlignment::toTfStampedTransform() const {
 	return tf::StampedTransform(toTfTransform(), stamp, from, to);
 }
