@@ -22,10 +22,10 @@ namespace base_link {
 
 class BaseLinkPublisher {
 public:
-	BaseLinkPublisher(filter::FilterConstPtr filter, ros::Duration duration);
+	BaseLinkPublisher(filter::FilterConstPtr filter, ros::WallDuration duration);
 
 private:
-	void updateBaseLink(const ros::TimerEvent& event);
+	void updateBaseLink(const ros::WallTimerEvent& event);
 
 	filter::FilterConstPtr filter;
 

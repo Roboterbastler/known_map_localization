@@ -5,7 +5,7 @@
  *      Author: jacob
  */
 
-#include "MapPreprocessor.h"
+#include <preprocessing/MapPreprocessor.h>
 
 #include <cv_bridge/cv_bridge.h>
 #include <mapstitch/utils.h>
@@ -22,6 +22,9 @@ MapPreprocessor::MapPreprocessor(std::string topicName, std::string paramName) :
 				1, true);
 		nh.getParam(paramName, enabled);
 	}
+}
+
+MapPreprocessor::~MapPreprocessor() {
 }
 
 bool MapPreprocessor::process(nav_msgs::OccupancyGridPtr map) {
@@ -47,15 +50,15 @@ cv::Mat MapPreprocessor::matFromOccupancyGrid(
 
 nav_msgs::OccupancyGridPtr MapPreprocessor::occupancyGridFromMat(
 		const cv::Mat &img) {
-	return cvMatToOccupancyGrid(&img);
+	return boost::make_shared<nav_msgs::OccupancyGrid>(cvMatToOccupancyGrid(&img));
 }
 
 void MapPreprocessor::overwriteMapContent(nav_msgs::OccupancyGridPtr map,
 		const cv::Mat &content) {
-	nav_msgs::OccupancyGrid preprocessedMap = occupancyGridFromMat(content);
-	map->data = preprocessedMap.data;
-	map->info.width = preprocessedMap.info.width;
-	map->info.height = preprocessedMap.info.height;
+	nav_msgs::OccupancyGridConstPtr preprocessedMap = occupancyGridFromMat(content);
+	map->data = preprocessedMap->data;
+	map->info.width = preprocessedMap->info.width;
+	map->info.height = preprocessedMap->info.height;
 }
 
 void MapPreprocessor::publishResult(const cv::Mat &img) {

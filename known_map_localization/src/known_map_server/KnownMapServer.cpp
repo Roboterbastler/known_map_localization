@@ -10,9 +10,10 @@
 
 #include <nav_msgs/GetMap.h>
 #include <map_server/image_loader.h>
+#include <tf/transform_datatypes.h>
 
-#include "YAMLConversions.h"
-#include "KnownMapServer.h"
+#include <known_map_server/KnownMapServer.h>
+#include <known_map_server/YAMLConversions.h>
 
 namespace known_map_localization {
 namespace known_map_server {
@@ -34,6 +35,7 @@ KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr preprocessor) :
 		}
 
 		ROS_INFO("Preprocessing of known map...");
+		assert(knownMap);
 		preprocessor->process(knownMap);
 
 		knownMapPublisher.publish(knownMap);

@@ -5,19 +5,20 @@
  *      Author: jacob
  */
 
-#include "BaseLinkPublisher.h"
+#include <base_link/BaseLinkPublisher.h>
+#include <Exception.h>
 
 namespace known_map_localization {
 namespace base_link {
 
-BaseLinkPublisher::BaseLinkPublisher(filter::FilterConstPtr filter, ros::Duration duration) : filter(filter) {
+BaseLinkPublisher::BaseLinkPublisher(filter::FilterConstPtr filter, ros::WallDuration duration) : filter(filter) {
 	if(ros::isInitialized()) {
 		ros::NodeHandle nh;
-		timer = nh.createTimer(duration, &BaseLinkPublisher::updateBaseLink, this);
+		timer = nh.createWallTimer(duration, &BaseLinkPublisher::updateBaseLink, this);
 	}
 }
 
-void BaseLinkPublisher::updateBaseLink(const ros::TimerEvent& event) {
+void BaseLinkPublisher::updateBaseLink(const ros::WallTimerEvent& event) {
 	// request /orb_slam/map to /orb_slam/base_link
 	// scale it
 	// transform.inverse() + scaled ORB base link
@@ -26,7 +27,7 @@ void BaseLinkPublisher::updateBaseLink(const ros::TimerEvent& event) {
 	alignment::Alignment alignment;
 	try {
 		alignment = filter->getAlignment();
-	} catch(filter::AlignmentNotAvailable &e) {
+	} catch(AlignmentNotAvailable &e) {
 		return;
 	}
 

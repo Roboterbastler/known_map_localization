@@ -5,13 +5,16 @@
  *      Author: jacob
  */
 
-#include "Filter.h"
+#include <filter/Filter.h>
+#include <Exception.h>
 
 namespace known_map_localization {
 namespace filter {
 
 Filter::Filter() : ready(false) {
+}
 
+Filter::~Filter() {
 }
 
 const alignment::Alignment& Filter::getAlignment() const {

@@ -11,7 +11,9 @@
 namespace known_map_localization {
 
 typedef enum {
-	MAPMERGE = 0
+	MAPSTITCH = 0,
+	MAPMERGE = 1,
+	CSMERGE = 2
 } Algorithm;
 
 }

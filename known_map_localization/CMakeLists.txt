@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   mapstitch
   geographic_msgs
+  map_server
 )
 
 ## System dependencies are found with CMake's conventions
@@ -142,11 +143,14 @@ add_library(algorithm_selection
 )
 add_library(aligning
   src/aligning/Aligner.cpp
+  src/aligning/MapstitchAligner.cpp
 )
 add_library(preprocessing
   src/preprocessing/MapPreprocessor.cpp
   src/preprocessing/KnownMapPreprocessor.cpp
   src/preprocessing/SlamMapPreprocessor.cpp
+  src/preprocessing/MapstitchKnownMapPreprocessor.cpp
+  src/preprocessing/MapstitchSlamMapPreprocessor.cpp
 )
 add_library(known_map_server
   src/known_map_server/KnownMapServer.cpp
@@ -157,6 +161,10 @@ add_library(alignment
 )
 add_library(filter
   src/filter/Filter.cpp
+  src/filter/PassThroughFilter.cpp
+)
+add_library(base_link
+  src/base_link/BaseLinkPublisher.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -164,11 +172,18 @@ add_library(filter
 ## either from message generation or dynamic reconfigure
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(known_map_localization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(algorithm_selection ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(aligning ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(preprocessing ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(known_map_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(alignment ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(filter ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(base_link ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/known_map_localization_node.cpp)
+add_executable(known_map_localization_node src/known_map_localization_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -178,14 +193,21 @@ add_dependencies(known_map_localization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${ca
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(known_map_localization_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(known_map_localization_node
+  known_map_localization
+  ${catkin_LIBRARIES}
+)
 target_link_libraries(known_map_localization
   algorithm_selection
+  known_map_server
+  filter
+  base_link
   ${catkin_LIBRARIES}
 )
 target_link_libraries(algorithm_selection
@@ -211,6 +233,10 @@ target_link_libraries(alignment
 )
 target_link_libraries(filter
   alignment
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(base_link
+  filter
   ${catkin_LIBRARIES}
 )
 
@@ -254,10 +280,15 @@ target_link_libraries(filter
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_known_map_localization.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+catkin_add_gtest(${PROJECT_NAME}-test
+  test/test.cpp
+  test/filter_test.cpp
+)
+if(TARGET ${PROJECT_NAME}-test)
+  target_link_libraries(${PROJECT_NAME}-test
+    filter
+  )
+endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

@@ -19,6 +19,8 @@ class StampedAlignment: public Alignment {
 public:
 	tf::StampedTransform toTfStampedTransform() const;
 
+	static StampedAlignment getIdentity();
+
 	ros::Time stamp;
 };
 

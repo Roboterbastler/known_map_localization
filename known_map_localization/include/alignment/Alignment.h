@@ -26,6 +26,8 @@ public:
 
 	std::string from;
 	std::string to;
+
+	static Alignment getIdentity();
 };
 
 } /* namespace alignment */

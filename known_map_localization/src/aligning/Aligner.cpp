@@ -5,10 +5,13 @@
  *      Author: jacob
  */
 
-#include "Aligner.h"
+#include <aligning/Aligner.h>
 
 namespace known_map_localization {
 namespace aligning {
+
+Aligner::~Aligner() {
+}
 
 } /* namespace aligning */
 } /* namespace known_map_localization */

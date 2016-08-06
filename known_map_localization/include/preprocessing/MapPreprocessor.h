@@ -11,6 +11,7 @@
 #include <string>
 
 #include <boost/shared_ptr.hpp>
+#include <opencv2/opencv.hpp>
 
 #include <ros/ros.h>
 #include <nav_msgs/OccupancyGrid.h>

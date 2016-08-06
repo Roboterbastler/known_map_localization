@@ -8,10 +8,10 @@
 #ifndef KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWNMAPLOCALIZATION_H_
 #define KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWNMAPLOCALIZATION_H_
 
-#include "AlgorithmSelector.h"
-#include "known_map_server/KnownMapServer.h"
-#include "filter/Filter.h"
-#include "base_link/BaseLinkPublisher.h"
+#include <AlgorithmSelector.h>
+#include <known_map_server/KnownMapServer.h>
+#include <filter/Filter.h>
+#include <base_link/BaseLinkPublisher.h>
 
 namespace known_map_localization {
 

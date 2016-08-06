@@ -5,7 +5,7 @@
  *      Author: jacob
  */
 
-#include "KnownMapPreprocessor.h"
+#include <preprocessing/KnownMapPreprocessor.h>
 
 namespace known_map_localization {
 namespace preprocessing {

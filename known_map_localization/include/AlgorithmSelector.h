@@ -10,23 +10,31 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "Algorithms.h"
-#include "aligning/Aligner.h"
-#include "preprocessing/KnownMapPreprocessor.h"
-#include "preprocessing/SlamMapPreprocessor.h"
+#include <Algorithms.h>
+#include <aligning/Aligner.h>
+#include <preprocessing/KnownMapPreprocessor.h>
+#include <preprocessing/SlamMapPreprocessor.h>
 
 namespace known_map_localization {
 
 class AlgorithmSelector {
 public:
+	/**
+	 * @throw ros::InvalidNameException
+	 */
 	AlgorithmSelector();
 
-	preprocessing::SlamMapPreprocessorPtr getSlamMapPreprocessor();
-	preprocessing::KnownMapPreprocessorPtr getKnownMapPreprocessor();
-	aligning::AlignerPtr getAligner();
+	preprocessing::SlamMapPreprocessorPtr getSlamMapPreprocessor() const;
+	preprocessing::KnownMapPreprocessorPtr getKnownMapPreprocessor() const;
+	aligning::AlignerPtr getAligner() const;
 
 private:
-	void selectAlgorithms(Algorithm algorithm);
+	/**
+	 * Evaluates the algorithm name string and returns the corresponding enum value.
+	 * @param algorithm The name of the algorithm
+	 * @return The corresponding enum value
+	 */
+	static Algorithm getAlgorithm(std::string algorithm);
 
 private:
 	preprocessing::SlamMapPreprocessorPtr slamMapPreprocessor;

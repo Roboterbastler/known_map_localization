@@ -5,7 +5,7 @@
  *      Author: jacob
  */
 
-#include "SlamMapPreprocessor.h"
+#include <preprocessing/SlamMapPreprocessor.h>
 
 namespace known_map_localization {
 namespace preprocessing {
