@@ -20,18 +20,39 @@
 namespace known_map_localization {
 namespace base_link {
 
+/**
+ * # BaseLinkPublisher
+ * Publishes a base link on a regular basis using the current filtered alignment.
+ *
+ * ## Published Topics
+ * - __/known_map_localization/base_link__: The current base link.
+ */
 class BaseLinkPublisher {
 public:
+	/**
+	 * Creates the base link publisher.
+	 * @param filter The filter where the filtered alignment will be fetched
+	 * @param duration The duration between two publications of base links
+	 */
 	BaseLinkPublisher(filter::FilterConstPtr filter, ros::WallDuration duration);
 
 private:
+	/**
+	 * Is called by a ROS WallTimer to update and publish the base link.
+	 * @param event The WallTimer event
+	 */
 	void updateBaseLink(const ros::WallTimerEvent& event);
 
+	/// Holds the filter
 	filter::FilterConstPtr filter;
 
+	/// The ROS timer causing regular updates
 	ros::WallTimer timer;
 
+	/// Broadcaster for the base link transform
 	tf::TransformBroadcaster broadcaster;
+
+	/// Listens to tf messages to get the **ORB_base_link** transformation
 	tf::TransformListener listener;
 };
 
