@@ -21,6 +21,7 @@ namespace alignment {
  */
 class StampedAlignment: public Alignment {
 public:
+	StampedAlignment();
 	StampedAlignment(const Alignment &a);
 
 	/**

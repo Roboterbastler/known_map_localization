@@ -10,6 +10,9 @@
 namespace known_map_localization {
 namespace alignment {
 
+StampedAlignment::StampedAlignment() {
+}
+
 StampedAlignment::StampedAlignment(const Alignment &e) {
 	from = e.from;
 	to = e.to;
