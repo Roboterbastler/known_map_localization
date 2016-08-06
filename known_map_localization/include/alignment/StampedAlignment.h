@@ -15,12 +15,26 @@
 namespace known_map_localization {
 namespace alignment {
 
+/**
+ * # StampedAlignment
+ * Extends the Alignment with a time stamp.
+ */
 class StampedAlignment: public Alignment {
 public:
+	/**
+	 * Converts the alignment to a stamped tf transform.
+	 * @note The scale factor is omitted when converting!
+	 * @return The stamped tf transform
+	 */
 	tf::StampedTransform toTfStampedTransform() const;
 
+	/**
+	 * Get an alignment without any transformation.
+	 * @return The identity alignment
+	 */
 	static StampedAlignment getIdentity();
 
+	/// The ROS time stamp of the alignment
 	ros::Time stamp;
 };
 

@@ -283,6 +283,7 @@ target_link_libraries(base_link
 catkin_add_gtest(${PROJECT_NAME}-test
   test/test.cpp
   test/filter_test.cpp
+  test/alignment_test.cpp
 )
 if(TARGET ${PROJECT_NAME}-test)
   target_link_libraries(${PROJECT_NAME}-test
