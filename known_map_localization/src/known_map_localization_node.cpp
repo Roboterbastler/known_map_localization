@@ -12,9 +12,11 @@ int main(int argc, char **argv) {
 	// Initialize the ROS system
 	ros::init(argc, argv, "known_map_localization");
 
+	ROS_INFO_STREAM("---------- Known Map Localization initialization started...");
+
 	known_map_localization::KnownMapLocalization kml;
 
-	ROS_INFO_STREAM("Known Map Localization started...");
+	ROS_INFO_STREAM("---------- Known Map Localization initialization finished.");
 
 	ros::spin();
 }

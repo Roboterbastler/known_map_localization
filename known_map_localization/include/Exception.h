@@ -32,6 +32,26 @@ public:
 	AlgorithmNotSpecified(std::string msg) : KnownMapLocalizationException(msg) {};
 };
 
+class AlignerException : public KnownMapLocalizationException {
+public:
+	AlignerException(std::string msg) : KnownMapLocalizationException(msg) {};
+};
+
+class AlignerMissingParameter : public AlignerException {
+public:
+	AlignerMissingParameter(std::string msg) : AlignerException(msg) {};
+};
+
+class AlignerInternalError : public AlignerException {
+public:
+	AlignerInternalError(std::string msg) : AlignerException(msg) {};
+};
+
+class AlignerFailed : public AlignerException {
+public:
+	AlignerFailed(std::string msg) : AlignerException(msg) {};
+};
+
 } /* namespace known_map_localization */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_EXCEPTION_H_ */

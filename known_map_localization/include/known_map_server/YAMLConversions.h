@@ -14,6 +14,9 @@
 
 namespace YAML {
 template<>
+/**
+ * Define YAML encoding and decoding for the GeoPose data structure.
+ */
 struct convert<geographic_msgs::GeoPose> {
 	static Node encode(const geographic_msgs::GeoPose& gp) {
 		Node node, position, orientation;

@@ -6,6 +6,7 @@ project(known_map_localization)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  roslib
   cv_bridge
   nav_msgs
   mapstitch
@@ -166,6 +167,9 @@ add_library(filter
 add_library(base_link
   src/base_link/BaseLinkPublisher.cpp
 )
+add_library(visualization
+  src/visualization/VisualizationSlamMapPublisher.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -179,6 +183,7 @@ add_dependencies(known_map_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_E
 add_dependencies(alignment ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(filter ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(base_link ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(visualization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -208,6 +213,7 @@ target_link_libraries(known_map_localization
   known_map_server
   filter
   base_link
+  visualization
   ${catkin_LIBRARIES}
 )
 target_link_libraries(algorithm_selection
@@ -237,6 +243,11 @@ target_link_libraries(filter
 )
 target_link_libraries(base_link
   filter
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(visualization
+  filter
+  alignment
   ${catkin_LIBRARIES}
 )
 

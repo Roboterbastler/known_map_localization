@@ -14,10 +14,10 @@
 namespace known_map_localization {
 
 AlgorithmSelector::AlgorithmSelector() {
+	ros::NodeHandle nh("~");
 	std::string algorithm;
-	try {
-		ros::NodeHandle().getParam("algorithm", algorithm);
-	} catch(ros::InvalidNameException &e) {
+
+	if(!nh.getParam("algorithm", algorithm)) {
 		throw AlgorithmNotSpecified("Algorithm parameter is missing");
 	}
 
@@ -41,8 +41,12 @@ AlgorithmSelector::AlgorithmSelector() {
 Algorithm AlgorithmSelector::getAlgorithm(std::string algorithm) {
 	if(algorithm == "mapstitch") {
 		return MAPSTITCH;
+	} if(algorithm == "mapmerge") {
+		return MAPMERGE;
+	} if(algorithm == "csmerge") {
+		return CSMERGE;
 	} else {
-		throw IllegalAlgorithm("Invalid algorithm name: " + algorithm);
+		throw IllegalAlgorithm("Invalid algorithm name: '" + algorithm + "'");
 	}
 }
 

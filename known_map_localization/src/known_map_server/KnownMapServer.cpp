@@ -8,6 +8,7 @@
 #include <libgen.h>
 #include <yaml-cpp/yaml.h>
 
+#include <ros/package.h>
 #include <nav_msgs/GetMap.h>
 #include <map_server/image_loader.h>
 #include <tf/transform_datatypes.h>
@@ -21,25 +22,25 @@ using namespace preprocessing;
 
 KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr preprocessor) :
 		preprocessor(preprocessor) {
-	if(ros::isInitialized()) {
-		ros::NodeHandle nh;
-		knownMapPublisher = nh.advertise<nav_msgs::OccupancyGrid>("known_map", 4, true);
+	ros::NodeHandle nh("~");
+	knownMapPublisher = nh.advertise<nav_msgs::OccupancyGrid>("visualization_known_map", 10, true);
 
-		std::string fileName;
-		nh.getParam("known_map_config_file", fileName);
+	std::string fileName;
+	nh.getParam("known_map_config_file", fileName);
+	fileName = ros::package::getPath("known_map_localization") + '/' + fileName;
 
-		ROS_INFO("Load known map...");
-		if(!loadKnownMap(fileName)) {
-			ROS_ERROR("Known map could not be loaded. It will not be published at all.");
-			return;
-		}
-
-		ROS_INFO("Preprocessing of known map...");
-		assert(knownMap);
-		preprocessor->process(knownMap);
-
-		knownMapPublisher.publish(knownMap);
+	ROS_INFO("Load known map...");
+	if(!loadKnownMap(fileName)) {
+		ROS_FATAL("Known map could not be loaded.");
+		ros::shutdown();
+		return;
 	}
+
+	ROS_INFO("Preprocessing of known map...");
+	assert(knownMap);
+	preprocessor->process(knownMap);
+
+	knownMapPublisher.publish(knownMap);
 }
 
 bool KnownMapServer::loadKnownMap(std::string fileName) {
@@ -47,7 +48,7 @@ bool KnownMapServer::loadKnownMap(std::string fileName) {
 	try {
 		mapMetaData = YAML::LoadFile(fileName);
 	} catch (YAML::BadFile &bf) {
-		ROS_ERROR_STREAM("Bad YAML file, could not load map meta data! " << bf.what());
+		ROS_ERROR_STREAM("Bad YAML file, could not load map meta data! File name: " << fileName << " Description: " << bf.what());
 		return false;
 	}
 
@@ -95,7 +96,7 @@ bool KnownMapServer::loadKnownMap(std::string fileName) {
 	}
 
 	*knownMap = mapResp.map;
-	ros::NodeHandle().getParam("known_map_frame_id", knownMap->header.frame_id);
+	ros::NodeHandle("~").getParam("known_map_frame_id", knownMap->header.frame_id);
 	knownMap->info.origin.orientation = tf::createQuaternionMsgFromYaw(yaw);
 
 	return true;
@@ -106,6 +107,16 @@ std::string KnownMapServer::absoluteMapFileName(std::string mapFileName, std::st
 	std::string absMapFileName = std::string(dirname(configFileNameCopy)) + '/' + mapFileName;
 	free(configFileNameCopy);
 	return absMapFileName;
+}
+
+nav_msgs::OccupancyGridConstPtr KnownMapServer::getKnownMap() const {
+	assert(knownMap);
+	return knownMap;
+}
+
+geographic_msgs::GeoPoseConstPtr KnownMapServer::getAnchor() const {
+	assert(knownMapAnchor);
+	return knownMapAnchor;
 }
 
 } /* namespace known_map_server */

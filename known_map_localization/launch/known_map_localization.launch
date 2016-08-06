@@ -1,21 +1,11 @@
 <launch>
 	<group ns="known_map_localization">
 		<!-- The main localization node -->
-		<node pkg="known_map_localization" type="known_map_localization_node" name="localization_node" output="screen">
-			<remap from="slam_map" to="/orb_slam/projected_map" />
-			<param name="align_service_name" value="map_alignment/align" />
-			<param name="slam_preprocessing_enabled" value="false" />
-			<param name="algorithm" value="mapstitch" />
+		<node pkg="known_map_localization" type="known_map_localization_node" name="localization_node" output="screen" required="true">
+			<remap from="localization_node/slam_map" to="/orb_slam/projected_map" />
+			<rosparam command="load" file="$(find known_map_localization)/launch/mapstitch.yaml" />
 		</node>
 		
 		<!-- The alignment node -->
-		<node pkg="map_alignment" type="map_alignment_node" name="alignment_node" ns="map_alignment">
-			<param name="orb_matching_max_pairwise_dist" value="5.0" />
-		</node>
-		
-		<!-- Known map server -->
-		<node pkg="known_map_localization" type="known_map_server_node" name="known_map_server">
-			<param name="file_name" type="string" value="$(find map_alignment)/test/data/known_map.yaml" />
-		</node>
 	</group>
 </launch>

@@ -16,7 +16,7 @@ namespace preprocessing {
 MapPreprocessor::MapPreprocessor(std::string topicName, std::string paramName) :
 		enabled(false) {
 	if (ros::isInitialized()) {
-		ros::NodeHandle nh;
+		ros::NodeHandle nh("~");
 
 		preprocessedMapPublisher = nh.advertise<sensor_msgs::Image>(topicName,
 				1, true);

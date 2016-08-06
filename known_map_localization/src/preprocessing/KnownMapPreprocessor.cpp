@@ -11,7 +11,7 @@ namespace known_map_localization {
 namespace preprocessing {
 
 KnownMapPreprocessor::KnownMapPreprocessor() :
-		MapPreprocessor("preprocessed_known_map", "known_preprocessing_enabled") {
+		MapPreprocessor("processed_known_map", "known_preprocessing_enabled") {
 
 }
 
