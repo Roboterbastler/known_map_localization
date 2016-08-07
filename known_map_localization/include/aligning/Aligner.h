@@ -19,6 +19,12 @@ class Aligner {
 public:
 	virtual ~Aligner();
 
+	/**
+	 *Aligns the two maps and returns an alignment.
+	 * @param knownMap The known map
+	 * @param slamMap The SLAM map
+	 * @return The alignment
+	 */
 	virtual alignment::StampedAlignment align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) = 0;
 };
 
