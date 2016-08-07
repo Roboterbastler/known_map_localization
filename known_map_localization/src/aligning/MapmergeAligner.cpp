@@ -34,7 +34,8 @@ HypothesesVect MapmergeAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, 
 	unsigned int mapWidth = std::max(knownMap->info.width, slamMap->info.width);
 	unsigned int mapHeight = std::max(knownMap->info.height, slamMap->info.height);
 
-	mapmerge::grid_map knownGrid, slamGrid;
+	mapmerge::grid_map knownGrid(mapHeight, mapWidth);
+	mapmerge::grid_map slamGrid(mapHeight, mapWidth);
 	copyOccupancyGridToGridMap(knownMap, knownGrid);
 	copyOccupancyGridToGridMap(slamMap, slamGrid);
 

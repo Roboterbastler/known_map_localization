@@ -38,6 +38,7 @@ AlgorithmSelector::AlgorithmSelector() {
 		slamMapPreprocessor = SlamMapPreprocessorPtr(new MapmergeSlamMapPreprocessor());
 		knownMapPreprocessor = KnownMapPreprocessorPtr(new MapmergeKnownMapPreprocessor());
 		aligner = aligning::AlignerPtr(new aligning::MapmergeAligner());
+		break;
 	case CSMERGE:
 	default:
 		throw IllegalAlgorithm("Invalid algorithm");
