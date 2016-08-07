@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   nav_msgs
   mapstitch
+  mapmerge
   geographic_msgs
   map_server
 )
@@ -145,6 +146,7 @@ add_library(algorithm_selection
 add_library(aligning
   src/aligning/Aligner.cpp
   src/aligning/MapstitchAligner.cpp
+  src/aligning/MapmergeAligner.cpp
 )
 add_library(preprocessing
   src/preprocessing/MapPreprocessor.cpp
