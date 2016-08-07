@@ -16,7 +16,7 @@
 namespace known_map_localization {
 namespace aligning {
 
-alignment::StampedAlignment MapstitchAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) {
+alignment::HypothesesVect MapstitchAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) {
 	ros::NodeHandle nh("~");
 
 	float max_pairwise_distance;
@@ -115,7 +115,9 @@ alignment::StampedAlignment MapstitchAligner::align(nav_msgs::OccupancyGridConst
 
 	ROS_INFO("Successfully completed aligning in %f sec", duration.toSec());
 
-	return alignment;
+	// No score available, so all are scored 0
+	alignment::HypothesesVect hypotheses(1, alignment::Hypothesis(alignment));
+	return hypotheses;
 }
 
 tf::Transform MapstitchAligner::getOriginTransform(nav_msgs::OccupancyGridConstPtr map) {

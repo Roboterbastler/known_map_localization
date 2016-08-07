@@ -7,7 +7,7 @@
 
 #include <KnownMapLocalization.h>
 #include <filter/PassThroughFilter.h>
-#include <alignment/StampedAlignment.h>
+#include <alignment/Hypothesis.h>
 #include <Utils.h>
 #include <Exception.h>
 
@@ -39,18 +39,23 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 	slamMapPreprocessor->process(slamMapFixed);
 
 	try {
-		// compute alignment
-		StampedAlignment alignment = aligner->align(knownMapServer->getKnownMap(), slamMapFixed);
+		// compute hypotheses (alignments)
+		HypothesesVect hypotheses = aligner->align(knownMapServer->getKnownMap(), slamMapFixed);
 
-		ROS_INFO("New Alignment: Transform from %s to %s [x=%f, y=%f, theta=%f, scale=%f]",
-					alignment.from.c_str(),
-					alignment.to.c_str(),
-					alignment.x,
-					alignment.y,
-					radToDeg(alignment.theta),
-					alignment.scale);
+		ROS_INFO("Got %ld new hypotheses.", hypotheses.size());
 
-		filter->addAlignment(alignment);
+		for(HypothesesVect::const_iterator it = hypotheses.begin(); it != hypotheses.end(); ++it) {
+			ROS_INFO("  - Transform from %s to %s [x=%f, y=%f, theta=%f, scale=%f]. Score = %f",
+					it->from.c_str(),
+					it->to.c_str(),
+					it->x,
+					it->y,
+					radToDeg(it->theta),
+					it->scale,
+					it->score);
+		}
+
+		filter->addHypotheses(hypotheses);
 	} catch(AlignerInternalError &e) {
 		ROS_WARN_STREAM("Internal aligner error: " << e.what());
 	} catch(AlignerFailed &e) {

@@ -11,7 +11,7 @@
 #include <vector>
 #include <exception>
 
-#include "alignment/StampedAlignment.h"
+#include "alignment/Hypothesis.h"
 
 namespace known_map_localization {
 namespace filter {
@@ -25,11 +25,11 @@ public:
 	virtual ~Filter();
 
 	/**
-	 * Add a new alignment and update the filtered alignment accordingly.
+	 * Add new hypotheses and update the filtered alignment accordingly.
 	 * Multiple possible implementations are given by subclasses of Filter.
-	 * @param alignment The new alignment
+	 * @param hypotheses New hypotheses
 	 */
-	virtual void addAlignment(alignment::StampedAlignment alignment) = 0;
+	virtual void addHypotheses(const alignment::HypothesesVect &hypotheses) = 0;
 
 	/**
 	 * Get the filtered alignment, if available. If it isn't available, an exception is thrown.
@@ -38,10 +38,13 @@ public:
 	 */
 	const alignment::Alignment& getAlignment() const;
 
-protected:
-	/// list of cached alignments used for filtering
-	std::vector<alignment::StampedAlignment> alignments;
+	/**
+	 * Check if the filtered alignment is available.
+	 * @return State of the filtered alignment
+	 */
+	bool isAvailable() const;
 
+protected:
 	/// the current filtered alignment
 	alignment::Alignment filteredAlignment;
 

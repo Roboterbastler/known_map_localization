@@ -24,5 +24,9 @@ const alignment::Alignment& Filter::getAlignment() const {
 	return filteredAlignment;
 }
 
+bool Filter::isAvailable() const {
+	return ready;
+}
+
 } /* namespace filter */
 } /* namespace known_map_localization */

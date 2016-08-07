@@ -10,6 +10,10 @@
 namespace known_map_localization {
 namespace alignment {
 
+Alignment::Alignment() :
+		scale(1), theta(0), x(0), y(0), from(""), to("") {
+}
+
 tf::Transform Alignment::toTfTransform() const {
 	tf::Quaternion q;
 	q.setRPY(0, 0, theta);
@@ -17,14 +21,7 @@ tf::Transform Alignment::toTfTransform() const {
 }
 
 Alignment Alignment::getIdentity() {
-	Alignment a;
-	a.from = "";
-	a.to = "";
-	a.scale = 1.;
-	a.theta = 0.;
-	a.x = 0.;
-	a.y = 0.;
-	return a;
+	return Alignment();
 }
 
 } /* namespace alignment */

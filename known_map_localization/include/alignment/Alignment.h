@@ -9,6 +9,7 @@
 #define KNOWN_MAP_LOCALIZATION_INCLUDE_ALIGNMENT_ALIGNMENT_H_
 
 #include <string>
+#include <vector>
 
 #include <tf/transform_datatypes.h>
 
@@ -21,6 +22,8 @@ namespace alignment {
  */
 class Alignment {
 public:
+	Alignment();
+
 	/**
 	 * Converts the alignment to a tf transform.
 	 * @note The scale factor is omitted when converting!

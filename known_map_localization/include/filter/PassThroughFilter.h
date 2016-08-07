@@ -21,10 +21,10 @@ namespace filter {
 class PassThroughFilter: public Filter {
 public:
 	/**
-	 * Update the filtered alignment by simply overwriting it with the new one.
+	 * Update the filtered alignment by simply overwriting it with the first new hypothesis.
 	 * @param alignment The new alignment
 	 */
-	void addAlignment(alignment::StampedAlignment alignment);
+	void addHypotheses(const alignment::HypothesesVect &hypotheses);
 };
 
 } /* namespace filter */

@@ -7,14 +7,22 @@
 
 #include <gtest/gtest.h>
 
+#include <ros/ros.h>
+
 #include <alignment/Alignment.h>
 #include <alignment/StampedAlignment.h>
 
 using namespace known_map_localization;
-using namespace alignment;
+
+class StampedAlignment : public ::testing::Test {
+protected:
+	static void SetUpTestCase() {
+		ros::Time::init();
+	}
+};
 
 TEST(Alignment, givesCorrectIdentity) {
-	Alignment a = Alignment::getIdentity();
+	alignment::Alignment a = alignment::Alignment::getIdentity();
 
 	ASSERT_EQ(0., a.theta);
 	ASSERT_EQ(0., a.x);
@@ -23,7 +31,7 @@ TEST(Alignment, givesCorrectIdentity) {
 }
 
 TEST(Alignment, convertsToCorrectTfTransform) {
-	Alignment id = Alignment::getIdentity();
+	alignment::Alignment id = alignment::Alignment::getIdentity();
 	tf::Transform tfId = id.toTfTransform();
 
 	ASSERT_FLOAT_EQ(0., tfId.getOrigin().getX());
@@ -34,7 +42,7 @@ TEST(Alignment, convertsToCorrectTfTransform) {
 	ASSERT_FLOAT_EQ(0., tfId.getRotation().getZ());
 	ASSERT_FLOAT_EQ(1., tfId.getRotation().getW());
 
-	Alignment b;
+	alignment::Alignment b;
 	b.scale = 1.25;
 	b.theta = M_PI / 2;
 	b.x = 5.;
@@ -53,8 +61,8 @@ TEST(Alignment, convertsToCorrectTfTransform) {
 	ASSERT_FLOAT_EQ(q.getW(), tfId.getRotation().getW());
 }
 
-TEST(StampedAlignment, givesCorrectIdentity) {
-	StampedAlignment a = StampedAlignment::getIdentity();
+TEST_F(StampedAlignment, givesCorrectIdentity) {
+	alignment::StampedAlignment a = alignment::StampedAlignment::getIdentity();
 
 	ASSERT_EQ(0., a.theta);
 	ASSERT_EQ(0., a.x);

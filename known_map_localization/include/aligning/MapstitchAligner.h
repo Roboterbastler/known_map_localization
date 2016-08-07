@@ -15,7 +15,7 @@ namespace aligning {
 
 class MapstitchAligner : public Aligner {
 public:
-	alignment::StampedAlignment align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap);
+	alignment::HypothesesVect align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap);
 
 protected:
 	static tf::Transform getOriginTransform(nav_msgs::OccupancyGridConstPtr map);

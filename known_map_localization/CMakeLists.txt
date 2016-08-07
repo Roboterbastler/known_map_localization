@@ -159,6 +159,7 @@ add_library(known_map_server
 add_library(alignment
   src/alignment/Alignment.cpp
   src/alignment/StampedAlignment.cpp
+  src/alignment/Hypothesis.cpp
 )
 add_library(filter
   src/filter/Filter.cpp

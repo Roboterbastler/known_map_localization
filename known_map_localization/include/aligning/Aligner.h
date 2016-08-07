@@ -10,7 +10,7 @@
 
 #include <nav_msgs/OccupancyGrid.h>
 
-#include "alignment/StampedAlignment.h"
+#include "alignment/Hypothesis.h"
 
 namespace known_map_localization {
 namespace aligning {
@@ -23,9 +23,10 @@ public:
 	 *Aligns the two maps and returns an alignment.
 	 * @param knownMap The known map
 	 * @param slamMap The SLAM map
-	 * @return The alignment
+	 * @return A vector of hypotheses, with some aligning algorithms
+	 * it just contains one hypothesis (the alignment)
 	 */
-	virtual alignment::StampedAlignment align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) = 0;
+	virtual alignment::HypothesesVect align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) = 0;
 };
 
 typedef boost::shared_ptr<Aligner> AlignerPtr;

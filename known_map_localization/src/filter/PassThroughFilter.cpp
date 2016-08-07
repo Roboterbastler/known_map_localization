@@ -10,8 +10,12 @@
 namespace known_map_localization {
 namespace filter {
 
-void PassThroughFilter::addAlignment(alignment::StampedAlignment alignment) {
-	filteredAlignment = alignment;
+void PassThroughFilter::addHypotheses(const alignment::HypothesesVect &hypotheses) {
+	if(hypotheses.empty()) {
+		return;
+	}
+
+	filteredAlignment = *(hypotheses.begin());
 	ready = true;
 }
 

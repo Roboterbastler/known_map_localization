@@ -12,28 +12,40 @@
 #include <filter/PassThroughFilter.h>
 
 using namespace known_map_localization;
-using namespace filter;
+
+class PassThroughFilter : public ::testing::Test {
+protected:
+	static void SetUpTestCase() {
+		ros::Time::init();
+	}
+};
 
 TEST(Filter, isNotReadyAtBeginning) {
-	FilterPtr filter(new PassThroughFilter());
+	filter::FilterPtr filter(new filter::PassThroughFilter());
 
 	ASSERT_THROW(filter->getAlignment(), AlignmentNotAvailable);
 }
 
-TEST(PassThroughFilter, isReadyAfterAdding) {
-	FilterPtr filter(new PassThroughFilter());
+TEST_F(PassThroughFilter, isReadyAfterAdding) {
+	filter::FilterPtr filter(new filter::PassThroughFilter());
 
-	filter->addAlignment(alignment::StampedAlignment());
+	filter->addHypotheses(alignment::HypothesesVect(1, alignment::StampedAlignment()));
 
 	ASSERT_NO_THROW(filter->getAlignment());
 }
 
-TEST(PassThroughFilter, passesAlignment) {
-	FilterPtr filter(new PassThroughFilter());
+TEST_F(PassThroughFilter, passesAlignment) {
+	filter::FilterPtr filter(new filter::PassThroughFilter());
 
 	alignment::StampedAlignment alignment;
+	alignment.from = "origin_frame";
+	alignment.to = "target_frame";
+	alignment.theta = M_PI / 4;
+	alignment.scale = 0.87;
+	alignment.x = 141.9;
+	alignment.y = -32.4;
 
-	filter->addAlignment(alignment);
+	filter->addHypotheses(alignment::HypothesesVect(1, alignment));
 
 	alignment::Alignment filteredAlignment = filter->getAlignment();
 
