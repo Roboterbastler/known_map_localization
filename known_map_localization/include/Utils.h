@@ -17,7 +17,7 @@ namespace known_map_localization {
  * @param degrees Angle in degrees
  * @return Angle in radians
  */
-double degToRad(double degrees) {
+inline double degToRad(double degrees) {
 	return degrees * M_PI / 180.;
 }
 
@@ -26,7 +26,7 @@ double degToRad(double degrees) {
  * @param radians Angle in radians
  * @return Angle in degrees
  */
-double radToDeg(double radians) {
+inline double radToDeg(double radians) {
 	return radians * 180. / M_PI;
 }
 
@@ -35,7 +35,7 @@ double radToDeg(double radians) {
  * @param quaternion The quaternion
  * @return The yaw in radians
  */
-double quaternionToYawRad(const tf::Quaternion &quaternion) {
+inline double quaternionToYawRad(const tf::Quaternion &quaternion) {
 	double roll, pitch, yaw;
 	tf::Matrix3x3(quaternion).getRPY(roll, pitch, yaw);
 	return yaw;
@@ -46,7 +46,7 @@ double quaternionToYawRad(const tf::Quaternion &quaternion) {
  * @param quaternion The quaternion
  * @return The yaw in degrees
  */
-double quaternionToYawDegree(const tf::Quaternion &quaternion) {
+inline double quaternionToYawDegree(const tf::Quaternion &quaternion) {
 	return radToDeg(quaternionToYawRad(quaternion));
 }
 

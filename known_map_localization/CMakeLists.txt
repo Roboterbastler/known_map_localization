@@ -154,6 +154,8 @@ add_library(preprocessing
   src/preprocessing/SlamMapPreprocessor.cpp
   src/preprocessing/MapstitchKnownMapPreprocessor.cpp
   src/preprocessing/MapstitchSlamMapPreprocessor.cpp
+  src/preprocessing/MapmergeKnownMapPreprocessor.cpp
+  src/preprocessing/MapmergeSlamMapPreprocessor.cpp
 )
 add_library(known_map_server
   src/known_map_server/KnownMapServer.cpp

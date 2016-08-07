@@ -6,6 +6,7 @@
  */
 
 #include <ros/ros.h>
+#include <mapmerge/manipulatemap.h>
 
 #include <aligning/MapmergeAligner.h>
 #include <Utils.h>
@@ -79,8 +80,8 @@ void MapmergeAligner::copyOccupancyGridToGridMap(nav_msgs::OccupancyGridConstPtr
 	}
 
 	nav_msgs::OccupancyGrid::_data_type::const_iterator occCellIt = occGrid->data.begin();
-	std::vector<std::vector<unsigned int> >::const_iterator rowIt = gridMap.grid.begin();
-	std::vector<unsigned int>::const_iterator gridCellIt;
+	std::vector<std::vector<unsigned int> >::iterator rowIt = gridMap.grid.begin();
+	std::vector<unsigned int>::iterator gridCellIt;
 
 	for(int row = 0; row < occGrid->info.height; row++, ++rowIt) {
 		gridCellIt = rowIt->begin();

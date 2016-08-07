@@ -8,10 +8,15 @@
 #include <AlgorithmSelector.h>
 #include <Exception.h>
 #include <aligning/MapstitchAligner.h>
+#include <aligning/MapmergeAligner.h>
 #include <preprocessing/MapstitchSlamMapPreprocessor.h>
 #include <preprocessing/MapstitchKnownMapPreprocessor.h>
+#include <preprocessing/MapmergeSlamMapPreprocessor.h>
+#include <preprocessing/MapmergeKnownMapPreprocessor.h>
 
 namespace known_map_localization {
+
+using namespace preprocessing;
 
 AlgorithmSelector::AlgorithmSelector() {
 	ros::NodeHandle nh("~");
@@ -21,13 +26,18 @@ AlgorithmSelector::AlgorithmSelector() {
 		throw AlgorithmNotSpecified("Algorithm parameter is missing");
 	}
 
+	ROS_INFO("Selected algorithm: %s", algorithm.c_str());
+
 	switch(getAlgorithm(algorithm)) {
 	case MAPSTITCH:
-		slamMapPreprocessor = preprocessing::SlamMapPreprocessorPtr(new preprocessing::MapstitchSlamMapPreprocessor());
-		knownMapPreprocessor = preprocessing::KnownMapPreprocessorPtr(new preprocessing::MapstitchKnownMapPreprocessor());
+		slamMapPreprocessor = SlamMapPreprocessorPtr(new MapstitchSlamMapPreprocessor());
+		knownMapPreprocessor = KnownMapPreprocessorPtr(new MapstitchKnownMapPreprocessor());
 		aligner = aligning::AlignerPtr(new aligning::MapstitchAligner());
 		break;
 	case MAPMERGE:
+		slamMapPreprocessor = SlamMapPreprocessorPtr(new MapmergeSlamMapPreprocessor());
+		knownMapPreprocessor = KnownMapPreprocessorPtr(new MapmergeKnownMapPreprocessor());
+		aligner = aligning::AlignerPtr(new aligning::MapmergeAligner());
 	case CSMERGE:
 	default:
 		throw IllegalAlgorithm("Invalid algorithm");
