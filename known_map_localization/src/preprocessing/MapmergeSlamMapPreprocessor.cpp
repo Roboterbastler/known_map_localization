@@ -20,6 +20,8 @@ MapmergeSlamMapPreprocessor::MapmergeSlamMapPreprocessor() {
 }
 
 bool MapmergeSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData) {
+	//crop(img, mapMetaData);
+
 	// TODO: scale SLAM map
 	return true;
 }

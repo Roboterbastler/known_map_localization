@@ -40,7 +40,7 @@ void BaseLinkPublisher::updateBaseLink(const ros::WallTimerEvent& event) {
 	try {
 		listener.lookupTransform("orb_slam/map", "ORB_base_link", ros::Time(0), slamMapFrame_to_slamBaseLink);
 	} catch(tf::TransformException &e) {
-		ROS_WARN("Required tf data not available, base_link not published: %s", e.what());
+		//ROS_WARN("Required tf data not available, base_link not published: %s", e.what());
 		return;
 	}
 

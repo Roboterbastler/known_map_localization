@@ -1,6 +1,6 @@
 algorithm: mapmerge
-slam_preprocessing_enabled: true
-known_preprocessing_enabled: true
+slam_preprocessing_enabled: false
+known_preprocessing_enabled: false
 known_map_config_file: data/known_map.yaml
 known_map_frame_id: /known_map_localization/anchor
 slam_map_scale: 1.0

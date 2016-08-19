@@ -6,6 +6,9 @@
 			<rosparam command="load" file="$(find known_map_localization)/launch/mapmerge.yaml" />
 		</node>
 		
-		<!-- The alignment node -->
+		<!-- The aligning node -->
+		<node pkg="mrgs_alignment" type="align_node" name="mrgs_align_node" output="screen" required="true">
+			<remap from="align" to="~align" />
+		</node>
 	</group>
 </launch>

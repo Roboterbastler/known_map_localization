@@ -5,10 +5,13 @@
  *      Author: jacob
  */
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 #include <preprocessing/MapPreprocessor.h>
 
 #include <cv_bridge/cv_bridge.h>
 #include <mapstitch/utils.h>
+#include <tf/transform_datatypes.h>
 
 namespace known_map_localization {
 namespace preprocessing {
@@ -69,6 +72,29 @@ void MapPreprocessor::publishResult(const cv::Mat &img) {
 		intermediateResultImage.header.stamp = ros::Time::now();
 		preprocessedMapPublisher.publish(intermediateResultImage.toImageMsg());
 	}
+}
+
+void MapPreprocessor::crop(cv::Mat &img, nav_msgs::MapMetaData &map) {
+	cv::Mat points, mask;
+	cv::threshold(img, mask, 1, 255, cv::THRESH_BINARY_INV);
+	cv::findNonZero(mask, points);
+	cv::Rect boundingBox = cv::boundingRect(points);
+
+	// crop
+	img = img(boundingBox);
+
+	cv::Point2i offset(boundingBox.x, boundingBox.y);
+	updateMapOrigin(map, offset);
+}
+
+void MapPreprocessor::updateMapOrigin(nav_msgs::MapMetaData &map, cv::Point2i origin) {
+	tf::Pose offset(tf::Quaternion::getIdentity(), tf::Vector3(origin.x * map.resolution, origin.y * map.resolution, 0));
+
+	tf::Transform oldOrigin;
+	tf::poseMsgToTF(map.origin, oldOrigin);
+	tf::Transform newOrigin = oldOrigin * offset;
+
+	tf::poseTFToMsg(newOrigin, map.origin);
 }
 
 } /* namespace preprocessing */

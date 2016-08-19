@@ -64,6 +64,9 @@
   
   <build_depend>mapmerge</build_depend>
   <run_depend>mapmerge</run_depend>
+  
+  <build_depend>mrgs_alignment</build_depend>
+  <run_depend>mrgs_alignment</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

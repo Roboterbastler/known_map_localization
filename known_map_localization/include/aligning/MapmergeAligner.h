@@ -28,6 +28,12 @@ protected:
 	 */
 	static void copyOccupancyGridToGridMap(nav_msgs::OccupancyGridConstPtr occGrid, mapmerge::grid_map &gridMap);
 
+	bool alignMapmerge(nav_msgs::OccupancyGridConstPtr map1, nav_msgs::OccupancyGridConstPtr map2, alignment::HypothesesVect &res);
+
+	bool alignMrgs(nav_msgs::OccupancyGridConstPtr map1, nav_msgs::OccupancyGridConstPtr map2, alignment::HypothesesVect &res);
+
+	ros::ServiceClient client;
+
 	/// This flag determines whether the randomized Hough transform should be used
 	bool useRandomizedHoughTransform;
 

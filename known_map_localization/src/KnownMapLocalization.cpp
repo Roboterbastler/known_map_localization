@@ -27,7 +27,7 @@ KnownMapLocalization::KnownMapLocalization() :
 
 	// subscribe to topics
 	ros::NodeHandle nh("~");
-	slamMapSubscriber = nh.subscribe("slam_map", 10, &KnownMapLocalization::receiveSlamMap, this);
+	slamMapSubscriber = nh.subscribe("slam_map", 1, &KnownMapLocalization::receiveSlamMap, this);
 }
 
 void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap) {
@@ -45,9 +45,7 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 		ROS_INFO("Got %ld new hypotheses.", hypotheses.size());
 
 		for(HypothesesVect::const_iterator it = hypotheses.begin(); it != hypotheses.end(); ++it) {
-			ROS_INFO("  - Transform from %s to %s [x=%f, y=%f, theta=%f, scale=%f]. Score = %f",
-					it->from.c_str(),
-					it->to.c_str(),
+			ROS_INFO("  - [x=%.2f, y=%.2f, theta=%.2f, scale=%.2f]. Score = %.4f",
 					it->x,
 					it->y,
 					radToDeg(it->theta),

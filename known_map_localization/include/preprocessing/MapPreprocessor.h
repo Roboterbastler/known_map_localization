@@ -29,6 +29,9 @@ public:
 protected:
 	virtual bool processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData) = 0;
 
+	static void updateMapOrigin(nav_msgs::MapMetaData &map, cv::Point2i origin);
+	static void crop(cv::Mat &img, nav_msgs::MapMetaData &map);
+
 private:
 	static cv::Mat matFromOccupancyGrid(nav_msgs::OccupancyGridConstPtr map);
 	static nav_msgs::OccupancyGridPtr occupancyGridFromMat(const cv::Mat &img);
