@@ -363,10 +363,8 @@ HypothesesVect MapmergeAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, 
 		hypothesis.score = transformation.ai;
 		hypothesis.stamp = ros::Time::now();
 		hypothesis.theta = degToRad(transformation.rotation);
-		hypothesis.y = mapToMap.getOrigin().getX();
-		hypothesis.x = -mapToMap.getOrigin().getY();
-//		hypothesis.x = transformation.deltax * knownMap->info.resolution;
-//		hypothesis.y = transformation.deltay * knownMap->info.resolution;
+		hypothesis.x = transformation.deltax * knownMap->info.resolution;
+		hypothesis.y = transformation.deltay * knownMap->info.resolution;
 
 		resultHypotheses.push_back(hypothesis);
 	}

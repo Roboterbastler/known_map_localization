@@ -490,8 +490,8 @@ vector<transformation> get_hypothesis_robust(const grid_map& map0,
     
     float rot_original = -rotationEstimate[hyp] - adjustment_rotation;
     
-    tmp_trans.deltax = (int)deltax;
-    tmp_trans.deltay = (int)deltay;
+    tmp_trans.deltax = (int)cvmGet(T4,0,2);
+    tmp_trans.deltay = (int)cvmGet(T4,1,2);
     tmp_trans.rotation = (int)rot_original;
     tmp_trans.ai = acceptance_index(map0,imtrans); 
     tmp_trans.overlapping = overlapping(map0,imtrans)/(map0.get_rows()*map0.get_cols()); 
@@ -708,8 +708,8 @@ vector<transformation> get_hypothesis(const grid_map& map0,
     
     float rot_original = -rotationEstimate[hyp] - adjustment_rotation;
     
-    tmp_trans.deltax = (int)deltax;
-    tmp_trans.deltay = (int)deltay;
+    tmp_trans.deltax = (int)cvmGet(T4,0,2);
+    tmp_trans.deltay = (int)cvmGet(T4,1,2);
     tmp_trans.rotation = (int)rot_original;
     tmp_trans.ai = acceptance_index(map0,imtrans); 
     tmp_trans.overlapping = overlapping(map0,imtrans)/(map0.get_rows()*map0.get_cols()); 
