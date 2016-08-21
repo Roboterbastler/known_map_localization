@@ -112,15 +112,24 @@ bool MapmergeAligner::copyOccupancyGridToGridMap(nav_msgs::OccupancyGridConstPtr
 	}
 
 	nav_msgs::OccupancyGrid::_data_type::const_iterator occCellIt = occGrid->data.begin();
-	std::vector<std::vector<unsigned int> >::iterator rowIt = gridMap.grid.begin();
+	std::vector<std::vector<unsigned int> >::iterator rowIt;
 	std::vector<unsigned int>::iterator gridCellIt;
 	bool containsOccupiedCell = false;
+
+	// fill all cells with 'unknown' value
+	for(rowIt = gridMap.grid.begin(); rowIt != gridMap.grid.end(); ++rowIt) {
+		for(gridCellIt = rowIt->begin(); gridCellIt != rowIt->end(); ++gridCellIt) {
+			*gridCellIt = gridMap.get_unknown_cell();
+		}
+	}
+
+	// copy 'occupied' and 'free' cells from occupancy grid
+	rowIt = gridMap.grid.begin();
 
 	for(int row = 0; row < occGrid->info.height; row++, ++rowIt) {
 		gridCellIt = rowIt->begin();
 		for(int col = 0; col < occGrid->info.width; col++, ++gridCellIt, ++occCellIt) {
 			if(*occCellIt == -1) {
-				*gridCellIt = gridMap.get_unknown_cell();
 				continue;
 			}
 			if(*occCellIt < FREE_THRESHOLD) {
