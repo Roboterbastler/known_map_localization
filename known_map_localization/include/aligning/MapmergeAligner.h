@@ -25,14 +25,9 @@ protected:
 	 * Copies the map to a grid_map, assuming, that the target gridMap already has the needed size.
 	 * @param occGrid The source map
 	 * @param gridMap The target map
+	 * @return True if map contains at least on occupied cell.
 	 */
-	static void copyOccupancyGridToGridMap(nav_msgs::OccupancyGridConstPtr occGrid, mapmerge::grid_map &gridMap);
-
-	bool alignMapmerge(nav_msgs::OccupancyGridConstPtr map1, nav_msgs::OccupancyGridConstPtr map2, alignment::HypothesesVect &res);
-
-	bool alignMrgs(nav_msgs::OccupancyGridConstPtr map1, nav_msgs::OccupancyGridConstPtr map2, alignment::HypothesesVect &res);
-
-	ros::ServiceClient client;
+	static bool copyOccupancyGridToGridMap(nav_msgs::OccupancyGridConstPtr occGrid, mapmerge::grid_map &gridMap);
 
 	/// This flag determines whether the randomized Hough transform should be used
 	bool useRandomizedHoughTransform;
