@@ -42,7 +42,12 @@ bool MapPreprocessor::process(nav_msgs::OccupancyGridPtr map) {
 		overwriteMapContent(map, img);
 	}
 
-	publishResult(img);
+	if(success) {
+		publishResult(img);
+	} else {
+		ROS_WARN("Map preprocessing failed.");
+	}
+
 	return success;
 }
 

@@ -11,7 +11,7 @@ namespace known_map_localization {
 namespace preprocessing {
 
 SlamMapPreprocessor::SlamMapPreprocessor() :
-		MapPreprocessor("processed_slam_map", "slam_preprocessing_enabled") {
+		MapPreprocessor("processed_slam_map_img", "slam_preprocessing_enabled") {
 
 }
 
