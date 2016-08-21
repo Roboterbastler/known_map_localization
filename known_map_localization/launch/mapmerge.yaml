@@ -3,6 +3,8 @@ slam_preprocessing_enabled: false
 known_preprocessing_enabled: false
 known_map_config_file: data/known_map.yaml
 known_map_frame_id: /known_map_localization/anchor
+
+# one unit in real world corresponds to this amount of SLAM map units
 slam_map_scale: 1.0
 use_randomized_hough_transform: false
 use_robust_algorithm: false
