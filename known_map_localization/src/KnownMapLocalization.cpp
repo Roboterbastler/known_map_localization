@@ -36,7 +36,14 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 	tf::quaternionTFToMsg(tf::Quaternion(0, 0, 0, 1), slamMapFixed->info.origin.orientation);
 
 	// preprocess the SLAM map
-	slamMapPreprocessor->process(slamMapFixed);
+	if(!slamMapPreprocessor->process(slamMapFixed)) {
+		// preprocessing failed
+		ROS_WARN("SLAM map preprocessing failed. Aligning cancelled.");
+		return;
+	}
+
+	// publish visualization SLAM map
+	visualizationSlamMapPublisher->publishSlamMap(slamMapFixed);
 
 	try {
 		// compute hypotheses (alignments)

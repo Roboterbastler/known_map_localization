@@ -28,16 +28,13 @@ class VisualizationSlamMapPublisher {
 public:
 	VisualizationSlamMapPublisher(filter::FilterConstPtr filter);
 
-private:
 	/**
-	 * This callback function is used by the subscriber to the occupancy grid map coming in from ORB_SLAM.
-	 * @param slamMap The nav_msgs/OccupancyGrid message
+	 * Publishes the preprocessed SMAL map for visualization purposes.
+	 * @param slamMap The SLAM map
 	 */
-	void receiveSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap);
+	void publishSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap) const;
 
 private:
-	/// Subscribes to the SLAM map
-	ros::Subscriber slamMapSubscriber;
 
 	/// Publishes the visualization SLAM map
 	ros::Publisher slamMapPublisher;

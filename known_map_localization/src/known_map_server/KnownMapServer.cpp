@@ -38,7 +38,11 @@ KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr preprocessor) :
 
 	ROS_INFO("Preprocessing of known map...");
 	assert(knownMap);
-	preprocessor->process(knownMap);
+
+	if(!preprocessor->process(knownMap)) {
+		ROS_ERROR("Known map preprocessing failed.");
+		return;
+	}
 
 	knownMapPublisher.publish(knownMap);
 }

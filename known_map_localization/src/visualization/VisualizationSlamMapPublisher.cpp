@@ -15,10 +15,9 @@ namespace visualization {
 VisualizationSlamMapPublisher::VisualizationSlamMapPublisher(filter::FilterConstPtr filter) : filter(filter) {
 	ros::NodeHandle nh("~");
 	slamMapPublisher = nh.advertise<nav_msgs::OccupancyGrid>("visualization_slam_map", 10);
-	slamMapSubscriber = nh.subscribe("slam_map", 10, &VisualizationSlamMapPublisher::receiveSlamMap, this);
 }
 
-void VisualizationSlamMapPublisher::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap) {
+void VisualizationSlamMapPublisher::publishSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap) const {
 	nav_msgs::OccupancyGridPtr correctedSlamMap(new nav_msgs::OccupancyGrid(*slamMap));
 	alignment::Alignment alignment;
 	try {
