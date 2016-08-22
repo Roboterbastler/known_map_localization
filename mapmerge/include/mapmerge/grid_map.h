@@ -134,7 +134,7 @@ public:
     @param fn: file name
     @return 0 if correctly saved, 1 if the file could not be opened
    */
-  int save_map(const char *fn);
+  int save_map(const char *fn) const;
   
   /*!
     This actually stores the grid_cell. 

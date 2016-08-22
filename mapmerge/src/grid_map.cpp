@@ -122,11 +122,13 @@ int grid_map::load_map(unsigned int r,unsigned int c,const char* fname) {
 }
 
 // TESTED: OK
-int grid_map::save_map(const char *fname) {
+int grid_map::save_map(const char *fname) const {
 
   ofstream ofs(fname);
   if (! ofs ) 
     return 1;
+
+  ofs << "P2 " << cols << " " << rows << " 255 " << endl;
 
   for ( unsigned int i = 0 ; i < rows ; i++ ) {
     for (unsigned int j = 0 ; j < cols ; j++ ) {
