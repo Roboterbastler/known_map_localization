@@ -20,6 +20,8 @@ MapmergeSlamMapPreprocessor::MapmergeSlamMapPreprocessor() : knownMapResolution(
 		return;
 	}
 
+	ROS_INFO("SLAM scale: %f", scale);
+
 	// subscribe to known map topic to get known map resolution
 	knownMapSubscriber = nh.subscribe("visualization_known_map", 1, &MapmergeSlamMapPreprocessor::receiveKnownMap, this);
 }
@@ -36,23 +38,12 @@ bool MapmergeSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData
 		return false;
 	}
 
-	ROS_INFO("- Unprocessed SLAM map dimensions: x = %d y = %d", img.cols, img.rows);
-
 	float realSlamResolution = mapMetaData.resolution / scale;
 	float imgScaleFactor = realSlamResolution / knownMapResolution;
 	cv::resize(img, img, cv::Size(), imgScaleFactor, imgScaleFactor, CV_INTER_NN);
 	mapMetaData.resolution = realSlamResolution / imgScaleFactor;
 	mapMetaData.height = img.rows;
 	mapMetaData.width = img.cols;
-
-	// restore map
-	//cv::threshold(img, img, )
-
-	ROS_INFO("- Real SLAM resolution: %f", realSlamResolution);
-	ROS_INFO("- SLAM scale factor: %f", imgScaleFactor);
-	ROS_INFO("- Known map resolution: %f", knownMapResolution);
-	ROS_INFO("- Preprocessed SLAM map resolution: %f", mapMetaData.resolution);
-	ROS_INFO("- Preprocessed SLAM map dimensions: x = %d y = %d", img.cols, img.rows);
 
 	return true;
 }

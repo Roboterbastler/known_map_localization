@@ -23,6 +23,7 @@ namespace known_map_localization {
 namespace aligning {
 
 using namespace alignment;
+using namespace std;
 
 MapmergeAligner::MapmergeAligner() :
 		useRandomizedHoughTransform(false), useRobust(false), numberOfHypotheses(4) {
@@ -38,21 +39,37 @@ HypothesesVect MapmergeAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, 
 
 	HypothesesVect resultHypotheses;
 
-	// copy maps to grid maps and ensure they have same dimensions
-	unsigned int mapWidth = std::max(knownMap->info.width, slamMap->info.width);
-	unsigned int mapHeight = std::max(knownMap->info.height, slamMap->info.height);
-	bool mapsNonEmpty = true;
+	// ensure maps have same dimensions
+	unsigned int mapWidth = max(knownMap->info.width, slamMap->info.width);
+	unsigned int mapHeight = max(knownMap->info.height, slamMap->info.height);
 
-	mapmerge::grid_map knownGrid(mapHeight, mapWidth);
-	mapmerge::grid_map slamGrid(mapHeight, mapWidth);
-	mapsNonEmpty = mapsNonEmpty && copyOccupancyGridToGridMap(knownMap, knownGrid);
-	mapsNonEmpty = mapsNonEmpty && copyOccupancyGridToGridMap(slamMap, slamGrid);
+	// add rotational padding, so no content gets lost when rotating
+	unsigned int rotationRadius = ceil(sqrt(pow(mapWidth / 2.0, 2) + pow(mapHeight / 2.0, 2)));
+	int paddingWidth = rotationRadius - ceil(mapWidth / 2.0);
+	int paddingHeight = rotationRadius - ceil(mapHeight / 2.0);
+	paddingWidth = max(0, paddingWidth);
+	paddingHeight = max(0, paddingHeight);
+	mapWidth += 2 * paddingWidth;
+	mapHeight += 2 * paddingHeight;
+
+	mapmerge::grid_map knownGridTmp(mapHeight, mapWidth);
+	mapmerge::grid_map slamGridTmp(mapHeight, mapWidth);
+	mapmerge::grid_map knownGrid, slamGrid;
+
+	// copy maps and check for empty maps
+	bool mapsNonEmpty = true;
+	mapsNonEmpty = mapsNonEmpty && copyOccupancyGridToGridMap(knownMap, knownGridTmp);
+	mapsNonEmpty = mapsNonEmpty && copyOccupancyGridToGridMap(slamMap, slamGridTmp);
 
 	// check that maps contain at least one occupied cell
 	if(!mapsNonEmpty) {
 		ROS_WARN("One of the maps to align does not contain at least one occupied cell.");
 		return resultHypotheses;
 	}
+
+	// re-center maps
+	mapmerge::translate_map(knownGrid, knownGridTmp, -paddingWidth, -paddingHeight);
+	mapmerge::translate_map(slamGrid, slamGridTmp, -paddingWidth, -paddingHeight);
 
 	// compute hypotheses
 	std::vector<mapmerge::transformation> hypotheses;
@@ -62,35 +79,57 @@ HypothesesVect MapmergeAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, 
 		hypotheses = mapmerge::get_hypothesis(slamGrid, knownGrid, numberOfHypotheses, 1, useRandomizedHoughTransform);
 	}
 
+	tf::Quaternion rotation;
+	float resolution = knownMap->info.resolution;
+
+	// padding offset
+	tf::Transform paddedOriginToMapOrigin;
+	paddedOriginToMapOrigin.setIdentity();
+	paddedOriginToMapOrigin.setOrigin(tf::Vector3(paddingWidth * resolution, paddingHeight * resolution, 0));
+
+	// known map frame to known map origin
+	tf::Transform knownMapFrameToOrigin;
+	knownMapFrameToOrigin.setIdentity();
+	knownMapFrameToOrigin.setOrigin(tf::Vector3(knownMap->info.origin.position.x, knownMap->info.origin.position.y, 0));
+	tf::quaternionMsgToTF(knownMap->info.origin.orientation, rotation);
+	knownMapFrameToOrigin.setRotation(rotation);
+
+	// SLAM map frame to SLAM map origin
+	tf::Transform slamMapFrameToOrigin;
+	slamMapFrameToOrigin.setIdentity();
+	slamMapFrameToOrigin.setOrigin(tf::Vector3(slamMap->info.origin.position.x, slamMap->info.origin.position.y, 0));
+	tf::quaternionMsgToTF(slamMap->info.origin.orientation, rotation);
+	slamMapFrameToOrigin.setRotation(rotation);
+
 	// get transformations from hypotheses
 	for(int i = 0; i < hypotheses.size(); i++) {
 		Hypothesis hypothesis;
 		mapmerge::transformation transformation = hypotheses.at(i);
 
-		tf::Transform centerToCenter;
-		tf::Quaternion rotation;
-		centerToCenter.setIdentity();
-		centerToCenter.setOrigin(tf::Vector3(knownMap->info.resolution*transformation.deltax, knownMap->info.resolution*transformation.deltay, 0));
+		// map alignment computed by mapmerge
+		tf::Transform slamOriginToKnownOrigin;
+		slamOriginToKnownOrigin.setIdentity();
+		slamOriginToKnownOrigin.setOrigin(tf::Vector3(resolution * transformation.deltax, resolution * transformation.deltay, 0));
 		rotation.setRPY(0, 0, degToRad(transformation.rotation));
-		centerToCenter.setRotation(rotation);
-		tf::Transform mapOriginToCenter;
-		mapOriginToCenter.setIdentity();
-		mapOriginToCenter.setOrigin(tf::Vector3(knownMap->info.resolution*mapWidth / 2., knownMap->info.resolution*mapHeight / 2., 0));
+		slamOriginToKnownOrigin.setRotation(rotation);
 
-		tf::Transform mapToMap;
-		mapToMap.setIdentity();
-		mapToMap *= mapOriginToCenter;
-		mapToMap *= centerToCenter;
-		mapToMap *= mapOriginToCenter.inverse();
+		// SLAM map frame to known map frame
+		tf::Transform mapFrameToMapFrame;
+		mapFrameToMapFrame.setIdentity();
+		mapFrameToMapFrame *= slamMapFrameToOrigin;
+		mapFrameToMapFrame *= paddedOriginToMapOrigin.inverse();
+		mapFrameToMapFrame *= slamOriginToKnownOrigin;
+		mapFrameToMapFrame *= paddedOriginToMapOrigin;
+		mapFrameToMapFrame *= knownMapFrameToOrigin.inverse();
 
 		hypothesis.from = slamMap->header.frame_id;
 		hypothesis.to = knownMap->header.frame_id;
 		hypothesis.scale = 1.;
 		hypothesis.score = transformation.ai;
 		hypothesis.stamp = ros::Time::now();
-		hypothesis.theta = degToRad(transformation.rotation);
-		hypothesis.x = transformation.deltax * knownMap->info.resolution;
-		hypothesis.y = transformation.deltay * knownMap->info.resolution;
+		hypothesis.theta = tf::getYaw(mapFrameToMapFrame.getRotation());
+		hypothesis.x = mapFrameToMapFrame.getOrigin().getX();
+		hypothesis.y = mapFrameToMapFrame.getOrigin().getY();
 
 		resultHypotheses.push_back(hypothesis);
 	}
