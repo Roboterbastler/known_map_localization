@@ -86,10 +86,13 @@ void MapPreprocessor::crop(cv::Mat &img, nav_msgs::MapMetaData &map) {
 	cv::Rect boundingBox = cv::boundingRect(points);
 
 	// crop
-	img = img(boundingBox);
+	img = img(boundingBox).clone();
 
 	cv::Point2i offset(boundingBox.x, boundingBox.y);
 	updateMapOrigin(map, offset);
+
+	map.height = img.rows;
+	map.width = img.cols;
 }
 
 void MapPreprocessor::updateMapOrigin(nav_msgs::MapMetaData &map, cv::Point2i origin) {

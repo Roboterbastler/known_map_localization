@@ -45,6 +45,14 @@ bool MapmergeSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData
 	mapMetaData.height = img.rows;
 	mapMetaData.width = img.cols;
 
+	// remove small particles (morphological close)
+	unsigned int kernelSize = std::ceil(0.1 / mapMetaData.resolution);
+	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2*kernelSize+1, 2*kernelSize+1));
+	cv::morphologyEx(img, img, cv::MORPH_CLOSE, kernel);
+
+	// crop image to occupied region
+	crop(img, mapMetaData);
+
 	return true;
 }
 
