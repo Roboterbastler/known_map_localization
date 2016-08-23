@@ -176,6 +176,9 @@ add_library(base_link
 add_library(visualization
   src/visualization/VisualizationSlamMapPublisher.cpp
 )
+add_library(logging
+  src/logging/DataLogger.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -190,6 +193,7 @@ add_dependencies(alignment ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED
 add_dependencies(filter ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(base_link ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(visualization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(logging ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -220,6 +224,7 @@ target_link_libraries(known_map_localization
   filter
   base_link
   visualization
+  logging
   ${catkin_LIBRARIES}
 )
 target_link_libraries(algorithm_selection
@@ -255,6 +260,9 @@ target_link_libraries(visualization
   filter
   alignment
   ${catkin_LIBRARIES}
+)
+target_link_libraries(logging
+
 )
 
 #############

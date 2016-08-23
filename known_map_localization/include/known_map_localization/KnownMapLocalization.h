@@ -15,6 +15,7 @@
 #include <filter/Filter.h>
 #include <base_link/BaseLinkPublisher.h>
 #include <visualization/VisualizationSlamMapPublisher.h>
+#include <logging/DataLogger.h>
 
 namespace known_map_localization {
 
@@ -67,6 +68,9 @@ private:
 
 	/// The SLAM map preprocessor
 	preprocessing::SlamMapPreprocessorPtr slamMapPreprocessor;
+
+	/// Data logger for later analysis
+	logging::DataLogger dataLogger;
 };
 
 } /* namespace known_map_localization */

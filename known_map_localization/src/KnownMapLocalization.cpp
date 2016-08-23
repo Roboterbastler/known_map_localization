@@ -20,7 +20,8 @@ KnownMapLocalization::KnownMapLocalization() :
 		knownMapServer(new KnownMapServer(algorithmSelector->getKnownMapPreprocessor())),
 		filter(new filter::PassThroughFilter()),
 		baseLinkPublisher(new base_link::BaseLinkPublisher(filter, ros::WallDuration(0.2))),
-		visualizationSlamMapPublisher(new visualization::VisualizationSlamMapPublisher(filter)) {
+		visualizationSlamMapPublisher(new visualization::VisualizationSlamMapPublisher(filter)),
+		dataLogger(true) {
 	aligner = algorithmSelector->getAligner();
 	knownMapPreprocessor = algorithmSelector->getKnownMapPreprocessor();
 	slamMapPreprocessor = algorithmSelector->getSlamMapPreprocessor();
@@ -46,8 +47,12 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 	visualizationSlamMapPublisher->publishSlamMap(slamMapFixed);
 
 	try {
+		ros::WallTime start = ros::WallTime::now();
+
 		// compute hypotheses (alignments)
 		HypothesesVect hypotheses = aligner->align(knownMapServer->getKnownMap(), slamMapFixed);
+
+		ros::WallDuration duration = ros::WallTime::now() - start;
 
 		ROS_INFO("Got %ld new hypotheses.", hypotheses.size());
 
@@ -59,6 +64,8 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 					it->scale,
 					it->score);
 		}
+
+		dataLogger.logComputation(hypotheses, duration, knownMapServer->getKnownMap()->info, slamMapFixed->info);
 
 		filter->addHypotheses(hypotheses);
 	} catch(AlignerInternalError &e) {
