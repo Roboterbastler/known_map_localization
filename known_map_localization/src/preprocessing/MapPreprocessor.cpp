@@ -83,6 +83,12 @@ void MapPreprocessor::crop(cv::Mat &img, nav_msgs::MapMetaData &map) {
 	cv::Mat points, mask;
 	cv::threshold(img, mask, 1, 255, cv::THRESH_BINARY_INV);
 	cv::findNonZero(mask, points);
+
+	if(points.rows == 0) {
+		ROS_DEBUG("Preprocessor: Map does not contain occupied cells. Skip cropping.");
+		return;
+	}
+
 	cv::Rect boundingBox = cv::boundingRect(points);
 
 	// crop
