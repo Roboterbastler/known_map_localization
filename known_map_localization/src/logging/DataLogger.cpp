@@ -120,9 +120,13 @@ void DataLogger::writeOrangeHeader() {
 
 	alignmentsFile << attributeNames.str() << endl << types.str() << endl
 			<< optionalElements.str() << endl;
-	attributeNames = stringstream();
-	types = stringstream();
-	optionalElements = stringstream();
+
+	attributeNames.str("");
+	attributeNames.clear();
+	types.str("");
+	types.clear();
+	optionalElements.str("");
+	optionalElements.clear();
 
 	// computations file
 	// timestamp
