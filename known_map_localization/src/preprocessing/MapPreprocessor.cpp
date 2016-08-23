@@ -111,5 +111,10 @@ void MapPreprocessor::updateMapOrigin(nav_msgs::MapMetaData &map, cv::Point2i or
 	tf::poseTFToMsg(newOrigin, map.origin);
 }
 
+void MapPreprocessor::restoreMap(cv::Mat &img) {
+	// truncate image to max value 254 (which means free)
+	cv::threshold(img, img, 254, 0, cv::THRESH_TRUNC);
+}
+
 } /* namespace preprocessing */
 } /* namespace known_map_localization */

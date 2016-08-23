@@ -31,6 +31,7 @@ protected:
 
 	static void updateMapOrigin(nav_msgs::MapMetaData &map, cv::Point2i origin);
 	static void crop(cv::Mat &img, nav_msgs::MapMetaData &map);
+	static void restoreMap(cv::Mat &img);
 
 private:
 	static cv::Mat matFromOccupancyGrid(nav_msgs::OccupancyGridConstPtr map);
