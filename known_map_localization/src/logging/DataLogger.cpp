@@ -8,6 +8,7 @@
 #include <string>
 #include <algorithm>
 #include <sstream>
+#include <limits>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <ros/package.h>
@@ -33,7 +34,7 @@ DataLogger::DataLogger(bool enabled) :
 	computationsFile.open(computationsFileName.c_str());
 
 	ROS_INFO("Logging alignment data to %s.", alignmentsFileName.c_str());
-	ROS_INFO("Logging alignment data to %s.", computationsFileName.c_str());
+	ROS_INFO("Logging computation data to %s.", computationsFileName.c_str());
 
 	if (!alignmentsFile.is_open()) {
 		ROS_WARN("Logging data failed. Unable to open file %s",
@@ -43,6 +44,10 @@ DataLogger::DataLogger(bool enabled) :
 		ROS_WARN("Logging data failed. Unable to open file %s",
 				computationsFileName.c_str());
 	}
+
+	int precision = std::numeric_limits<double>::digits10 + 2;
+	alignmentsFile.precision(precision);
+	computationsFile.precision(precision);
 
 	writeOrangeHeader();
 }
