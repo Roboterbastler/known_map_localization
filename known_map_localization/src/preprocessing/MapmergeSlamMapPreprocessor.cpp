@@ -42,6 +42,9 @@ bool MapmergeSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData
 	float imgScaleFactor = realSlamResolution / knownMapResolution;
 	cv::resize(img, img, cv::Size(), imgScaleFactor, imgScaleFactor, CV_INTER_NN);
 	mapMetaData.resolution = realSlamResolution / imgScaleFactor;
+	mapMetaData.origin.position.x /= scale;
+	mapMetaData.origin.position.y /= scale;
+	mapMetaData.origin.position.z /= scale;
 	mapMetaData.height = img.rows;
 	mapMetaData.width = img.cols;
 

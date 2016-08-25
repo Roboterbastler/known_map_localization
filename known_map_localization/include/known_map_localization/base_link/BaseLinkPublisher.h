@@ -23,6 +23,12 @@ namespace base_link {
 /**
  * # BaseLinkPublisher
  * Publishes a base link and the map transform on a regular basis using the current filtered alignment.
+ *
+ * ## Published Topics
+ * - **tf**: The transformations topic
+ *
+ * ## Parameters
+ * - **slam_map_scale**: The a priori known scale of the SLAM map, e.g. used with the mapmerge algorithm.
 
  */
 class BaseLinkPublisher {
@@ -52,6 +58,9 @@ private:
 
 	/// Listens to tf messages to get the **ORB_base_link** transformation
 	tf::TransformListener listener;
+
+	/// The static SLAM scale
+	float slamScale;
 };
 
 typedef boost::shared_ptr<BaseLinkPublisher> BaseLinkPublisherPtr;

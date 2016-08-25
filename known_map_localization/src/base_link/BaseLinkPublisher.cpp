@@ -13,8 +13,11 @@ namespace base_link {
 
 BaseLinkPublisher::BaseLinkPublisher(filter::FilterConstPtr filter, ros::WallDuration duration) : filter(filter) {
 	if(ros::isInitialized()) {
-		ros::NodeHandle nh;
+		ros::NodeHandle nh("~");
 		timer = nh.createWallTimer(duration, &BaseLinkPublisher::updateBaseLink, this);
+
+		// get static SLAM map scale if available
+		slamScale = nh.param("slam_map_scale", 1.0);
 	}
 }
 
@@ -44,8 +47,8 @@ void BaseLinkPublisher::updateBaseLink(const ros::WallTimerEvent& event) {
 		return;
 	}
 
-	// apply scale
-	slamMapFrame_to_slamBaseLink.getOrigin() *= alignment.scale;
+	// apply scales
+	slamMapFrame_to_slamBaseLink.getOrigin() *= alignment.scale / slamScale;
 
 	tf::Transform kmlBaseLink;
 	kmlBaseLink.setIdentity();
