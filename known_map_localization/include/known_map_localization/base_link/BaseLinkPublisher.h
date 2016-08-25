@@ -29,7 +29,6 @@ namespace base_link {
  *
  * ## Parameters
  * - **slam_map_scale**: The a priori known scale of the SLAM map, e.g. used with the mapmerge algorithm.
-
  */
 class BaseLinkPublisher {
 public:

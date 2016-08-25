@@ -27,8 +27,6 @@ namespace known_map_localization {
  *
  * ## Subscribed Topics
  * - **slam_map**: The SLAM map coming from the ORB_SLAM module
- *
- * ## Parameters
  */
 class KnownMapLocalization {
 public:
