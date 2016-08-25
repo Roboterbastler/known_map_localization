@@ -15,7 +15,8 @@
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 
-#include "filter/Filter.h"
+#include <filter/Filter.h>
+#include <geographic_msgs/GeoPose.h>
 
 namespace known_map_localization {
 namespace base_link {
@@ -35,16 +36,32 @@ public:
 	/**
 	 * Creates the base link publisher.
 	 * @param filter The filter where the filtered alignment will be fetched
+	 * @param anchor The known map anchor
 	 * @param duration The duration between two publications of base links
 	 */
-	BaseLinkPublisher(filter::FilterConstPtr filter, ros::WallDuration duration);
+	BaseLinkPublisher(filter::FilterConstPtr filter, geographic_msgs::GeoPoseConstPtr anchor, ros::WallDuration duration);
 
 private:
 	/**
 	 * Is called by a ROS WallTimer to update and publish the base link.
 	 * @param event The WallTimer event
 	 */
-	void updateBaseLink(const ros::WallTimerEvent& event);
+	void update(const ros::WallTimerEvent& event);
+
+	/**
+	 * Updates the tf transform from the SLAM map frame to the known map frame.
+	 */
+	void updateMapTransform();
+
+	/**
+	 * Update and publish the base link.
+	 */
+	void updateBaseLink();
+
+	/**
+	 * Updates the position based on the anchor and recent base link.
+	 */
+	void updatePosition();
 
 	/// Holds the filter
 	filter::FilterConstPtr filter;
@@ -60,6 +77,9 @@ private:
 
 	/// The static SLAM scale
 	float slamScale;
+
+	/// The known map anchor
+	geographic_msgs::GeoPoseConstPtr anchor;
 };
 
 typedef boost::shared_ptr<BaseLinkPublisher> BaseLinkPublisherPtr;

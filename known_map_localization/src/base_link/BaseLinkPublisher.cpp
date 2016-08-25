@@ -11,17 +11,47 @@
 namespace known_map_localization {
 namespace base_link {
 
-BaseLinkPublisher::BaseLinkPublisher(filter::FilterConstPtr filter, ros::WallDuration duration) : filter(filter) {
-	if(ros::isInitialized()) {
+BaseLinkPublisher::BaseLinkPublisher(filter::FilterConstPtr filter,
+		geographic_msgs::GeoPoseConstPtr anchor, ros::WallDuration duration) :
+		filter(filter),
+		anchor(anchor) {
+	assert(filter);
+	assert(anchor);
+
+	if (ros::isInitialized()) {
 		ros::NodeHandle nh("~");
-		timer = nh.createWallTimer(duration, &BaseLinkPublisher::updateBaseLink, this);
+		timer = nh.createWallTimer(duration, &BaseLinkPublisher::update, this);
 
 		// get static SLAM map scale if available
 		slamScale = nh.param("slam_map_scale", 1.0);
 	}
 }
 
-void BaseLinkPublisher::updateBaseLink(const ros::WallTimerEvent& event) {
+void BaseLinkPublisher::update(const ros::WallTimerEvent& event) {
+	// update map-to-map transform
+	updateMapTransform();
+
+	// update base link
+	updateBaseLink();
+
+	// update position
+	updatePosition();
+}
+
+void BaseLinkPublisher::updateMapTransform() {
+	// get filtered alignment
+	alignment::Alignment alignment;
+	try {
+		alignment = filter->getAlignment();
+
+		// publish map transform
+		broadcaster.sendTransform(
+				alignment::StampedAlignment(alignment).toTfStampedTransform());
+	} catch (AlignmentNotAvailable &e) {
+	}
+}
+
+void BaseLinkPublisher::updateBaseLink() {
 	// request /orb_slam/map to /orb_slam/base_link
 	// scale it
 	// transform.inverse() + scaled ORB base link
@@ -30,19 +60,17 @@ void BaseLinkPublisher::updateBaseLink(const ros::WallTimerEvent& event) {
 	alignment::Alignment alignment;
 	try {
 		alignment = filter->getAlignment();
-	} catch(AlignmentNotAvailable &e) {
+	} catch (AlignmentNotAvailable &e) {
 		return;
 	}
-
-	// publish map transform
-	broadcaster.sendTransform(alignment::StampedAlignment(alignment).toTfStampedTransform());
 
 	tf::StampedTransform slamMapFrame_to_slamBaseLink;
 	tf::Transform slamMapFrame_to_knownMapFrame = alignment.toTfTransform();
 
 	try {
-		listener.lookupTransform("orb_slam/map", "ORB_base_link", ros::Time(0), slamMapFrame_to_slamBaseLink);
-	} catch(tf::TransformException &e) {
+		listener.lookupTransform("orb_slam/map", "ORB_base_link", ros::Time(0),
+				slamMapFrame_to_slamBaseLink);
+	} catch (tf::TransformException &e) {
 		//ROS_WARN("Required tf data not available, base_link not published: %s", e.what());
 		return;
 	}
@@ -55,7 +83,17 @@ void BaseLinkPublisher::updateBaseLink(const ros::WallTimerEvent& event) {
 	kmlBaseLink *= slamMapFrame_to_knownMapFrame.inverse();
 	kmlBaseLink *= slamMapFrame_to_slamBaseLink;
 
-	broadcaster.sendTransform(tf::StampedTransform(kmlBaseLink, ros::Time::now(), "/known_map_localization/anchor", "/known_map_localization/base_link"));
+	broadcaster.sendTransform(
+			tf::StampedTransform(kmlBaseLink, ros::Time::now(),
+					"/known_map_localization/anchor",
+					"/known_map_localization/base_link"));
+}
+
+void BaseLinkPublisher::updatePosition() {
+	// create new GeoPose copying the anchor
+	geographic_msgs::GeoPosePtr position(new geographic_msgs::GeoPose(*anchor));
+
+	// TODO
 }
 
 } /* namespace base_link */
