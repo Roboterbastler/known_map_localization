@@ -14,6 +14,7 @@
 #include <ros/timer.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
+#include <orb_slam/ORBState.h>
 
 #include <filter/Filter.h>
 #include <geographic_msgs/GeoPose.h>
@@ -41,6 +42,14 @@ public:
 	 */
 	BaseLinkPublisher(filter::FilterConstPtr filter, geographic_msgs::GeoPoseConstPtr anchor, ros::WallDuration duration);
 
+	/**
+	 * Computes the absolute distance between two poses.
+	 * @param p1 The first pose
+	 * @param p2 The second pose
+	 * @return The distance
+	 */
+	static float poseToPoseAbsDistance(const tf::Pose &p1, const tf::Pose &p2);
+
 private:
 	/**
 	 * Is called by a ROS WallTimer to update and publish the base link.
@@ -55,13 +64,28 @@ private:
 
 	/**
 	 * Update and publish the base link.
+	 * @param out Outputs the new base link
+	 * @return Returns whether a new base link was generated
 	 */
-	void updateBaseLink();
+	bool updateBaseLink(tf::StampedTransform &out);
 
 	/**
 	 * Updates the position based on the anchor and recent base link.
+	 * @param baseLink The latest base link used to update the position
 	 */
-	void updatePosition();
+	void updatePosition(const tf::StampedTransform &baseLink);
+
+	/**
+	 * Callback for the ground truth topic subscriber.
+	 * @param poseMessage The received pose message
+	 */
+	void receiveGroundTruth(geometry_msgs::PoseStampedConstPtr poseMessage);
+
+	/**
+	 * Callback for the ORB SLAM state subscriber.
+	 * @param stateMessage The received state
+	 */
+	void receiveSlamState(orb_slam::ORBState stateMessage);
 
 	/// Holds the filter
 	filter::FilterConstPtr filter;
@@ -75,11 +99,31 @@ private:
 	/// Listens to tf messages to get the **ORB_base_link** transformation
 	tf::TransformListener listener;
 
+	/// Receives the ground truth pose over the /pose topic
+	ros::Subscriber groundTruthSubscriber;
+
+	/// subscribes to the SLAm state topic
+	ros::Subscriber slamStateSubscriber;
+
+	/// Publishes a corrected ground truth pose that takes possible offsets
+	/// between /world and /ORB_SLAM/World (due to re-localization) into account
+	ros::Publisher groundTruthPublisher;
+
 	/// The static SLAM scale
 	float slamScale;
 
 	/// The known map anchor
 	geographic_msgs::GeoPoseConstPtr anchor;
+
+	/// The ground truth pose received over the /pose topic
+	geometry_msgs::PoseStampedConstPtr groundTruth;
+
+	/// stores the last received SLAM state
+	int slamState;
+
+	/// stores the first transformation from /orb_slam/map to /blender_scene
+	/// which gets corrupted by re-localizations
+	tf::StampedTransform orbMapToScene;
 };
 
 typedef boost::shared_ptr<BaseLinkPublisher> BaseLinkPublisherPtr;

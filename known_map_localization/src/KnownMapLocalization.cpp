@@ -19,7 +19,7 @@ KnownMapLocalization::KnownMapLocalization() :
 		algorithmSelector(new AlgorithmSelector()),
 		knownMapServer(new KnownMapServer(algorithmSelector->getKnownMapPreprocessor())),
 		filter(new filter::PassThroughFilter()),
-		baseLinkPublisher(new base_link::BaseLinkPublisher(filter, ros::WallDuration(0.2))),
+		baseLinkPublisher(new base_link::BaseLinkPublisher(filter, knownMapServer->getAnchor(), ros::WallDuration(0.2))),
 		visualizationSlamMapPublisher(new visualization::VisualizationSlamMapPublisher(filter)),
 		dataLogger(true) {
 	aligner = algorithmSelector->getAligner();
