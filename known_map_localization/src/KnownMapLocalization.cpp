@@ -9,6 +9,9 @@
 #include <known_map_server/KnownMapServer.h>
 #include <preprocessing/SlamMapPreprocessor.h>
 #include <visualization/VisualizationSlamMapPublisher.h>
+#include <preprocessing/KnownMapPreprocessor.h>
+#include <base_link/BaseLinkPublisher.h>
+#include <SlamScaleManager.h>
 #include <aligning/Aligner.h>
 #include <alignment/Hypothesis.h>
 #include <Utils.h>
@@ -21,6 +24,14 @@ using namespace preprocessing;
 
 KnownMapLocalization::KnownMapLocalization() :
 		dataLogger(true) {
+
+	// initialize Singletons
+	KnownMapServer::instance();
+	aligning::Aligner::instance();
+	KnownMapPreprocessor::instance();
+	SlamMapPreprocessor::instance();
+	SlamScaleManager::instance();
+	base_link::BaseLinkPublisher::instance();
 
 	// subscribe to topics
 	ros::NodeHandle nh("~");

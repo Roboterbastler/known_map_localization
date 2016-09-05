@@ -231,6 +231,7 @@ target_link_libraries(known_map_localization
   known_map_server
   aligning
   visualization
+  base_link
   logging
   ${catkin_LIBRARIES}
 )
