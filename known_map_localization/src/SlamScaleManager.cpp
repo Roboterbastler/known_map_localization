@@ -91,7 +91,7 @@ void SlamScaleManager::updateSlamScale(float scale) {
 
 tf::Transform SlamScaleManager::convertTransform(
 		tf::Transform transform) const {
-	transform.getOrigin() /= getSlamScale();
+	transform.getOrigin() *= getSlamScale();
 	return transform;
 }
 
@@ -104,9 +104,9 @@ tf::StampedTransform SlamScaleManager::convertTransform(
 geometry_msgs::Pose SlamScaleManager::convertPoseMsg(
 		geometry_msgs::Pose pose) const {
 	float scale = getSlamScale();
-	pose.position.x /= scale;
-	pose.position.y /= scale;
-	pose.position.z /= scale;
+	pose.position.x *= scale;
+	pose.position.y *= scale;
+	pose.position.z *= scale;
 	return pose;
 }
 
