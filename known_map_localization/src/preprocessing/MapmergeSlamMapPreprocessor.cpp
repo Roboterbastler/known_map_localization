@@ -32,11 +32,11 @@ bool MapmergeSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData
 		return false;
 	}
 
-	float realSlamResolution = mapMetaData.resolution * slam_scale_manager::SlamScaleManager::instance()->getSlamScale();
+	float realSlamResolution = mapMetaData.resolution * SlamScaleManager::instance()->getSlamScale();
 	float imgScaleFactor = realSlamResolution / knownMapResolution;
 	cv::resize(img, img, cv::Size(), imgScaleFactor, imgScaleFactor, CV_INTER_NN);
 	mapMetaData.resolution = realSlamResolution / imgScaleFactor;
-	mapMetaData.origin = slam_scale_manager::SlamScaleManager::instance()->convertPoseMsg(mapMetaData.origin);
+	mapMetaData.origin = SlamScaleManager::instance()->convertPoseMsg(mapMetaData.origin);
 	mapMetaData.height = img.rows;
 	mapMetaData.width = img.cols;
 

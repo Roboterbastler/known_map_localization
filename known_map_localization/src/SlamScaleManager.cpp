@@ -13,8 +13,6 @@
 
 namespace known_map_localization {
 
-namespace slam_scale_manager {
-
 typedef std::vector<PositionPair>::iterator PositionPairIter;
 typedef std::vector<PositionPair>::const_iterator PositionPairConstIter;
 
@@ -166,8 +164,6 @@ float SlamScaleManager::distance(const geodesy::UTMPoint &p1, const geodesy::UTM
 
 float SlamScaleManager::distance(const geometry_msgs::Point &p1, const geometry_msgs::Point &p2) {
 	return sqrt(pow(p1.x - p2.x, 2.) + pow(p1.y - p2.y, 2.));
-}
-
 }
 
 } /* namespace known_map_localization */

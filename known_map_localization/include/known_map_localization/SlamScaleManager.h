@@ -21,8 +21,6 @@
 
 namespace known_map_localization {
 
-namespace slam_scale_manager {
-
 /// The mode of the SLAM scale manager
 typedef enum {
 	INVALID = 0, ///< Invalid mode only for internal use
@@ -179,8 +177,6 @@ private:
 	uint8_t zone;
 	char band;
 };
-
-}
 
 } /* namespace known_map_localization */
 

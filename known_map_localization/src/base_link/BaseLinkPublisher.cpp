@@ -91,7 +91,7 @@ bool BaseLinkPublisher::updateBaseLink(tf::StampedTransform &out) {
 
 	// convert transform to real world scale
 	float x = slamMapFrame_to_slamBaseLink.getOrigin().x();
-	slamMapFrame_to_slamBaseLink = slam_scale_manager::SlamScaleManager::instance()->convertTransform(slamMapFrame_to_slamBaseLink);
+	slamMapFrame_to_slamBaseLink = SlamScaleManager::instance()->convertTransform(slamMapFrame_to_slamBaseLink);
 
 	tf::Transform kmlBaseLink;
 	kmlBaseLink.setIdentity();

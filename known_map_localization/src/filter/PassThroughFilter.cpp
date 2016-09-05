@@ -17,7 +17,7 @@ void PassThroughFilter::addHypotheses(const alignment::HypothesesVect &hypothese
 	}
 
 	filteredAlignment = *(hypotheses.begin());
-	slam_scale_manager::SlamScaleManager::instance()->updateSlamScale(filteredAlignment.scale);
+	SlamScaleManager::instance()->updateSlamScale(filteredAlignment.scale);
 
 	ready = true;
 }
