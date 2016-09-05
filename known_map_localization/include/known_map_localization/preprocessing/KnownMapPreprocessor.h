@@ -13,13 +13,19 @@
 namespace known_map_localization {
 namespace preprocessing {
 
-class KnownMapPreprocessor: public MapPreprocessor {
-public:
-	KnownMapPreprocessor();
-};
-
+class KnownMapPreprocessor;
 typedef boost::shared_ptr<KnownMapPreprocessor> KnownMapPreprocessorPtr;
 typedef boost::shared_ptr<KnownMapPreprocessor const> KnownMapPreprocessorConstPtr;
+
+class KnownMapPreprocessor: public MapPreprocessor {
+public:
+	static KnownMapPreprocessorPtr instance();
+protected:
+	KnownMapPreprocessor();
+private:
+	static KnownMapPreprocessorPtr _instance;
+};
+
 } /* namespace preprocessing */
 } /* namespace known_map_localization */
 

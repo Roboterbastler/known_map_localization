@@ -9,22 +9,20 @@
 
 #include <base_link/BaseLinkPublisher.h>
 #include <Exception.h>
+#include <SlamScaleManager.h>
 
 namespace known_map_localization {
 namespace base_link {
 
-BaseLinkPublisher::BaseLinkPublisher(filter::FilterConstPtr filter,
-		geographic_msgs::GeoPoseConstPtr anchor, ros::WallDuration duration) :
-		filter(filter),
-		anchor(anchor),
+BaseLinkPublisherPtr BaseLinkPublisher::_instance;
+
+BaseLinkPublisher::BaseLinkPublisher() :
 		slamState(-1) {
-	assert(filter);
-	assert(anchor);
 	orbMapToScene.setIdentity();
 
 	if (ros::isInitialized()) {
 		ros::NodeHandle nh("~");
-		timer = nh.createWallTimer(duration, &BaseLinkPublisher::update, this);
+		timer = nh.createWallTimer(ros::WallDuration(0.2), &BaseLinkPublisher::update, this);
 
 		// get static SLAM map scale if available
 		slamScale = nh.param("slam_map_scale", 1.0);
@@ -33,6 +31,13 @@ BaseLinkPublisher::BaseLinkPublisher(filter::FilterConstPtr filter,
 		groundTruthPublisher = nh.advertise<geometry_msgs::PoseStamped>("ground_truth", 1000);
 		slamStateSubscriber = nh.subscribe("/orb_slam/state", 1000, &BaseLinkPublisher::receiveSlamState, this);
 	}
+}
+
+BaseLinkPublisherPtr BaseLinkPublisher::instance() {
+	if(!_instance) {
+		_instance = BaseLinkPublisherPtr(new BaseLinkPublisher());
+	}
+	return _instance;
 }
 
 void BaseLinkPublisher::update(const ros::WallTimerEvent& event) {
@@ -51,7 +56,7 @@ void BaseLinkPublisher::updateMapTransform() {
 	// get filtered alignment
 	alignment::Alignment alignment;
 	try {
-		alignment = filter->getAlignment();
+		alignment = filter::Filter::instance()->getAlignment();
 
 		// publish map transform
 		broadcaster.sendTransform(
@@ -68,7 +73,7 @@ bool BaseLinkPublisher::updateBaseLink(tf::StampedTransform &out) {
 	// get filtered alignment
 	alignment::Alignment alignment;
 	try {
-		alignment = filter->getAlignment();
+		alignment = filter::Filter::instance()->getAlignment();
 	} catch (AlignmentNotAvailable &e) {
 		return false;
 	}
@@ -84,8 +89,9 @@ bool BaseLinkPublisher::updateBaseLink(tf::StampedTransform &out) {
 		return false;
 	}
 
-	// apply scales
-	slamMapFrame_to_slamBaseLink.getOrigin() *= alignment.scale / slamScale;
+	// convert transform to real world scale
+	float x = slamMapFrame_to_slamBaseLink.getOrigin().x();
+	slamMapFrame_to_slamBaseLink = slam_scale_manager::SlamScaleManager::instance()->convertTransform(slamMapFrame_to_slamBaseLink);
 
 	tf::Transform kmlBaseLink;
 	kmlBaseLink.setIdentity();
@@ -106,16 +112,16 @@ void BaseLinkPublisher::updatePosition(const tf::StampedTransform &baseLink) {
 		return;
 	}
 
-	tf::StampedTransform baseLinkSlamWorld;
+	tf::StampedTransform baseLinkSlamMap;
 	try {
-		listener.lookupTransform("/orb_slam/map", "/known_map_localization/base_link", ros::Time(0), baseLinkSlamWorld);
+		listener.lookupTransform("/orb_slam/map", "/known_map_localization/base_link", ros::Time(0), baseLinkSlamMap);
 	} catch (tf::TransformException &e) {
 		ROS_WARN_THROTTLE(2, "Transformation of base link pose failed: %s", e.what());
 		return;
 	}
 
 	// the estimated pose
-	tf::Stamped<tf::Pose> baseLinkPose(baseLinkSlamWorld, baseLinkSlamWorld.stamp_, baseLinkSlamWorld.frame_id_);
+	tf::Stamped<tf::Pose> baseLinkPose(baseLinkSlamMap, baseLinkSlamMap.stamp_, baseLinkSlamMap.frame_id_);
 
 	// the ground truth pose in the "/blender_scene" frame
 	tf::Stamped<tf::Pose> groundTruthPose;
@@ -143,14 +149,17 @@ void BaseLinkPublisher::receiveSlamState(orb_slam::ORBState stateMessage) {
 		// store /world to /orb_slam/map
 		try {
 			listener.lookupTransform("/orb_slam/map", "/blender_scene", ros::Time(0), orbMapToScene);
-			ROS_INFO("START OF TRACKING detected. Stored /orb_slam/map to /world transformation: x=%f y=%f z=%f", orbMapToScene.getOrigin().x(), orbMapToScene.getOrigin().y(), orbMapToScene.getOrigin().z());
+			ROS_INFO("START OF TRACKING detected. Stored /orb_slam/map to /blender_scene transformation: x=%f y=%f z=%f sec=%d nsec=%d",
+					orbMapToScene.getOrigin().x(), orbMapToScene.getOrigin().y(), orbMapToScene.getOrigin().z(),
+					orbMapToScene.stamp_.sec, orbMapToScene.stamp_.nsec);
+			slamState = stateMessage.state;
 		} catch(tf::TransformException &e) {
 			ROS_WARN("Could not store /orb_slam/map to /world transformation: %s", e.what());
 			return;
 		}
+	} else {
+		slamState = stateMessage.state;
 	}
-
-	slamState = stateMessage.state;
 }
 
 float BaseLinkPublisher::poseToPoseAbsDistance(const tf::Pose &p1, const tf::Pose &p2) {

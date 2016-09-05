@@ -19,6 +19,10 @@
 namespace known_map_localization {
 namespace known_map_server {
 
+class KnownMapServer;
+typedef boost::shared_ptr<KnownMapServer> KnownMapServerPtr;
+typedef boost::shared_ptr<KnownMapServer const> KnownMapServerConstPtr;
+
 /**
  * # Known Map Server
  *
@@ -35,7 +39,7 @@ namespace known_map_server {
  */
 class KnownMapServer {
 public:
-	KnownMapServer(preprocessing::KnownMapPreprocessorPtr preprocessor);
+	static KnownMapServerPtr instance();
 
 	/**
 	 * Get the known map.
@@ -49,7 +53,12 @@ public:
 	 */
 	geographic_msgs::GeoPoseConstPtr getAnchor() const;
 
+protected:
+	KnownMapServer();
+
 private:
+	static KnownMapServerPtr _instance;
+
 	/**
 	 * Loads the known map from disc.
 	 * @param fileName File name of the YAML map meta data file
@@ -72,9 +81,6 @@ private:
 	/// Publishes the known map via a latched topic
 	ros::Publisher knownMapPublisher;
 
-	/// preprocesses the known map
-	preprocessing::KnownMapPreprocessorPtr preprocessor;
-
 	/// The known map
 	nav_msgs::OccupancyGridPtr knownMap;
 
@@ -82,8 +88,6 @@ private:
 	geographic_msgs::GeoPosePtr knownMapAnchor;
 };
 
-typedef boost::shared_ptr<KnownMapServer> KnownMapServerPtr;
-typedef boost::shared_ptr<KnownMapServer const> KnownMapServerConstPtr;
 } /* namespace known_map_server */
 } /* namespace known_map_localization */
 

@@ -52,6 +52,11 @@ public:
 	AlignerFailed(std::string msg) : AlignerException(msg) {};
 };
 
+class ScaleNotAvailable : public KnownMapLocalizationException {
+public:
+	ScaleNotAvailable(std::string msg) : KnownMapLocalizationException(msg) {};
+};
+
 } /* namespace known_map_localization */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_EXCEPTION_H_ */

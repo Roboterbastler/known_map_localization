@@ -6,7 +6,10 @@
  */
 
 #include <KnownMapLocalization.h>
-#include <filter/PassThroughFilter.h>
+#include <known_map_server/KnownMapServer.h>
+#include <preprocessing/SlamMapPreprocessor.h>
+#include <visualization/VisualizationSlamMapPublisher.h>
+#include <aligning/Aligner.h>
 #include <alignment/Hypothesis.h>
 #include <Utils.h>
 #include <Exception.h>
@@ -14,17 +17,10 @@
 namespace known_map_localization {
 using namespace known_map_server;
 using namespace alignment;
+using namespace preprocessing;
 
 KnownMapLocalization::KnownMapLocalization() :
-		algorithmSelector(new AlgorithmSelector()),
-		knownMapServer(new KnownMapServer(algorithmSelector->getKnownMapPreprocessor())),
-		filter(new filter::PassThroughFilter()),
-		baseLinkPublisher(new base_link::BaseLinkPublisher(filter, knownMapServer->getAnchor(), ros::WallDuration(0.2))),
-		visualizationSlamMapPublisher(new visualization::VisualizationSlamMapPublisher(filter)),
 		dataLogger(true) {
-	aligner = algorithmSelector->getAligner();
-	knownMapPreprocessor = algorithmSelector->getKnownMapPreprocessor();
-	slamMapPreprocessor = algorithmSelector->getSlamMapPreprocessor();
 
 	// subscribe to topics
 	ros::NodeHandle nh("~");
@@ -37,20 +33,20 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 	tf::quaternionTFToMsg(tf::Quaternion(0, 0, 0, 1), slamMapFixed->info.origin.orientation);
 
 	// preprocess the SLAM map
-	if(!slamMapPreprocessor->process(slamMapFixed)) {
+	if(!SlamMapPreprocessor::instance()->process(slamMapFixed)) {
 		// preprocessing failed
 		ROS_WARN("SLAM map preprocessing failed. Aligning cancelled.");
 		return;
 	}
 
 	// publish visualization SLAM map
-	visualizationSlamMapPublisher->publishSlamMap(slamMapFixed);
+	visualization::VisualizationSlamMapPublisher::instance()->publishSlamMap(slamMapFixed);
 
 	try {
 		ros::WallTime start = ros::WallTime::now();
 
 		// compute hypotheses (alignments)
-		HypothesesVect hypotheses = aligner->align(knownMapServer->getKnownMap(), slamMapFixed);
+		HypothesesVect hypotheses = aligning::Aligner::instance()->align(KnownMapServer::instance()->getKnownMap(), slamMapFixed);
 
 		ros::WallDuration duration = ros::WallTime::now() - start;
 
@@ -65,9 +61,9 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 					it->score);
 		}
 
-		dataLogger.logComputation(hypotheses, duration, knownMapServer->getKnownMap()->info, slamMapFixed->info);
+		dataLogger.logComputation(hypotheses, duration, KnownMapServer::instance()->getKnownMap()->info, slamMapFixed->info);
 
-		filter->addHypotheses(hypotheses);
+		filter::Filter::instance()->addHypotheses(hypotheses);
 	} catch(AlignerInternalError &e) {
 		ROS_WARN_STREAM("Internal aligner error: " << e.what());
 	} catch(AlignerFailed &e) {

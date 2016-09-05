@@ -7,47 +7,8 @@
 
 #include <AlgorithmSelector.h>
 #include <Exception.h>
-#include <aligning/MapstitchAligner.h>
-#include <aligning/MapmergeAligner.h>
-#include <preprocessing/MapstitchSlamMapPreprocessor.h>
-#include <preprocessing/MapstitchKnownMapPreprocessor.h>
-#include <preprocessing/MapmergeSlamMapPreprocessor.h>
-#include <preprocessing/MapmergeKnownMapPreprocessor.h>
 
 namespace known_map_localization {
-
-using namespace preprocessing;
-
-AlgorithmSelector::AlgorithmSelector() {
-	ros::NodeHandle nh("~");
-	std::string algorithm;
-
-	if(!nh.getParam("algorithm", algorithm)) {
-		throw AlgorithmNotSpecified("Algorithm parameter is missing");
-	}
-
-	ROS_INFO("Selected algorithm: %s", algorithm.c_str());
-
-	switch(getAlgorithm(algorithm)) {
-	case MAPSTITCH:
-		slamMapPreprocessor = SlamMapPreprocessorPtr(new MapstitchSlamMapPreprocessor());
-		knownMapPreprocessor = KnownMapPreprocessorPtr(new MapstitchKnownMapPreprocessor());
-		aligner = aligning::AlignerPtr(new aligning::MapstitchAligner());
-		break;
-	case MAPMERGE:
-		slamMapPreprocessor = SlamMapPreprocessorPtr(new MapmergeSlamMapPreprocessor());
-		knownMapPreprocessor = KnownMapPreprocessorPtr(new MapmergeKnownMapPreprocessor());
-		aligner = aligning::AlignerPtr(new aligning::MapmergeAligner());
-		break;
-	case CSMERGE:
-	default:
-		throw IllegalAlgorithm("Invalid algorithm");
-	}
-
-	assert(knownMapPreprocessor);
-	assert(slamMapPreprocessor);
-	assert(aligner);
-}
 
 Algorithm AlgorithmSelector::getAlgorithm(std::string algorithm) {
 	if(algorithm == "mapstitch") {
@@ -61,16 +22,15 @@ Algorithm AlgorithmSelector::getAlgorithm(std::string algorithm) {
 	}
 }
 
-preprocessing::SlamMapPreprocessorPtr AlgorithmSelector::getSlamMapPreprocessor() const {
-	return slamMapPreprocessor;
-}
+Algorithm AlgorithmSelector::determineAlgorithm() {
+	ros::NodeHandle nh("~");
+	std::string algorithm;
 
-preprocessing::KnownMapPreprocessorPtr AlgorithmSelector::getKnownMapPreprocessor() const {
-	return knownMapPreprocessor;
-}
+	if(!nh.getParam("algorithm", algorithm)) {
+		throw AlgorithmNotSpecified("Algorithm parameter is missing");
+	}
 
-aligning::AlignerPtr AlgorithmSelector::getAligner() const {
-	return aligner;
+	return getAlgorithm(algorithm);
 }
 
 } /* namespace known_map_localization */

@@ -9,12 +9,8 @@
 #define KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWNMAPLOCALIZATION_H_
 
 #include <ros/ros.h>
+#include <nav_msgs/OccupancyGrid.h>
 
-#include <AlgorithmSelector.h>
-#include <known_map_server/KnownMapServer.h>
-#include <filter/Filter.h>
-#include <base_link/BaseLinkPublisher.h>
-#include <visualization/VisualizationSlamMapPublisher.h>
 #include <logging/DataLogger.h>
 
 namespace known_map_localization {
@@ -40,32 +36,8 @@ private:
 	void receiveSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap);
 
 private:
-	/// selects the algorithms according to the method chosen
-	AlgorithmSelectorPtr algorithmSelector;
-
-	/// publishes the known map
-	known_map_server::KnownMapServerConstPtr knownMapServer;
-
-	/// filters the computed alignments
-	filter::FilterPtr filter;
-
-	/// publishes the base link based on the filtered alignment
-	base_link::BaseLinkPublisherConstPtr baseLinkPublisher;
-
-	/// Re-publishes a scaled version of the SLAM map for visualization purposes.
-	visualization::VisualizationSlamMapPublisherConstPtr visualizationSlamMapPublisher;
-
 	/// Subscribes to the map topic released by the SLAM package
 	ros::Subscriber slamMapSubscriber;
-
-	/// The aligning algorithm
-	aligning::AlignerPtr aligner;
-
-	/// The known map preprocessor
-	preprocessing::KnownMapPreprocessorPtr knownMapPreprocessor;
-
-	/// The SLAM map preprocessor
-	preprocessing::SlamMapPreprocessorPtr slamMapPreprocessor;
 
 	/// Data logger for later analysis
 	logging::DataLogger dataLogger;

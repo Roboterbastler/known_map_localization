@@ -15,8 +15,14 @@
 namespace known_map_localization {
 namespace aligning {
 
+class Aligner;
+typedef boost::shared_ptr<Aligner> AlignerPtr;
+typedef boost::shared_ptr<Aligner const> AlignerConstPtr;
+
 class Aligner {
 public:
+	static AlignerPtr instance();
+
 	virtual ~Aligner();
 
 	/**
@@ -27,10 +33,14 @@ public:
 	 * it just contains one hypothesis (the alignment)
 	 */
 	virtual alignment::HypothesesVect align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) = 0;
+
+protected:
+	Aligner();
+
+private:
+	static AlignerPtr _instance;
 };
 
-typedef boost::shared_ptr<Aligner> AlignerPtr;
-typedef boost::shared_ptr<Aligner const> AlignerConstPtr;
 } /* namespace aligning */
 } /* namespace known_map_localization */
 

@@ -20,8 +20,9 @@ namespace known_map_localization {
 namespace known_map_server {
 using namespace preprocessing;
 
-KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr preprocessor) :
-		preprocessor(preprocessor) {
+KnownMapServerPtr KnownMapServer::_instance;
+
+KnownMapServer::KnownMapServer() {
 	ros::NodeHandle nh("~");
 	knownMapPublisher = nh.advertise<nav_msgs::OccupancyGrid>("visualization_known_map", 10, true);
 
@@ -39,12 +40,19 @@ KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr preprocessor) :
 	ROS_INFO("Preprocessing of known map...");
 	assert(knownMap);
 
-	if(!preprocessor->process(knownMap)) {
+	if(!KnownMapPreprocessor::instance()->process(knownMap)) {
 		ROS_ERROR("Known map preprocessing failed.");
 		return;
 	}
 
 	knownMapPublisher.publish(knownMap);
+}
+
+KnownMapServerPtr KnownMapServer::instance() {
+	if(!_instance) {
+		_instance = KnownMapServerPtr(new KnownMapServer());
+	}
+	return _instance;
 }
 
 bool KnownMapServer::loadKnownMap(std::string fileName) {

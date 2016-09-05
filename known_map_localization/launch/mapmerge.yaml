@@ -4,8 +4,11 @@ known_preprocessing_enabled: true
 known_map_config_file: data/known_map.yaml
 known_map_frame_id: /known_map_localization/anchor
 
-# one unit in real world corresponds to this amount of SLAM map units
-slam_map_scale: 0.68
+# SLAM map cell size [meter]
+slam_scale_mode: parameter #[parameter/alignment/gps]
+slam_map_scale: 1.85 #2.27 #1.47
+
+# algorithm parameters
 use_randomized_hough_transform: false
 use_robust_algorithm: false
 number_of_hypotheses: 4

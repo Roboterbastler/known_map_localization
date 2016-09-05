@@ -12,16 +12,25 @@
 namespace known_map_localization {
 namespace visualization {
 
-VisualizationSlamMapPublisher::VisualizationSlamMapPublisher(filter::FilterConstPtr filter) : filter(filter) {
+VisualizationSlamMapPublisherPtr VisualizationSlamMapPublisher::_instance;
+
+VisualizationSlamMapPublisher::VisualizationSlamMapPublisher() {
 	ros::NodeHandle nh("~");
 	slamMapPublisher = nh.advertise<nav_msgs::OccupancyGrid>("visualization_slam_map", 10);
+}
+
+VisualizationSlamMapPublisherPtr VisualizationSlamMapPublisher::instance() {
+	if(!_instance) {
+		_instance = VisualizationSlamMapPublisherPtr(new VisualizationSlamMapPublisher());
+	}
+	return _instance;
 }
 
 void VisualizationSlamMapPublisher::publishSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap) const {
 	nav_msgs::OccupancyGridPtr correctedSlamMap(new nav_msgs::OccupancyGrid(*slamMap));
 	alignment::Alignment alignment;
 	try {
-		alignment = filter->getAlignment();
+		alignment = filter::Filter::instance()->getAlignment();
 	} catch(AlignmentNotAvailable &e) {
 		return;
 	}

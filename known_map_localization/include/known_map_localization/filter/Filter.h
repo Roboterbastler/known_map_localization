@@ -16,12 +16,17 @@
 namespace known_map_localization {
 namespace filter {
 
+class Filter;
+typedef boost::shared_ptr<Filter> FilterPtr;
+typedef boost::shared_ptr<Filter const> FilterConstPtr;
+
 /**
  * # Filter
  */
 class Filter {
 public:
-	Filter();
+	static FilterPtr instance();
+
 	virtual ~Filter();
 
 	/**
@@ -45,15 +50,19 @@ public:
 	bool isAvailable() const;
 
 protected:
+	Filter();
+
+protected:
 	/// the current filtered alignment
 	alignment::Alignment filteredAlignment;
 
 	/// flag indicating if filtered alignment is available
 	bool ready;
+
+private:
+	static FilterPtr _instance;
 };
 
-typedef boost::shared_ptr<Filter> FilterPtr;
-typedef boost::shared_ptr<Filter const> FilterConstPtr;
 } /* namespace filter */
 } /* namespace known_map_localization */
 

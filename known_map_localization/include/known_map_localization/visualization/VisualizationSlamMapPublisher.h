@@ -18,6 +18,10 @@
 namespace known_map_localization {
 namespace visualization {
 
+class VisualizationSlamMapPublisher;
+typedef boost::shared_ptr<VisualizationSlamMapPublisher> VisualizationSlamMapPublisherPtr;
+typedef boost::shared_ptr<VisualizationSlamMapPublisher const> VisualizationSlamMapPublisherConstPtr;
+
 /**
  * # Visualization SLAM Map
  *
@@ -26,7 +30,7 @@ namespace visualization {
  */
 class VisualizationSlamMapPublisher {
 public:
-	VisualizationSlamMapPublisher(filter::FilterConstPtr filter);
+	static VisualizationSlamMapPublisherPtr instance();
 
 	/**
 	 * Publishes the preprocessed SMAL map for visualization purposes.
@@ -34,17 +38,16 @@ public:
 	 */
 	void publishSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap) const;
 
+protected:
+	VisualizationSlamMapPublisher();
+
 private:
+	static VisualizationSlamMapPublisherPtr _instance;
 
 	/// Publishes the visualization SLAM map
 	ros::Publisher slamMapPublisher;
-
-	/// The filter to get the alignment from
-	filter::FilterConstPtr filter;
 };
 
-typedef boost::shared_ptr<VisualizationSlamMapPublisher> VisualizationSlamMapPublisherPtr;
-typedef boost::shared_ptr<VisualizationSlamMapPublisher const> VisualizationSlamMapPublisherConstPtr;
 } /* namespace visualization */
 } /* namespace known_map_localization */
 

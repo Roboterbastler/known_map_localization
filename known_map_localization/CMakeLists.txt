@@ -14,7 +14,9 @@ find_package(catkin REQUIRED COMPONENTS
   orb_slam
   mrgs_alignment
   geographic_msgs
+  geodesy
   geometry_msgs
+  sensor_msgs
   map_server
 )
 
@@ -181,6 +183,9 @@ add_library(visualization
 add_library(logging
   src/logging/DataLogger.cpp
 )
+add_library(slam_scale
+  src/SlamScaleManager.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -196,6 +201,7 @@ add_dependencies(filter ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TA
 add_dependencies(base_link ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(visualization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(logging ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(slam_scale ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -221,17 +227,14 @@ target_link_libraries(known_map_localization_node
   ${catkin_LIBRARIES}
 )
 target_link_libraries(known_map_localization
-  algorithm_selection
+  preprocessing
   known_map_server
-  filter
-  base_link
+  aligning
   visualization
   logging
   ${catkin_LIBRARIES}
 )
 target_link_libraries(algorithm_selection
-  aligning
-  preprocessing
   ${catkin_LIBRARIES}
 )
 target_link_libraries(aligning
@@ -239,6 +242,8 @@ target_link_libraries(aligning
   ${catkin_LIBRARIES}
 )
 target_link_libraries(preprocessing
+  slam_scale
+  algorithm_selection
   ${OpenCV_LIBS}
   ${catkin_LIBRARIES}
 )
@@ -252,10 +257,12 @@ target_link_libraries(alignment
 )
 target_link_libraries(filter
   alignment
+  slam_scale
   ${catkin_LIBRARIES}
 )
 target_link_libraries(base_link
   filter
+  slam_scale
   ${catkin_LIBRARIES}
 )
 target_link_libraries(visualization
@@ -265,6 +272,10 @@ target_link_libraries(visualization
 )
 target_link_libraries(logging
 
+)
+target_link_libraries(slam_scale
+  known_map_server
+  ${catkin_LIBRARIES}
 )
 
 #############
@@ -311,10 +322,12 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/test.cpp
   test/filter_test.cpp
   test/alignment_test.cpp
+  test/slam_scale_manager_test.cpp
 )
 if(TARGET ${PROJECT_NAME}-test)
   target_link_libraries(${PROJECT_NAME}-test
     filter
+    slam_scale
   )
 endif()
 

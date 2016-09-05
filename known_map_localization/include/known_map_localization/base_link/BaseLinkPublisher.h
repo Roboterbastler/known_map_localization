@@ -22,25 +22,25 @@
 namespace known_map_localization {
 namespace base_link {
 
+class BaseLinkPublisher;
+typedef boost::shared_ptr<BaseLinkPublisher> BaseLinkPublisherPtr;
+typedef boost::shared_ptr<BaseLinkPublisher const> BaseLinkPublisherConstPtr;
+
 /**
  * # BaseLinkPublisher
  * Publishes a base link and the map transform on a regular basis using the current filtered alignment.
  *
  * ## Published Topics
  * - **tf**: The transformations topic
+ * - **map_pose**: The current estimated pose in Cartesian coordinates relative to the known map anchor
+ * - **geo_pose**: The current estimated geographic pose using the WGS 84 reference ellipsoid
  *
  * ## Parameters
  * - **slam_map_scale**: The a priori known scale of the SLAM map, e.g. used with the mapmerge algorithm.
  */
 class BaseLinkPublisher {
 public:
-	/**
-	 * Creates the base link publisher.
-	 * @param filter The filter where the filtered alignment will be fetched
-	 * @param anchor The known map anchor
-	 * @param duration The duration between two publications of base links
-	 */
-	BaseLinkPublisher(filter::FilterConstPtr filter, geographic_msgs::GeoPoseConstPtr anchor, ros::WallDuration duration);
+	static BaseLinkPublisherPtr instance();
 
 	/**
 	 * Computes the absolute distance between two poses.
@@ -49,6 +49,9 @@ public:
 	 * @return The distance
 	 */
 	static float poseToPoseAbsDistance(const tf::Pose &p1, const tf::Pose &p2);
+
+protected:
+	BaseLinkPublisher();
 
 private:
 	/**
@@ -87,8 +90,8 @@ private:
 	 */
 	void receiveSlamState(orb_slam::ORBState stateMessage);
 
-	/// Holds the filter
-	filter::FilterConstPtr filter;
+private:
+	static BaseLinkPublisherPtr _instance;
 
 	/// The ROS timer causing regular updates
 	ros::WallTimer timer;
@@ -112,9 +115,6 @@ private:
 	/// The static SLAM scale
 	float slamScale;
 
-	/// The known map anchor
-	geographic_msgs::GeoPoseConstPtr anchor;
-
 	/// The ground truth pose received over the /pose topic
 	geometry_msgs::PoseStampedConstPtr groundTruth;
 
@@ -126,8 +126,6 @@ private:
 	tf::StampedTransform orbMapToScene;
 };
 
-typedef boost::shared_ptr<BaseLinkPublisher> BaseLinkPublisherPtr;
-typedef boost::shared_ptr<BaseLinkPublisher const> BaseLinkPublisherConstPtr;
 } /* namespace base_link */
 } /* namespace known_map_localization */
 

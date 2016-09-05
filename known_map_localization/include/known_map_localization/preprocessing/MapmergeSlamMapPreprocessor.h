@@ -25,13 +25,6 @@ protected:
 	 */
 	void receiveKnownMap(nav_msgs::OccupancyGridConstPtr knownMap);
 
-	/**
-	 * The a priori known scale of the SLAM map, e.g. empirically determined.
-	 * If one unit in the SLAM map corresponds to two units in real world,
-	 * the scale is 0.5 for example.
-	 */
-	float scale;
-
 	/// The resolution of the known map used to rescale the SLAM map.
 	float knownMapResolution;
 

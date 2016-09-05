@@ -6,12 +6,22 @@
  */
 
 #include <filter/Filter.h>
+#include <filter/PassThroughFilter.h>
 #include <Exception.h>
 
 namespace known_map_localization {
 namespace filter {
 
+FilterPtr Filter::_instance;
+
 Filter::Filter() : ready(false) {
+}
+
+FilterPtr Filter::instance() {
+	if(!_instance) {
+		_instance = FilterPtr(new PassThroughFilter());
+	}
+	return _instance;
 }
 
 Filter::~Filter() {
