@@ -15,6 +15,7 @@
 
 #include <known_map_server/KnownMapServer.h>
 #include <known_map_server/YAMLConversions.h>
+#include <preprocessing/KnownMapPreprocessor.h>
 
 namespace known_map_localization {
 namespace known_map_server {

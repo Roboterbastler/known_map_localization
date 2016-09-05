@@ -64,6 +64,12 @@ public:
 	float getSlamScale() const;
 
 	/**
+	 * Gets the current mode.
+	 * @return The mode
+	 */
+	SlamScaleMode getMode() const;
+
+	/**
 	 * Updates the SLAM scale determined by the aligning process.
 	 * @param scale The new SLAM scale estimated by the aligning algorithm
 	 * @note This method has no effect if the SLAM scale manager is not in the ALIGNMENT mode.
@@ -92,19 +98,28 @@ public:
 	geometry_msgs::Pose convertPoseMsg(geometry_msgs::Pose pose) const;
 
 	/**
-	 * Filter the position vectors and remove all positions where the GPS point is in a different
-	 * UTM zone than the given GPS point.
-	 * @param gpsPointData Vector of GPS positions
-	 * @param slamMapPointData Vector of SLAM positions
-	 * @param gpsPoint The given GPS point
+	 * Computes the Euclidean distance between two UTM points (on the xy plane).
+	 * @param p1 The first point
+	 * @param p2 The second point
+	 * @return The distance
+	 * @note It is assumed that both points lie in the same UTM grid zone.
 	 */
-	static void filterPositionData(std::vector<geodesy::UTMPoint> &gpsPointData, std::vector<geometry_msgs::Point> &slamMapPointData, const geodesy::UTMPoint &gpsPoint);
+	static float distance(const geodesy::UTMPoint &p1, const geodesy::UTMPoint &p2);
+
+	/**
+	 * Computes the distance between two points (on the xy plane).
+	 * @param p1 The first point
+	 * @param p2 The second point
+	 * @return The distance
+	 */
+	static float distance(const geometry_msgs::Point &p1, const geometry_msgs::Point &p2);
 
 protected:
 	SlamScaleManager();
 
 	/**
-	 * Callback method to receive GPS fixes.
+	 * Callback method to receive GPS fixes. If the corresponding UTM point lies in a different
+	 * UTM grid zone than the former received positions, the vector of received GPS fixes is cleared.
 	 * @param fix The GPS fix message
 	 * @note This has no effect if the SLAM scale manager
 	 * is not in the GPS mode.
@@ -118,10 +133,15 @@ protected:
 	SlamScaleMode determineMode() const;
 
 	/**
-	 * Performs least squares on the position data. Updates scale if least squares can be applied.
+	 * Computes an estimate of the SLAM map scale by comparing two distances.
+	 * The distance between two GPS fixes and the distance between the corresponding
+	 * SLAM map positions. The position pair with the greatest distance is chosen in
+	 * order to minimize influence of position inaccuracy.
+	 *
+	 * If a scale estimate was computed, the scale is updated.
 	 * @param pointData Positions from the GPS fixes and from SLAM base link
 	 */
-	void leastSquares(std::vector<PositionPair> pointData);
+	void estimateScale(const std::vector<PositionPair> &pointData);
 
 private:
 	static SlamScaleManagerPtr _instance;

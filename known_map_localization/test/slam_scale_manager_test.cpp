@@ -9,47 +9,54 @@
 
 #include <SlamScaleManager.h>
 
-using namespace known_map_localization;
+using namespace known_map_localization::slam_scale_manager;
 using namespace geodesy;
 using namespace geometry_msgs;
 
-class SlamScaleManager : public ::testing::Test {
-};
+TEST(PositionUTMZoneFilter, classifiesCorrectly) {
+	PositionUTMZoneFilter filter(33, 'U');
 
-TEST_F(SlamScaleManager, filtersPositionData) {
-	std::vector<UTMPoint> gpsPoints;
-	std::vector<Point> slamPoints;
-	Point p;
+	EXPECT_FALSE(filter(PositionPair(UTMPoint(0, 0, 33, 'U'), Point())));
+	EXPECT_FALSE(filter(PositionPair(UTMPoint(0, 1, 33, 'U'), Point())));
+	EXPECT_FALSE(filter(PositionPair(UTMPoint(-5, 0, 33, 'U'), Point())));
 
-	gpsPoints.push_back(UTMPoint(0, 0, 33, 'U'));
-	p.x = 0;
-	p.y = 0;
-	slamPoints.push_back(p);
+	EXPECT_TRUE(filter(PositionPair(UTMPoint(0, 0, 32, 'U'), Point())));
+	EXPECT_TRUE(filter(PositionPair(UTMPoint(0, 0, 33, 'V'), Point())));
+	EXPECT_TRUE(filter(PositionPair(UTMPoint(0, 0, 15, 'S'), Point())));
+}
 
-	gpsPoints.push_back(UTMPoint(2, 15, 33, 'U'));
-	p.x = 1;
-	p.y = 9;
-	slamPoints.push_back(p);
+TEST(SlamScaleManager, geometryPointDistance) {
+	Point p1, p2;
+	p1.x = 0;
+	p1.y = 0;
+	p2.x = 0;
+	p2.y = 0;
 
-	gpsPoints.push_back(UTMPoint(2, 15, 32, 'U'));
-	p.x = 7;
-	p.y = 2;
-	slamPoints.push_back(p);
+	EXPECT_FLOAT_EQ(0., SlamScaleManager::distance(p1, p2));
 
-	gpsPoints.push_back(UTMPoint(2, 15, 33, 'U'));
-	p.x = 12;
-	p.y = 12;
-	slamPoints.push_back(p);
+	p2.x = 1;
 
-	gpsPoints.push_back(UTMPoint(2, 15, 33, 'V'));
-	p.x = 11;
-	p.y = 23;
-	slamPoints.push_back(p);
+	EXPECT_FLOAT_EQ(1., SlamScaleManager::distance(p1, p2));
 
-	UTMPoint gpsPoint(1, 7, 33, 'U');
+	p2.y = 1;
 
-	slam_scale_manager::SlamScaleManager::filterPositionData(gpsPoints, slamPoints, gpsPoint);
+	EXPECT_FLOAT_EQ(sqrt(2), SlamScaleManager::distance(p1, p2));
+}
 
-	EXPECT_EQ(3, gpsPoints.size());
-	EXPECT_EQ(3, slamPoints.size());
+TEST(SlamScaleManager, utmPointDistance) {
+	UTMPoint p1, p2;
+	p1.northing = 0;
+	p1.easting = 0;
+	p2.northing = 0;
+	p2.easting = 0;
+
+	EXPECT_FLOAT_EQ(0., SlamScaleManager::distance(p1, p2));
+
+	p2.northing = 1;
+
+	EXPECT_FLOAT_EQ(1., SlamScaleManager::distance(p1, p2));
+
+	p2.easting = 1;
+
+	EXPECT_FLOAT_EQ(sqrt(2), SlamScaleManager::distance(p1, p2));
 }

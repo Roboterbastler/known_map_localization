@@ -9,12 +9,14 @@
 #include <geodesy/wgs84.h>
 
 #include <SlamScaleManager.h>
-#include <known_map_server/KnownMapServer.h>
 #include <Exception.h>
 
 namespace known_map_localization {
 
 namespace slam_scale_manager {
+
+typedef std::vector<PositionPair>::iterator PositionPairIter;
+typedef std::vector<PositionPair>::const_iterator PositionPairConstIter;
 
 SlamScaleManagerPtr SlamScaleManager::_instance;
 
@@ -47,6 +49,10 @@ SlamScaleManager::SlamScaleManager() :
 		ros::shutdown();
 		return;
 	}
+}
+
+SlamScaleMode SlamScaleManager::getMode() const {
+	return mode;
 }
 
 SlamScaleManagerPtr SlamScaleManager::instance() {
@@ -125,32 +131,41 @@ void SlamScaleManager::receiveGpsFix(const sensor_msgs::NavSatFix &fix) {
 		}
 		geometry_msgs::Pose slamPose;
 		tf::poseTFToMsg(slamTransformation, slamPose);
-		geometry_msgs::Point slamPosition = slamPose.position;
-
-		geographic_msgs::GeoPoint geoPoint = geodesy::toMsg(fix);
-		geodesy::UTMPoint utmPoint(geoPoint);
-		geodesy::UTMPoint utmAnchor(known_map_server::KnownMapServer::instance()->getAnchor()->position);
-
-		if (!geodesy::sameGridZone(utmAnchor, utmPoint)) {
-			ROS_ERROR_ONCE(
-					"UTM zone of GPS fix does not match zone of known map anchor.");
-			return;
-		}
-		// GPS position in anchor frame
-		geodesy::UTMPoint gpsPosition(utmPoint.easting - utmAnchor.easting,
-				utmPoint.northing - utmAnchor.northing, utmPoint.zone,
-				utmPoint.band);
+		geodesy::UTMPoint utmGpsPoint(geodesy::toMsg(fix));
 
 		// remove all positions where the UTM zone does not match the new GPS fix's zone
-		std::remove_if(pointData.begin(), pointData.end(), PositionUTMZoneFilter(gpsPosition.zone, gpsPosition.band));
-		pointData.push_back(PositionPair(gpsPosition, slamPosition));
+		std::remove_if(pointData.begin(), pointData.end(), PositionUTMZoneFilter(utmGpsPoint.zone, utmGpsPoint.band));
 
-		leastSquares(pointData);
+		pointData.push_back(PositionPair(utmGpsPoint, slamPose.position));
+
+		estimateScale(pointData);
 	}
 }
 
-void SlamScaleManager::leastSquares(std::vector<PositionPair> pointData) {
+void SlamScaleManager::estimateScale(const std::vector<PositionPair> &pointData) {
+	if(pointData.size() >= 2) {
+		float realWorldDistance = 0;
+		float slamMapDistance;
 
+		for(PositionPairConstIter first = pointData.begin(); first != pointData.end(); ++first) {
+			for(PositionPairConstIter second = pointData.begin(); second != pointData.end(); ++second) {
+				if(distance(first->first, second->first) > realWorldDistance) {
+					realWorldDistance = distance(first->first, second->first);
+					slamMapDistance = distance(first->second, second->second);
+				}
+			}
+		};
+
+		scale = realWorldDistance / slamMapDistance;
+	}
+}
+
+float SlamScaleManager::distance(const geodesy::UTMPoint &p1, const geodesy::UTMPoint &p2) {
+	return sqrt(pow(p1.easting - p2.easting, 2.) + pow(p1.northing - p2.northing, 2.));
+}
+
+float SlamScaleManager::distance(const geometry_msgs::Point &p1, const geometry_msgs::Point &p2) {
+	return sqrt(pow(p1.x - p2.x, 2.) + pow(p1.y - p2.y, 2.));
 }
 
 }

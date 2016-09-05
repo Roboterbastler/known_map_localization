@@ -274,7 +274,6 @@ target_link_libraries(logging
 
 )
 target_link_libraries(slam_scale
-  known_map_server
   ${catkin_LIBRARIES}
 )
 

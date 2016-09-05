@@ -14,8 +14,6 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <geographic_msgs/GeoPose.h>
 
-#include "preprocessing/KnownMapPreprocessor.h"
-
 namespace known_map_localization {
 namespace known_map_server {
 
