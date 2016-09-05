@@ -112,9 +112,6 @@ private:
 	/// between /world and /ORB_SLAM/World (due to re-localization) into account
 	ros::Publisher groundTruthPublisher;
 
-	/// The static SLAM scale
-	float slamScale;
-
 	/// The ground truth pose received over the /pose topic
 	geometry_msgs::PoseStampedConstPtr groundTruth;
 

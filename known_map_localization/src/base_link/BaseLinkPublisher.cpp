@@ -24,9 +24,6 @@ BaseLinkPublisher::BaseLinkPublisher() :
 		ros::NodeHandle nh("~");
 		timer = nh.createWallTimer(ros::WallDuration(0.2), &BaseLinkPublisher::update, this);
 
-		// get static SLAM map scale if available
-		slamScale = nh.param("slam_map_scale", 1.0);
-
 		groundTruthSubscriber = nh.subscribe("/pose", 10, &BaseLinkPublisher::receiveGroundTruth, this);
 		groundTruthPublisher = nh.advertise<geometry_msgs::PoseStamped>("ground_truth", 1000);
 		slamStateSubscriber = nh.subscribe("/orb_slam/state", 1000, &BaseLinkPublisher::receiveSlamState, this);
