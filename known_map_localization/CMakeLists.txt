@@ -15,6 +15,8 @@ find_package(catkin REQUIRED COMPONENTS
   mrgs_alignment
   geographic_msgs
   geodesy
+  message_generation
+  std_msgs
   geometry_msgs
   sensor_msgs
   map_server
@@ -61,11 +63,11 @@ endif(YAMLCPP_FOUND)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
+add_message_files(
+  FILES
+    PoseError.msg
 #   Message2.msg
-# )
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -82,10 +84,10 @@ endif(YAMLCPP_FOUND)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+  DEPENDENCIES
+    std_msgs  # Or other packages containing msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -119,7 +121,7 @@ endif(YAMLCPP_FOUND)
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES known_map_localization
-#  CATKIN_DEPENDS roscpp
+  CATKIN_DEPENDS roscpp std_msgs message_runtime
 #  DEPENDS system_lib
 )
 

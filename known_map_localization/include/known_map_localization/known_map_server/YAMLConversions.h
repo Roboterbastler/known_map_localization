@@ -11,6 +11,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include <geographic_msgs/GeoPose.h>
+#include <tf/transform_datatypes.h>
 
 namespace YAML {
 template<>
@@ -33,7 +34,7 @@ struct convert<geographic_msgs::GeoPose> {
 	}
 
 	static bool decode(const Node& node, geographic_msgs::GeoPose& gp) {
-		if(!node.IsMap() || node.size() != 2 || !node["position"].IsMap() || !node["orientation"].IsMap()) {
+		if(!node.IsMap() || node.size() != 2 || !node["position"].IsMap() || node["orientation"].IsMap()) {
 			std::cerr << "Invalid input" << node.IsMap() << node.size() << std::endl;
 			return false;
 		}
@@ -43,10 +44,7 @@ struct convert<geographic_msgs::GeoPose> {
 			gp.position.latitude = node["position"]["latitude"].as<double>();
 			gp.position.longitude = node["position"]["longitude"].as<double>();
 
-			gp.orientation.x = node["orientation"]["x"].as<double>();
-			gp.orientation.y = node["orientation"]["y"].as<double>();
-			gp.orientation.z = node["orientation"]["z"].as<double>();
-			gp.orientation.w = node["orientation"]["w"].as<double>();
+			gp.orientation = tf::createQuaternionMsgFromYaw(node["heading"].as<double>());
 
 			return true;
 		} catch (InvalidNode &in) {

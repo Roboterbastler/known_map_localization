@@ -6,21 +6,22 @@
  */
 
 #include <geometry_msgs/PoseStamped.h>
+#include <std_msgs/Float32.h>
 
 #include <base_link/BaseLinkPublisher.h>
 #include <Exception.h>
 #include <SlamScaleManager.h>
+#include <known_map_server/KnownMapServer.h>
+#include <known_map_localization/PoseError.h>
 
 namespace known_map_localization {
 namespace base_link {
 
 BaseLinkPublisherPtr BaseLinkPublisher::_instance;
 
-BaseLinkPublisher::BaseLinkPublisher() :
-		slamState(-1) {
+BaseLinkPublisher::BaseLinkPublisher() {
 	ROS_INFO("Base link publisher initialization...");
 
-	orbMapToScene.setIdentity();
 	ros::WallDuration interval(0.2);
 
 	ROS_INFO("    Interval: %.2f", interval.toSec());
@@ -31,7 +32,8 @@ BaseLinkPublisher::BaseLinkPublisher() :
 
 		groundTruthSubscriber = nh.subscribe("/pose", 10, &BaseLinkPublisher::receiveGroundTruth, this);
 		groundTruthPublisher = nh.advertise<geometry_msgs::PoseStamped>("ground_truth", 1000);
-		slamStateSubscriber = nh.subscribe("/orb_slam/state", 1000, &BaseLinkPublisher::receiveSlamState, this);
+		geoPosePublisher = nh.advertise<geographic_msgs::GeoPose>("geo_pose", 1000);
+		poseErrorPublisher = nh.advertise<PoseError>("pose_error", 1000);
 	}
 }
 
@@ -49,8 +51,9 @@ void BaseLinkPublisher::update(const ros::WallTimerEvent& event) {
 	// update base link
 	tf::StampedTransform baseLink;
 	if(updateBaseLink(baseLink)) {
-		// update position
-		updatePosition(baseLink);
+		// update positions
+		updatePositionError(baseLink);
+		updateGeoPose(known_map_server::KnownMapServer::instance()->getAnchor(), baseLink);
 	}
 }
 
@@ -108,67 +111,57 @@ bool BaseLinkPublisher::updateBaseLink(tf::StampedTransform &out) {
 	return true;
 }
 
-void BaseLinkPublisher::updatePosition(const tf::StampedTransform &baseLink) {
+void BaseLinkPublisher::updatePositionError(const tf::StampedTransform &baseLink) {
 	if(!groundTruth) {
-		ROS_DEBUG_THROTTLE(2, "Ground truth pose not available. Pose not published.");
+		ROS_DEBUG_THROTTLE(2, "Ground truth pose not available. Pose error not published.");
 		return;
 	}
 
-	tf::StampedTransform baseLinkSlamMap;
 	try {
-		listener.lookupTransform("/orb_slam/map", "/known_map_localization/base_link", ros::Time(0), baseLinkSlamMap);
-	} catch (tf::TransformException &e) {
-		ROS_WARN_THROTTLE(2, "Transformation of base link pose failed: %s", e.what());
-		return;
+		// estimated pose in known map anchor frame
+		tf::Stamped<tf::Pose> estimatedPose(baseLink, baseLink.stamp_, baseLink.frame_id_);
+
+		// ground truth pose in the "/blender_scene" frame
+		tf::Stamped<tf::Pose> groundTruthPose;
+		tf::poseStampedMsgToTF(*groundTruth, groundTruthPose);
+
+		// publish pose error
+		PoseError poseError;
+		poseError.error = poseToPoseAbsDistance(estimatedPose, groundTruthPose);
+		poseError.header.stamp = baseLink.stamp_;
+		poseErrorPublisher.publish(poseError);
+	} catch(tf::TransformException &e) {
+		ROS_WARN_THROTTLE(2, "Could not get estimated pose or ground truth pose: %s", e.what());
 	}
+}
 
-	// the estimated pose
-	tf::Stamped<tf::Pose> baseLinkPose(baseLinkSlamMap, baseLinkSlamMap.stamp_, baseLinkSlamMap.frame_id_);
+void BaseLinkPublisher::updateGeoPose(geographic_msgs::GeoPoseConstPtr anchor, const tf::StampedTransform &baseLink) {
+	tf::Quaternion anchorRotation;
+	tf::quaternionMsgToTF(anchor->orientation, anchorRotation);
+	tf::Transform t(anchorRotation.inverse());
 
-	// the ground truth pose in the "/blender_scene" frame
-	tf::Stamped<tf::Pose> groundTruthPose;
-	tf::poseStampedMsgToTF(*groundTruth, groundTruthPose);
+	// transform base link to align x axis with circles of latitude
+	tf::Pose cartesianPose = t * baseLink;
 
-	// convert pose into "/orb_slam/map" frame
-	groundTruthPose.setData(orbMapToScene * groundTruthPose);
-	groundTruthPose.frame_id_ = "/orb_slam/map";
+	// use the quick and dirty estimate that 111,111 meters (111.111 km) in the y direction is 1 degree (of latitude)
+	// and 111,111 * cos(latitude) meters in the x direction is 1 degree (of longitude).
+	geographic_msgs::GeoPose geoPose;
+	tf::quaternionTFToMsg(cartesianPose.getRotation(), geoPose.orientation);
+	geoPose.position.altitude = anchor->position.altitude + cartesianPose.getOrigin().getZ();
+	geoPose.position.latitude = anchor->position.latitude + (cartesianPose.getOrigin().getY() / 111111.);
+	geoPose.position.longitude = anchor->position.longitude + (cartesianPose.getOrigin().getX() / (111111. * cos(geoPose.position.latitude)));
 
-	// publish ground truth pose
-	geometry_msgs::PoseStamped groundTruthPoseMsg;
-	tf::poseStampedTFToMsg(groundTruthPose, groundTruthPoseMsg);
-	groundTruthPublisher.publish(groundTruthPoseMsg);
-
-	float absPoseError = poseToPoseAbsDistance(baseLinkPose, groundTruthPose);
+	geoPosePublisher.publish(geoPose);
 }
 
 void BaseLinkPublisher::receiveGroundTruth(geometry_msgs::PoseStampedConstPtr poseMessage) {
 	groundTruth = poseMessage;
 }
 
-void BaseLinkPublisher::receiveSlamState(orb_slam::ORBState stateMessage) {
-	// detect "initialization -> tracking" transition
-	if(slamState == 2 && stateMessage.state == 3) {
-		// store /world to /orb_slam/map
-		try {
-			listener.lookupTransform("/orb_slam/map", "/blender_scene", ros::Time(0), orbMapToScene);
-			ROS_INFO("START OF TRACKING detected. Stored /orb_slam/map to /blender_scene transformation: x=%f y=%f z=%f sec=%d nsec=%d",
-					orbMapToScene.getOrigin().x(), orbMapToScene.getOrigin().y(), orbMapToScene.getOrigin().z(),
-					orbMapToScene.stamp_.sec, orbMapToScene.stamp_.nsec);
-			slamState = stateMessage.state;
-		} catch(tf::TransformException &e) {
-			ROS_WARN("Could not store /orb_slam/map to /world transformation: %s", e.what());
-			return;
-		}
-	} else {
-		slamState = stateMessage.state;
-	}
-}
-
 float BaseLinkPublisher::poseToPoseAbsDistance(const tf::Pose &p1, const tf::Pose &p2) {
 	float dx = p2.getOrigin().x() - p1.getOrigin().x();
 	float dy = p2.getOrigin().y() - p1.getOrigin().y();
-	float dz = p2.getOrigin().z() - p1.getOrigin().z();
-	return sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
+	return sqrt(pow(dx, 2) + pow(dy, 2));
 }
 
 } /* namespace base_link */
