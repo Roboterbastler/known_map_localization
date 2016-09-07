@@ -1,4 +1,0 @@
-<launch>
-	<node pkg="mrgs_alignment" type="align_node" name="mrgs_alignment_node" />
-	<test test-name="test_mrgs_alignment" pkg="mrgs_alignment" type="mrgs_alignment_test_node" />
-</launch>

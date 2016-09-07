@@ -12,7 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
   mapstitch
   mapmerge
   orb_slam
-  mrgs_alignment
   geographic_msgs
   geodesy
   message_generation
