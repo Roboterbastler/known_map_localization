@@ -15,6 +15,7 @@ namespace filter {
 FilterPtr Filter::_instance;
 
 Filter::Filter() : ready(false) {
+	ROS_INFO("Filter initialization...");
 }
 
 FilterPtr Filter::instance() {

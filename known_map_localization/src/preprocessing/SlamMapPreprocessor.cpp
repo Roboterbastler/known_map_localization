@@ -18,6 +18,7 @@ SlamMapPreprocessorPtr SlamMapPreprocessor::_instance;
 
 SlamMapPreprocessor::SlamMapPreprocessor() :
 		MapPreprocessor("processed_slam_map_img", "slam_preprocessing_enabled") {
+	ROS_INFO("SLAM map preprocessor initialization...");
 }
 
 SlamMapPreprocessorPtr SlamMapPreprocessor::instance() {

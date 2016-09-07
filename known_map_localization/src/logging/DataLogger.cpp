@@ -22,8 +22,10 @@ using namespace std;
 
 DataLogger::DataLogger(bool enabled) :
 		computationId(0), enabled(enabled) {
+	ROS_INFO("Data logger initialization...");
+
 	if(!enabled) {
-		ROS_INFO("Data logging disabled.");
+		ROS_INFO("    Data logging disabled.");
 		return;
 	}
 
@@ -33,15 +35,15 @@ DataLogger::DataLogger(bool enabled) :
 	alignmentsFile.open(alignmentsFileName.c_str());
 	computationsFile.open(computationsFileName.c_str());
 
-	ROS_INFO("Logging alignment data to %s.", alignmentsFileName.c_str());
-	ROS_INFO("Logging computation data to %s.", computationsFileName.c_str());
+	ROS_INFO("    Alignment data file: %s.", alignmentsFileName.c_str());
+	ROS_INFO("    Computation data file: %s.", computationsFileName.c_str());
 
 	if (!alignmentsFile.is_open()) {
-		ROS_WARN("Logging data failed. Unable to open file %s",
+		ROS_WARN("    Logging data failed. Unable to open file %s",
 				alignmentsFileName.c_str());
 	}
 	if (!computationsFile.is_open()) {
-		ROS_WARN("Logging data failed. Unable to open file %s",
+		ROS_WARN("    Logging data failed. Unable to open file %s",
 				computationsFileName.c_str());
 	}
 

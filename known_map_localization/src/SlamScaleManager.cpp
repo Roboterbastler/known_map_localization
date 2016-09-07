@@ -22,11 +22,13 @@ SlamScaleManager::SlamScaleManager() :
 		mode(determineMode()), isValid(false), scale(1.0) {
 	ros::NodeHandle nh("~");
 
+	ROS_INFO("SLAM scale manager initialization...");
+
 	switch (mode) {
 	case PARAMETER:
-		ROS_INFO("SLAM scale manager mode: PARAMETER");
+		ROS_INFO("    Mode: PARAMETER");
 		if (nh.getParam("slam_map_scale", scale)) {
-			ROS_INFO("Setting scale to %f", scale);
+			ROS_INFO("    Scale: %f", scale);
 			isValid = true;
 		} else {
 			ROS_FATAL("No SLAM scale parameter found.");
@@ -35,15 +37,15 @@ SlamScaleManager::SlamScaleManager() :
 		}
 		break;
 	case ALIGNMENT:
-		ROS_INFO("SLAM scale manager mode: ALIGNMENT");
+		ROS_INFO("    Mode: ALIGNMENT");
 		break;
 	case GPS:
-		ROS_INFO("SLAM scale manager mode: GPS");
+		ROS_INFO("    Mode: GPS");
 		gpsFixSubscriber = nh.subscribe("/fix", 100,
 				&SlamScaleManager::receiveGpsFix, this);
 		break;
 	default:
-		ROS_FATAL("Illegal or not specified SLAM scale manager mode.");
+		ROS_FATAL("    Illegal or not specified SLAM scale manager mode.");
 		ros::shutdown();
 		return;
 	}

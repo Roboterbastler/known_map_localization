@@ -18,6 +18,7 @@ KnownMapPreprocessorPtr KnownMapPreprocessor::_instance;
 
 KnownMapPreprocessor::KnownMapPreprocessor() :
 		MapPreprocessor("processed_known_map_img", "known_preprocessing_enabled") {
+	ROS_INFO("Known map preprocessor initialization...");
 }
 
 KnownMapPreprocessorPtr KnownMapPreprocessor::instance() {

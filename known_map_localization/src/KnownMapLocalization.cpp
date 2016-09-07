@@ -31,6 +31,7 @@ KnownMapLocalization::KnownMapLocalization() :
 	KnownMapPreprocessor::instance();
 	SlamMapPreprocessor::instance();
 	SlamScaleManager::instance();
+	filter::Filter::instance();
 	base_link::BaseLinkPublisher::instance();
 
 	// subscribe to topics

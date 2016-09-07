@@ -25,7 +25,6 @@ class AlgorithmSelector {
 public:
 	static Algorithm determineAlgorithm();
 
-protected:
 	/**
 	 * Evaluates the algorithm name string and returns the corresponding enum value.
 	 * @param algorithm The name of the algorithm

@@ -24,25 +24,30 @@ using namespace preprocessing;
 KnownMapServerPtr KnownMapServer::_instance;
 
 KnownMapServer::KnownMapServer() {
+	ROS_INFO("Known map server initialization...");
+
 	ros::NodeHandle nh("~");
 	knownMapPublisher = nh.advertise<nav_msgs::OccupancyGrid>("visualization_known_map", 10, true);
 
 	std::string fileName;
 	nh.getParam("known_map_config_file", fileName);
+
+	ROS_INFO("    file: %s", fileName.c_str());
+
 	fileName = ros::package::getPath("known_map_localization") + '/' + fileName;
 
-	ROS_INFO("Load known map...");
+	ROS_INFO("    Load known map...");
 	if(!loadKnownMap(fileName)) {
 		ROS_FATAL("Known map could not be loaded: %s", fileName.c_str());
 		ros::shutdown();
 		return;
 	}
 
-	ROS_INFO("Preprocessing of known map...");
+	ROS_INFO("    Preprocessing of known map...");
 	assert(knownMap);
 
 	if(!KnownMapPreprocessor::instance()->process(knownMap)) {
-		ROS_ERROR("Known map preprocessing failed.");
+		ROS_ERROR("    Known map preprocessing failed.");
 		return;
 	}
 

@@ -18,11 +18,16 @@ BaseLinkPublisherPtr BaseLinkPublisher::_instance;
 
 BaseLinkPublisher::BaseLinkPublisher() :
 		slamState(-1) {
+	ROS_INFO("Base link publisher initialization...");
+
 	orbMapToScene.setIdentity();
+	ros::WallDuration interval(0.2);
+
+	ROS_INFO("    Interval: %.2f", interval.toSec());
 
 	if (ros::isInitialized()) {
 		ros::NodeHandle nh("~");
-		timer = nh.createWallTimer(ros::WallDuration(0.2), &BaseLinkPublisher::update, this);
+		timer = nh.createWallTimer(interval, &BaseLinkPublisher::update, this);
 
 		groundTruthSubscriber = nh.subscribe("/pose", 10, &BaseLinkPublisher::receiveGroundTruth, this);
 		groundTruthPublisher = nh.advertise<geometry_msgs::PoseStamped>("ground_truth", 1000);
