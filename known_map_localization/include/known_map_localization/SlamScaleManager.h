@@ -58,7 +58,7 @@ typedef boost::shared_ptr<SlamScaleManager const> SlamScaleManagerConstPtr;
  * Only used in PARAMETER mode.
  *
  * ## Subscribed Topics
- * - __/fix__ (only in GPS mode): GPS fixes are received via this topic
+ * - __/robot/gps__ (only in GPS mode): GPS fixes are received via this topic
  */
 class SlamScaleManager {
 public:
