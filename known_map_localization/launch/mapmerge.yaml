@@ -5,7 +5,7 @@ known_map_config_file: data/known_map.yaml
 known_map_frame_id: /known_map_localization/anchor
 
 # SLAM map cell size [meters]
-slam_scale_mode: gps #[parameter/alignment/gps]
+slam_scale_mode: parameter #[parameter/alignment/gps]
 slam_map_scale: 1.7 #1.85 #2.27 #1.47
 
 # algorithm parameters
