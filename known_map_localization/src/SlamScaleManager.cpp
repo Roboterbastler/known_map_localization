@@ -5,16 +5,20 @@
  *      Author: jacob
  */
 
+#include <numeric>
+
 #include <ros/ros.h>
 #include <geodesy/wgs84.h>
 
 #include <SlamScaleManager.h>
 #include <Exception.h>
 
+#define MAX_POSITION_CACHE_SIZE 100
+#define MIN_GPS_DISTANCE_M 0.5
+
 namespace known_map_localization {
 
-typedef std::vector<PositionPair>::iterator PositionPairIter;
-typedef std::vector<PositionPair>::const_iterator PositionPairConstIter;
+typedef std::vector<PositionElement>::const_iterator PositionElementConstIter;
 
 SlamScaleManagerPtr SlamScaleManager::_instance;
 
@@ -41,7 +45,7 @@ SlamScaleManager::SlamScaleManager() :
 		break;
 	case GPS:
 		ROS_INFO("    Mode: GPS");
-		gpsFixSubscriber = nh.subscribe("/fix", 100,
+		gpsFixSubscriber = nh.subscribe("/robot/gps", 10,
 				&SlamScaleManager::receiveGpsFix, this);
 		break;
 	default:
@@ -56,7 +60,7 @@ SlamScaleMode SlamScaleManager::getMode() const {
 }
 
 SlamScaleManagerPtr SlamScaleManager::instance() {
-	if(!_instance) {
+	if (!_instance) {
 		_instance = SlamScaleManagerPtr(new SlamScaleManager());
 	}
 	return _instance;
@@ -66,15 +70,15 @@ SlamScaleMode SlamScaleManager::determineMode() const {
 	ros::NodeHandle nh("~");
 	std::string invalid = "not specified";
 	std::string mode = nh.param("slam_scale_mode", invalid);
-	std::transform(mode.begin(), mode.end(),mode.begin(), ::toupper);
+	std::transform(mode.begin(), mode.end(), mode.begin(), ::toupper);
 
-	if(mode == "PARAMETER") {
+	if (mode == "PARAMETER") {
 		return PARAMETER;
 	}
-	if(mode =="ALIGNMENT") {
+	if (mode == "ALIGNMENT") {
 		return ALIGNMENT;
 	}
-	if(mode == "GPS") {
+	if (mode == "GPS") {
 		return GPS;
 	}
 	return INVALID;
@@ -117,55 +121,127 @@ geometry_msgs::Pose SlamScaleManager::convertPoseMsg(
 }
 
 void SlamScaleManager::receiveGpsFix(const sensor_msgs::NavSatFix &fix) {
-	if (fix.status.status >= sensor_msgs::NavSatStatus::STATUS_FIX) {
-		// valid fix
-		// get SLAM position in anchor frame
-		tf::StampedTransform slamTransformation;
-		try {
-			listener.lookupTransform("/known_map_localization/anchor",
-					"ORB_base_link", fix.header.stamp, slamTransformation);
-		} catch (tf::TransformException &e) {
-			ROS_DEBUG_THROTTLE(1,
-					"SLAM scale manager: SLAM position not available.");
+	if (fix.status.status < sensor_msgs::NavSatStatus::STATUS_FIX) {
+		// fix is not valid
+		return;
+	}
+
+	geodesy::UTMPoint utmGpsPoint(geodesy::toMsg(fix));
+
+	if (!positionCache.empty() && geodesy::sameGridZone(utmGpsPoint, positionCache.back().gps)) {
+		if (distance(utmGpsPoint, positionCache.back().gps) < MIN_GPS_DISTANCE_M) {
+			// too small distance, skip GPS fix
 			return;
 		}
-		geometry_msgs::Pose slamPose;
-		tf::poseTFToMsg(slamTransformation, slamPose);
-		geodesy::UTMPoint utmGpsPoint(geodesy::toMsg(fix));
-
-		// remove all positions where the UTM zone does not match the new GPS fix's zone
-		std::remove_if(pointData.begin(), pointData.end(), PositionUTMZoneFilter(utmGpsPoint.zone, utmGpsPoint.band));
-
-		pointData.push_back(PositionPair(utmGpsPoint, slamPose.position));
-
-		estimateScale(pointData);
 	}
+
+	tf::StampedTransform slamTransformation;
+	try {
+		if (!listener.waitForTransform("/orb_slam/map", "ORB_base_link",
+				fix.header.stamp, ros::Duration(1.0))) {
+			ROS_DEBUG("Waited for transform, but it didn't become available.");
+			return;
+		}
+		listener.lookupTransform("/orb_slam/map", "ORB_base_link",
+				fix.header.stamp, slamTransformation);
+	} catch (tf::TransformException &e) {
+		ROS_WARN("SLAM scale manager: SLAM position not available (%s).",
+				e.what());
+		return;
+	}
+
+	geometry_msgs::Pose slamPose;
+	tf::poseTFToMsg(slamTransformation, slamPose);
+
+	if (!positionCache.empty()) {
+		const geodesy::UTMPoint &first = positionCache.front().gps;
+		if (!geodesy::sameGridZone(first, utmGpsPoint)) {
+			// copter crossed border between two different UTM zones
+			// reset position cache
+			positionCache.clear();
+			ROS_INFO("SLAM scale manager: UTM zone border crossed. Resetting GPS position cache.");
+		}
+	}
+
+	// add new position cache element
+	positionCache.push_back(PositionElement(utmGpsPoint, slamPose.position));
+	ROS_DEBUG("Position cache size: %ld", positionCache.size());
+
+	// remove oldest element if too big
+	if (positionCache.size() > MAX_POSITION_CACHE_SIZE) {
+		positionCache.erase(positionCache.begin());
+		ROS_DEBUG_ONCE(
+				"SLAM scale manager: Reached maximum GPS position cache size. Starting to remove oldest positions.");
+	}
+
+	estimateScale(positionCache);
 }
 
-void SlamScaleManager::estimateScale(const std::vector<PositionPair> &pointData) {
-	if(pointData.size() >= 2) {
-		float realWorldDistance = 0;
-		float slamMapDistance;
+void SlamScaleManager::estimateScale(
+		const std::vector<PositionElement> &pointData) {
+	if (pointData.size() >= 2) {
+		std::vector<double> scales;
 
-		for(PositionPairConstIter first = pointData.begin(); first != pointData.end(); ++first) {
-			for(PositionPairConstIter second = pointData.begin(); second != pointData.end(); ++second) {
-				if(distance(first->first, second->first) > realWorldDistance) {
-					realWorldDistance = distance(first->first, second->first);
-					slamMapDistance = distance(first->second, second->second);
+		for (PositionElementConstIter first = pointData.begin();
+				first != pointData.end(); ++first) {
+			for (PositionElementConstIter second = pointData.begin();
+					second != pointData.end(); ++second) {
+				if (first == second) {
+					continue;
 				}
+
+				double slamMapDistance = distance(first->slam, second->slam);
+				double realWorldDistance = distance(first->gps, second->gps);
+
+				if (realWorldDistance < MIN_GPS_DISTANCE_M || slamMapDistance < 0.01) {
+					// avoid small distances
+					continue;
+				}
+
+				double scaleEstimate = realWorldDistance / slamMapDistance;
+
+				if(scaleEstimate > 10.) {
+					// drop too big estimates
+					continue;
+				}
+
+				scales.push_back(scaleEstimate);
 			}
 		};
 
-		scale = realWorldDistance / slamMapDistance;
+		if (!scales.empty()) {
+			scale = median(scales);
+			isValid = true;
+			ROS_INFO("Estimated scale by GPS (median from %ld values): %.4f",
+					scales.size(), scale);
+		} else {
+			ROS_INFO("No new scale estimation available.");
+		}
 	}
 }
 
-float SlamScaleManager::distance(const geodesy::UTMPoint &p1, const geodesy::UTMPoint &p2) {
-	return sqrt(pow(p1.easting - p2.easting, 2.) + pow(p1.northing - p2.northing, 2.));
+double SlamScaleManager::distance(const geodesy::UTMPoint &p1,
+		const geodesy::UTMPoint &p2) {
+	return sqrt(
+			pow(p1.easting - p2.easting, 2.)
+					+ pow(p1.northing - p2.northing, 2.));
 }
 
-float SlamScaleManager::distance(const geometry_msgs::Point &p1, const geometry_msgs::Point &p2) {
+double SlamScaleManager::distance(const geometry_msgs::Point &p1,
+		const geometry_msgs::Point &p2) {
 	return sqrt(pow(p1.x - p2.x, 2.) + pow(p1.y - p2.y, 2.));
+}
+
+double SlamScaleManager::median(std::vector<double> &values) {
+	std::sort(values.begin(), values.end());
+	size_t size = values.size();
+
+	if (size % 2 == 0) {
+		return (values.at(size / 2 - 1) + values.at(size / 2))
+				/ 2.;
+	} else {
+		return values.at(values.size() / 2);
+	}
 }
 
 } /* namespace known_map_localization */

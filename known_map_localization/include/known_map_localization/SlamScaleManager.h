@@ -29,7 +29,17 @@ typedef enum {
 	GPS ///< Uses GPS fixes to estimate the SLAM scale
 } SlamScaleMode;
 
-typedef std::pair<geodesy::UTMPoint, geometry_msgs::Point> PositionPair;
+/**
+ * Element of the position cache used when running in GPS mode.
+ */
+class PositionElement {
+public:
+	PositionElement(geodesy::UTMPoint gps, geometry_msgs::Point slam) : gps(gps), slam(slam) {
+	}
+
+	geodesy::UTMPoint gps;
+	geometry_msgs::Point slam;
+};
 
 class SlamScaleManager;
 typedef boost::shared_ptr<SlamScaleManager> SlamScaleManagerPtr;
@@ -102,7 +112,7 @@ public:
 	 * @return The distance
 	 * @note It is assumed that both points lie in the same UTM grid zone.
 	 */
-	static float distance(const geodesy::UTMPoint &p1, const geodesy::UTMPoint &p2);
+	static double distance(const geodesy::UTMPoint &p1, const geodesy::UTMPoint &p2);
 
 	/**
 	 * Computes the distance between two points (on the xy plane).
@@ -110,7 +120,14 @@ public:
 	 * @param p2 The second point
 	 * @return The distance
 	 */
-	static float distance(const geometry_msgs::Point &p1, const geometry_msgs::Point &p2);
+	static double distance(const geometry_msgs::Point &p1, const geometry_msgs::Point &p2);
+
+	/**
+	 * Computes the median of a vector of values.
+	 * @param values The values
+	 * @return The median
+	 */
+	static double median(std::vector<double> &values);
 
 protected:
 	SlamScaleManager();
@@ -139,7 +156,7 @@ protected:
 	 * If a scale estimate was computed, the scale is updated.
 	 * @param pointData Positions from the GPS fixes and from SLAM base link
 	 */
-	void estimateScale(const std::vector<PositionPair> &pointData);
+	void estimateScale(const std::vector<PositionElement> &pointData);
 
 private:
 	static SlamScaleManagerPtr _instance;
@@ -159,23 +176,8 @@ private:
 	/// Listens to the **tf** topic
 	tf::TransformListener listener;
 
-	std::vector<PositionPair> pointData;
-};
-
-/**
- * Used to remove positions with a different UTM zone from a vector.
- */
-class PositionUTMZoneFilter {
-public:
-	PositionUTMZoneFilter(uint8_t zone, char band) :
-		zone(zone), band(band) {}
-
-	bool operator() (const PositionPair &elem) const {
-		return zone != elem.first.zone || band != elem.first.band;
-	}
-private:
-	uint8_t zone;
-	char band;
+	/// Caches pairs of GPS and SLAM positions when running in GPS mode
+	std::vector<PositionElement> positionCache;
 };
 
 } /* namespace known_map_localization */

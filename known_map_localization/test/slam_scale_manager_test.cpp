@@ -9,21 +9,9 @@
 
 #include <SlamScaleManager.h>
 
-using namespace known_map_localization::slam_scale_manager;
+using namespace known_map_localization;
 using namespace geodesy;
 using namespace geometry_msgs;
-
-TEST(PositionUTMZoneFilter, classifiesCorrectly) {
-	PositionUTMZoneFilter filter(33, 'U');
-
-	EXPECT_FALSE(filter(PositionPair(UTMPoint(0, 0, 33, 'U'), Point())));
-	EXPECT_FALSE(filter(PositionPair(UTMPoint(0, 1, 33, 'U'), Point())));
-	EXPECT_FALSE(filter(PositionPair(UTMPoint(-5, 0, 33, 'U'), Point())));
-
-	EXPECT_TRUE(filter(PositionPair(UTMPoint(0, 0, 32, 'U'), Point())));
-	EXPECT_TRUE(filter(PositionPair(UTMPoint(0, 0, 33, 'V'), Point())));
-	EXPECT_TRUE(filter(PositionPair(UTMPoint(0, 0, 15, 'S'), Point())));
-}
 
 TEST(SlamScaleManager, geometryPointDistance) {
 	Point p1, p2;
@@ -59,4 +47,43 @@ TEST(SlamScaleManager, utmPointDistance) {
 	p2.easting = 1;
 
 	EXPECT_FLOAT_EQ(sqrt(2), SlamScaleManager::distance(p1, p2));
+}
+
+TEST(SlamScaleManager, medianEmpty) {
+	std::vector<double> empty;
+
+	ASSERT_THROW(SlamScaleManager::median(empty), std::out_of_range);
+}
+
+TEST(SlamScaleManager, medianEven) {
+	std::vector<double> data;
+	data.push_back(6);
+	data.push_back(3);
+
+	data.push_back(5);
+	data.push_back(10);
+
+	data.push_back(8);
+	data.push_back(2);
+
+	data.push_back(5);
+	data.push_back(11);
+
+	ASSERT_EQ(5.5, SlamScaleManager::median(data));
+}
+
+TEST(SlamScaleManager, medianOdd) {
+	std::vector<double> data;
+	data.push_back(6);
+
+	data.push_back(5);
+	data.push_back(10);
+
+	data.push_back(8);
+	data.push_back(2);
+
+	data.push_back(5);
+	data.push_back(11);
+
+	ASSERT_EQ(6, SlamScaleManager::median(data));
 }

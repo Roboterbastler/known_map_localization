@@ -7,6 +7,7 @@
 
 #include <SlamScaleManager.h>
 #include <preprocessing/MapmergeSlamMapPreprocessor.h>
+#include <Exception.h>
 
 #define KNOWN_MAP_RESOLUTION_UNAVAILABLE -1
 
@@ -32,13 +33,18 @@ bool MapmergeSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData
 		return false;
 	}
 
-	float realSlamResolution = mapMetaData.resolution * SlamScaleManager::instance()->getSlamScale();
-	float imgScaleFactor = realSlamResolution / knownMapResolution;
-	cv::resize(img, img, cv::Size(), imgScaleFactor, imgScaleFactor, CV_INTER_NN);
-	mapMetaData.resolution = realSlamResolution / imgScaleFactor;
-	mapMetaData.origin = SlamScaleManager::instance()->convertPoseMsg(mapMetaData.origin);
-	mapMetaData.height = img.rows;
-	mapMetaData.width = img.cols;
+	try {
+		float realSlamResolution = mapMetaData.resolution * SlamScaleManager::instance()->getSlamScale();
+		float imgScaleFactor = realSlamResolution / knownMapResolution;
+		cv::resize(img, img, cv::Size(), imgScaleFactor, imgScaleFactor, CV_INTER_NN);
+		mapMetaData.resolution = realSlamResolution / imgScaleFactor;
+		mapMetaData.origin = SlamScaleManager::instance()->convertPoseMsg(mapMetaData.origin);
+		mapMetaData.height = img.rows;
+		mapMetaData.width = img.cols;
+	} catch(ScaleNotAvailable &e) {
+		ROS_WARN("SLAM map preprocessing aborted: %s", e.what());
+		return false;
+	}
 
 	// remove small particles (morphological close)
 //	unsigned int kernelSize = std::ceil(0.1 / mapMetaData.resolution);
