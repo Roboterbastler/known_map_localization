@@ -11,6 +11,10 @@
 namespace known_map_localization {
 namespace filter {
 
+PassThroughFilter::PassThroughFilter() {
+	ROS_INFO("    Type: Pass through filter");
+}
+
 void PassThroughFilter::addHypotheses(const alignment::HypothesesVect &hypotheses) {
 	if(hypotheses.empty()) {
 		return;

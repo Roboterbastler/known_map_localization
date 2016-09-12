@@ -20,6 +20,8 @@ namespace filter {
  */
 class PassThroughFilter: public Filter {
 public:
+	PassThroughFilter();
+
 	/**
 	 * Update the filtered alignment by simply overwriting it with the first new hypothesis.
 	 * @param alignment The new alignment

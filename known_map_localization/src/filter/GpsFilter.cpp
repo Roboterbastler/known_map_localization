@@ -17,9 +17,14 @@ namespace filter {
 using namespace known_map_server;
 
 GpsFilter::GpsFilter() {
+	ROS_INFO("    Type: GPS filter");
+
 	ros::NodeHandle nh("~");
 
 	gpsSubscriber = nh.subscribe("/robot/gps", 10, &GpsFilter::receiveGpsFix, this);
+	constraintRadius = nh.param("gps_constraint_radius", 10.);
+
+	ROS_INFO("    Constraint radius: %.2f", constraintRadius);
 }
 
 void GpsFilter::addHypotheses(const alignment::HypothesesVect &hypotheses) {

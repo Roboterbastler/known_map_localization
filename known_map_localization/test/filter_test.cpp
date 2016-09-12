@@ -33,6 +33,7 @@ class GpsFilter : public ::testing::Test {
 protected:
 	static void SetUpTestCase() {
 		ros::Time::init();
+		ros::console::shutdown();
 	}
 };
 

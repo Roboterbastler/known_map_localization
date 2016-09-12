@@ -53,6 +53,9 @@ protected:
 private:
 	/// Subscribes to the GPS topic
 	ros::Subscriber gpsSubscriber;
+
+	/// The radius of the constraint given by a GPS fix
+	float constraintRadius;
 };
 
 } /* namespace filter */
