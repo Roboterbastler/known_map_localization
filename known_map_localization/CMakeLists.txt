@@ -174,6 +174,7 @@ add_library(alignment
 add_library(filter
   src/filter/Filter.cpp
   src/filter/PassThroughFilter.cpp
+  src/filter/GpsFilter.cpp
 )
 add_library(base_link
   src/base_link/BaseLinkPublisher.cpp
