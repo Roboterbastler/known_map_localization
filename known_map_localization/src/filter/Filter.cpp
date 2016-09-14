@@ -7,6 +7,7 @@
 
 #include <filter/Filter.h>
 #include <filter/PassThroughFilter.h>
+#include <filter/GpsFilter.h>
 #include <Exception.h>
 
 namespace known_map_localization {
@@ -20,7 +21,7 @@ Filter::Filter() : ready(false) {
 
 FilterPtr Filter::instance() {
 	if(!_instance) {
-		_instance = FilterPtr(new PassThroughFilter());
+		_instance = FilterPtr(new GpsFilter());
 	}
 	return _instance;
 }
