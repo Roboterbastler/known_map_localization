@@ -50,6 +50,16 @@ public:
 	 */
 	static float poseToPoseAbsDistance(const tf::Pose &p1, const tf::Pose &p2);
 
+	/**
+	 * Computes the copter pose based on the given alignment and current SLAM base link.
+	 * The pose is given in the known map anchor frame.
+	 * @param alignment The alignment used to compute the pose
+	 * @return The copter pose
+	 * @throws tf::TransformException If tf lookup of SLAM base link fails.
+	 * @throws ScaleNotAvailable If no scale is available.
+	 */
+	tf::Pose getPoseForAlignment(const alignment::Alignment &alignment);
+
 protected:
 	BaseLinkPublisher();
 

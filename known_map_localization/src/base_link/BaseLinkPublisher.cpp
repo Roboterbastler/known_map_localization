@@ -71,44 +71,46 @@ void BaseLinkPublisher::updateMapTransform() {
 }
 
 bool BaseLinkPublisher::updateBaseLink(tf::StampedTransform &out) {
-	// request /orb_slam/map to /orb_slam/base_link
-	// scale it
-	// transform.inverse() + scaled ORB base link
-
-	// get filtered alignment
-	alignment::Alignment alignment;
 	try {
-		alignment = filter::Filter::instance()->getAlignment();
+		// get filtered alignment
+		const alignment::Alignment &alignment = filter::Filter::instance()->getAlignment();
+
+		// get pose for alignment
+		tf::Pose copterPose = getPoseForAlignment(alignment);
+
+		// create base link
+		out = tf::StampedTransform(copterPose, ros::Time::now(),
+					"/known_map_localization/anchor",
+					"/known_map_localization/base_link");
+
+		// publish base link
+		broadcaster.sendTransform(out);
+		return true;
 	} catch (AlignmentNotAvailable &e) {
 		return false;
+	} catch (tf::TransformException &e) {
+		ROS_WARN_THROTTLE(1, "Getting pose for alignment failed: %s", e.what());
+		return false;
+	} catch(ScaleNotAvailable &e) {
+		return false;
 	}
+}
 
+tf::Pose BaseLinkPublisher::getPoseForAlignment(const alignment::Alignment &alignment) {
 	tf::StampedTransform slamMapFrame_to_slamBaseLink;
 	tf::Transform slamMapFrame_to_knownMapFrame = alignment.toTfTransform();
 
-	try {
-		listener.lookupTransform("orb_slam/map", "ORB_base_link", ros::Time(0),
-				slamMapFrame_to_slamBaseLink);
-	} catch (tf::TransformException &e) {
-		ROS_WARN_THROTTLE(1, "Required tf data not available, base_link not published: %s", e.what());
-		return false;
-	}
-
-	// convert transform to real world scale
+	listener.lookupTransform("orb_slam/map", "ORB_base_link", ros::Time(0), slamMapFrame_to_slamBaseLink);
+	
+	// convert pose to real world scale
 	float x = slamMapFrame_to_slamBaseLink.getOrigin().x();
 	slamMapFrame_to_slamBaseLink = SlamScaleManager::instance()->convertTransform(slamMapFrame_to_slamBaseLink);
 
-	tf::Transform kmlBaseLink;
-	kmlBaseLink.setIdentity();
-	kmlBaseLink *= slamMapFrame_to_knownMapFrame.inverse();
-	kmlBaseLink *= slamMapFrame_to_slamBaseLink;
-
-	out = tf::StampedTransform(kmlBaseLink, ros::Time::now(),
-			"/known_map_localization/anchor",
-			"/known_map_localization/base_link");
-
-	broadcaster.sendTransform(out);
-	return true;
+	tf::Pose pose;
+	pose.setIdentity();
+	pose *= slamMapFrame_to_knownMapFrame.inverse();
+	pose *= slamMapFrame_to_slamBaseLink;
+	return pose;
 }
 
 void BaseLinkPublisher::updatePositionError(const tf::StampedTransform &baseLink) {
