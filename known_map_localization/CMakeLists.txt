@@ -146,15 +146,15 @@ include_directories(
 add_library(known_map_localization
   src/KnownMapLocalization.cpp
 )
-add_library(algorithm_selection
+add_library(algorithm_selection STATIC
   src/AlgorithmSelector.cpp
 )
-add_library(aligning
+add_library(aligning STATIC
   src/aligning/Aligner.cpp
   src/aligning/MapstitchAligner.cpp
   src/aligning/MapmergeAligner.cpp
 )
-add_library(preprocessing
+add_library(preprocessing STATIC
   src/preprocessing/MapPreprocessor.cpp
   src/preprocessing/KnownMapPreprocessor.cpp
   src/preprocessing/SlamMapPreprocessor.cpp
@@ -163,29 +163,29 @@ add_library(preprocessing
   src/preprocessing/MapmergeKnownMapPreprocessor.cpp
   src/preprocessing/MapmergeSlamMapPreprocessor.cpp
 )
-add_library(known_map_server
+add_library(known_map_server STATIC
   src/known_map_server/KnownMapServer.cpp
 )
-add_library(alignment
+add_library(alignment STATIC
   src/alignment/Alignment.cpp
   src/alignment/StampedAlignment.cpp
   src/alignment/Hypothesis.cpp
 )
-add_library(filter
+add_library(filter STATIC
   src/filter/Filter.cpp
   src/filter/PassThroughFilter.cpp
   src/filter/GpsFilter.cpp
 )
-add_library(base_link
+add_library(base_link STATIC
   src/base_link/BaseLinkPublisher.cpp
 )
-add_library(visualization
+add_library(visualization STATIC
   src/visualization/VisualizationSlamMapPublisher.cpp
 )
-add_library(logging
+add_library(logging STATIC
   src/logging/DataLogger.cpp
 )
-add_library(slam_scale
+add_library(slam_scale STATIC
   src/SlamScaleManager.cpp
 )
 
@@ -261,6 +261,8 @@ target_link_libraries(alignment
 target_link_libraries(filter
   alignment
   slam_scale
+  known_map_server
+  base_link
   ${catkin_LIBRARIES}
 )
 target_link_libraries(base_link
