@@ -145,16 +145,10 @@ include_directories(
 # )
 add_library(known_map_localization
   src/KnownMapLocalization.cpp
-)
-add_library(algorithm_selection STATIC
   src/AlgorithmSelector.cpp
-)
-add_library(aligning STATIC
   src/aligning/Aligner.cpp
   src/aligning/MapstitchAligner.cpp
   src/aligning/MapmergeAligner.cpp
-)
-add_library(preprocessing STATIC
   src/preprocessing/MapPreprocessor.cpp
   src/preprocessing/KnownMapPreprocessor.cpp
   src/preprocessing/SlamMapPreprocessor.cpp
@@ -162,31 +156,18 @@ add_library(preprocessing STATIC
   src/preprocessing/MapstitchSlamMapPreprocessor.cpp
   src/preprocessing/MapmergeKnownMapPreprocessor.cpp
   src/preprocessing/MapmergeSlamMapPreprocessor.cpp
-)
-add_library(known_map_server STATIC
   src/known_map_server/KnownMapServer.cpp
-)
-add_library(alignment STATIC
   src/alignment/Alignment.cpp
   src/alignment/StampedAlignment.cpp
   src/alignment/Hypothesis.cpp
-)
-add_library(filter STATIC
   src/filter/Filter.cpp
   src/filter/PassThroughFilter.cpp
   src/filter/GpsFilter.cpp
-)
-add_library(base_link STATIC
   src/base_link/BaseLinkPublisher.cpp
-)
-add_library(visualization STATIC
   src/visualization/VisualizationSlamMapPublisher.cpp
-)
-add_library(logging STATIC
   src/logging/DataLogger.cpp
-)
-add_library(slam_scale STATIC
   src/SlamScaleManager.cpp
+  src/GpsManager.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -194,16 +175,6 @@ add_library(slam_scale STATIC
 ## either from message generation or dynamic reconfigure
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(known_map_localization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(algorithm_selection ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(aligning ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(preprocessing ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(known_map_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(alignment ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(filter ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(base_link ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(visualization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(logging ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(slam_scale ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -229,56 +200,8 @@ target_link_libraries(known_map_localization_node
   ${catkin_LIBRARIES}
 )
 target_link_libraries(known_map_localization
-  preprocessing
-  known_map_server
-  aligning
-  visualization
-  base_link
-  logging
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(algorithm_selection
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(aligning
-  alignment
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(preprocessing
-  slam_scale
-  algorithm_selection
   ${OpenCV_LIBS}
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(known_map_server
-  preprocessing
   ${YAMLCPP_LIBRARIES}
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(alignment
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(filter
-  alignment
-  slam_scale
-  known_map_server
-  base_link
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(base_link
-  filter
-  slam_scale
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(visualization
-  filter
-  alignment
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(logging
-
-)
-target_link_libraries(slam_scale
   ${catkin_LIBRARIES}
 )
 
@@ -330,8 +253,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
 )
 if(TARGET ${PROJECT_NAME}-test)
   target_link_libraries(${PROJECT_NAME}-test
-    filter
-    slam_scale
+    known_map_localization
   )
 endif()
 

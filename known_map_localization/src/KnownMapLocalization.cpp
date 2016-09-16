@@ -13,6 +13,7 @@
 #include <base_link/BaseLinkPublisher.h>
 #include <SlamScaleManager.h>
 #include <aligning/Aligner.h>
+#include <GpsManager.h>
 #include <alignment/Hypothesis.h>
 #include <Utils.h>
 #include <Exception.h>
@@ -31,6 +32,7 @@ KnownMapLocalization::KnownMapLocalization() :
 	KnownMapPreprocessor::instance();
 	SlamMapPreprocessor::instance();
 	SlamScaleManager::instance();
+	GpsManager::instance();
 	filter::Filter::instance();
 	base_link::BaseLinkPublisher::instance();
 
