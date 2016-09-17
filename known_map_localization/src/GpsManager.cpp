@@ -9,12 +9,16 @@
 
 #include <geodesy/utm.h>
 #include <geodesy/wgs84.h>
+#include <visualization_msgs/Marker.h>
 
 #include <Exception.h>
 #include <known_map_server/KnownMapServer.h>
 #include <SlamScaleManager.h>
 
-#define MAX_KEYPOINT_SIZE 10
+#define MAX_KEYPOINT_SIZE 20
+#define MAX_QUEUE_SIZE 50
+#define MIN_GPS_POS_DISTANCE 0.5
+#define CONSTRAINT_RADIUS 1.0
 
 namespace known_map_localization {
 
@@ -32,6 +36,7 @@ GpsManager::GpsManager() {
 
 	gpsFixSubscriber = nh.subscribe("/gps_fix", 1000, &GpsManager::receiveGpsFix, this);
 	timer = nh.createWallTimer(interval, &GpsManager::updateKeyPoints, this);
+	gpsPositionMarkerPublisher = nh.advertise<visualization_msgs::Marker>("gps_position_marker", 1);
 }
 
 void GpsManager::receiveGpsFix(const sensor_msgs::NavSatFix &fix) {
@@ -40,34 +45,45 @@ void GpsManager::receiveGpsFix(const sensor_msgs::NavSatFix &fix) {
 		return;
 	}
 
-	// TODO: check minimal time difference or spatial distance
+	try {
+		GpsHint hint;
+		hint.gpsPosition = convertGPSPositionToAnchorFrame(fix, *(KnownMapServer::instance()->getAnchor()));
 
-	fixQueue.push_back(fix);
-	ROS_DEBUG("Received new GPS fix. Queue size: %ld", fixQueue.size());
+		// check minimal spatial distance
+		if(hintQueue.empty() || hint.distanceTo(hintQueue.back().gpsPosition) > MIN_GPS_POS_DISTANCE) {
+
+			hint.stamp = fix.header.stamp;
+			hint.gpsFix = fix;
+
+			hintQueue.push_back(hint);
+
+			// remove front if queue too full
+			if(hintQueue.size() > MAX_QUEUE_SIZE) {
+				hintQueue.erase(hintQueue.begin());
+			}
+
+			publishGpsFixMarker();
+
+			ROS_DEBUG("Received new GPS fix. Queue size: %ld", hintQueue.size());
+		}
+	} catch(DifferentUTMGridZones &e) {
+		ROS_WARN("GPS Manager unsupported fix: %s", e.what());
+	}
 }
 
 void GpsManager::updateKeyPoints(const ros::WallTimerEvent& event) {
-	for(std::vector<sensor_msgs::NavSatFix>::iterator fix = fixQueue.begin(); fix != fixQueue.end();) {
+	for(GpsHintVect::iterator hint = hintQueue.begin(); hint != hintQueue.end();) {
 		try {
-			GpsKeyPoint kp;
-			kp.baseLink = getSlamBaseLink(fix->header.stamp);
-
-			kp.stamp = fix->header.stamp;
-
-			kp.gpsFix = *fix;
-			kp.gpsPosition = convertGPSPositionToAnchorFrame(*fix, *(KnownMapServer::instance()->getAnchor()));
+			GpsKeyPoint kp(*hint);
+			kp.baseLink = getSlamBaseLink(kp.stamp);
 
 			// add new key point
 			keypoints.push_back(kp);
 
 			// remove GPS fix from queue
-			fix = fixQueue.erase(fix);
+			hint = hintQueue.erase(hint);
 		} catch (tf::TransformException &e) {
-			++fix;
-		} catch (DifferentUTMGridZones &e) {
-			ROS_WARN("GPS Manager unsupported fix: %s", e.what());
-			// remove unsupported GPS fix from queue
-			fix = fixQueue.erase(fix);
+			++hint;
 		}
 	}
 
@@ -75,6 +91,8 @@ void GpsManager::updateKeyPoints(const ros::WallTimerEvent& event) {
 	while(keypoints.size() > MAX_KEYPOINT_SIZE) {
 		keypoints.erase(keypoints.begin());
 	}
+
+	publishKeyPointMarker();
 
 	ROS_DEBUG("Key points: %ld", keypoints.size());
 }
@@ -139,6 +157,74 @@ geometry_msgs::Pose GpsKeyPoint::getRobotPose(const alignment::Alignment &alignm
 	geometry_msgs::Pose poseMsg;
 	tf::poseTFToMsg(pose, poseMsg);
 	return poseMsg;
+}
+
+void GpsManager::publishKeyPointMarker() {
+	if(gpsPositionMarkerPublisher.getNumSubscribers() > 0) {
+		visualization_msgs::Marker constraintsMarker;
+		constraintsMarker.header.frame_id = KnownMapServer::instance()->getKnownMap()->header.frame_id;
+		constraintsMarker.header.stamp = ros::Time::now();
+		constraintsMarker.ns = "GPS-Positions";
+		constraintsMarker.id = 0;
+		constraintsMarker.type = visualization_msgs::Marker::SPHERE_LIST;
+		constraintsMarker.action = visualization_msgs::Marker::ADD;
+		constraintsMarker.color.r = 1.0;
+		constraintsMarker.color.a = 0.5;
+		constraintsMarker.scale.x = CONSTRAINT_RADIUS;
+		constraintsMarker.scale.y = CONSTRAINT_RADIUS;
+		constraintsMarker.scale.z = CONSTRAINT_RADIUS;
+		constraintsMarker.pose.orientation.w = 1.0;
+
+		visualization_msgs::Marker keyPointMarker;
+		keyPointMarker.header.frame_id = KnownMapServer::instance()->getKnownMap()->header.frame_id;
+		keyPointMarker.header.stamp = ros::Time::now();
+		keyPointMarker.ns = "GPS-Positions";
+		keyPointMarker.id = 1;
+		keyPointMarker.type = visualization_msgs::Marker::POINTS;
+		keyPointMarker.action = visualization_msgs::Marker::ADD;
+		keyPointMarker.color.g = 1.0;
+		keyPointMarker.color.a = 1.0;
+		float pointSize = 0.1;
+		keyPointMarker.scale.x = pointSize;
+		keyPointMarker.scale.y = pointSize;
+		keyPointMarker.pose.orientation.w = 1.0;
+		for(GpsKeyPointVect::const_iterator keyPoint = keypoints.begin(); keyPoint != keypoints.end(); ++keyPoint) {
+			keyPointMarker.points.push_back(keyPoint->gpsPosition);
+			constraintsMarker.points.push_back(keyPoint->gpsPosition);
+		}
+		//gpsPositionMarkerPublisher.publish(constraintsMarker);
+		gpsPositionMarkerPublisher.publish(keyPointMarker);
+	}
+}
+
+void GpsManager::publishGpsFixMarker() {
+	if(gpsPositionMarkerPublisher.getNumSubscribers() > 0) {
+		visualization_msgs::Marker gpsFixMarker;
+		gpsFixMarker.header.frame_id = KnownMapServer::instance()->getKnownMap()->header.frame_id;
+		gpsFixMarker.header.stamp = ros::Time::now();
+		gpsFixMarker.ns = "GPS-Fixes";
+		gpsFixMarker.id = 2;
+		gpsFixMarker.type = visualization_msgs::Marker::POINTS;
+		gpsFixMarker.action = visualization_msgs::Marker::ADD;
+		gpsFixMarker.color.b = 1.0;
+		gpsFixMarker.color.a = 1.0;
+		float pointSize = 0.1;
+		gpsFixMarker.scale.x = pointSize;
+		gpsFixMarker.scale.y = pointSize;
+		gpsFixMarker.pose.orientation.w = 1.0;
+		for(GpsHintVect::const_iterator hint = hintQueue.begin(); hint != hintQueue.end(); ++hint) {
+			gpsFixMarker.points.push_back(hint->gpsPosition);
+		}
+		gpsPositionMarkerPublisher.publish(gpsFixMarker);
+	}
+}
+
+GpsKeyPoint::GpsKeyPoint(const GpsHint &hint) :
+		GpsHint(hint) {
+}
+
+double GpsHint::distanceTo(const geometry_msgs::Point &p) const {
+	return sqrt(pow(gpsPosition.x - p.x, 2) + pow(gpsPosition.y - p.y, 2));
 }
 
 } /* namespace known_map_localization */

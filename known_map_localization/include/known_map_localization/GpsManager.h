@@ -19,8 +19,31 @@
 
 namespace known_map_localization {
 
-class GpsKeyPoint {
+class GpsHint {
 public:
+	/**
+	 * Computes the distance of the GPS hint position to another point.
+	 * Both positions are assumed to be relative to the anchor frame.
+	 * @param p The other point
+	 * @return The distance
+	 */
+	double distanceTo(const geometry_msgs::Point &p) const;
+
+	/// the time stamp of the associated positions
+	ros::Time stamp;
+
+	/// the GPS fix
+	sensor_msgs::NavSatFix gpsFix;
+
+	/// GPS position in the anchor frame
+	geometry_msgs::Point gpsPosition;
+};
+
+class GpsKeyPoint : public GpsHint {
+public:
+	/// Initialize from hint
+	GpsKeyPoint(const GpsHint &hint);
+
 	/**
 	 * Computes the estimated robot pose in the anchor frame, based on the
 	 * given map alignment and the scaled SLAM base link.
@@ -29,19 +52,11 @@ public:
 	 */
 	geometry_msgs::Pose getRobotPose(const alignment::Alignment &alignment) const;
 
-	/// the GPS fix
-	sensor_msgs::NavSatFix gpsFix;
-
-	/// GPS position in the anchor frame
-	geometry_msgs::Point gpsPosition;
-
 	/// the associated SLAM base link (not scaled!)
 	tf::Transform baseLink;
-
-	/// the time stamp of the associated positions
-	ros::Time stamp;
 };
 
+typedef std::vector<GpsHint> GpsHintVect;
 typedef std::vector<GpsKeyPoint> GpsKeyPointVect;
 
 class GpsManager;
@@ -50,6 +65,9 @@ typedef boost::shared_ptr<GpsManager const> GpsManagerConstPtr;
 
 /**
  * # GPS Manager
+ *
+ * ## Published topics
+ * - **gps_position_marker**: The GPS positions for visualization purposes
  *
  * ## Subscribed topics
  * - __/gps_fix__: The GPS fix topic
@@ -97,6 +115,16 @@ private:
 	 */
 	static geometry_msgs::Point convertGPSPositionToAnchorFrame(const sensor_msgs::NavSatFix &gpsFix, const geographic_msgs::GeoPose &anchor);
 
+	/**
+	 * Publishes key point marker for visualization/debugging purposes.
+	 */
+	void publishKeyPointMarker();
+
+	/**
+	 * Publishes GPS fix marker for visualization/debugging purposes.
+	 */
+	void publishGpsFixMarker();
+
 private:
 	static GpsManagerPtr _instance;
 
@@ -108,11 +136,14 @@ private:
 	/// Subscriber for the GPS fix topic
 	ros::Subscriber gpsFixSubscriber;
 
+	/// Publishes marker for visualization/debugging purposes
+	ros::Publisher gpsPositionMarkerPublisher;
+
 	/// queue of GPS fixes waiting to be paired with the according SLAM base links
-	std::vector<sensor_msgs::NavSatFix> fixQueue;
+	GpsHintVect hintQueue;
 
 	/// GPS position/SLAM base link pairs
-	std::vector<GpsKeyPoint> keypoints;
+	GpsKeyPointVect keypoints;
 };
 
 } /* namespace known_map_localization */
