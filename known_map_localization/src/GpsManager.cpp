@@ -17,7 +17,6 @@
 
 #define MAX_KEYPOINT_SIZE 10
 #define MAX_QUEUE_SIZE 10
-#define CONSTRAINT_RADIUS 1.0
 
 namespace known_map_localization {
 
@@ -199,7 +198,7 @@ void GpsManager::publishGpsFixMarker() {
 		gpsFixMarker.header.frame_id = KnownMapServer::instance()->getKnownMap()->header.frame_id;
 		gpsFixMarker.header.stamp = ros::Time::now();
 		gpsFixMarker.ns = "GPS-Fixes";
-		gpsFixMarker.id = 2;
+		gpsFixMarker.id = 0;
 		gpsFixMarker.frame_locked = true;
 		gpsFixMarker.type = visualization_msgs::Marker::POINTS;
 		gpsFixMarker.action = visualization_msgs::Marker::ADD;

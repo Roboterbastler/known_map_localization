@@ -8,6 +8,9 @@
 #ifndef KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_FILTER_GPSFILTER_H_
 #define KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_FILTER_GPSFILTER_H_
 
+#include <ros/ros.h>
+#include <visualization_msgs/Marker.h>
+
 #include <filter/Filter.h>
 
 namespace known_map_localization {
@@ -38,13 +41,17 @@ protected:
 	/**
 	 * Computes a scoring for a given hypothesis.
 	 * @param h The hypothesis
+	 * @param constraints The marker message to add visualization info to
 	 * @return The score
 	 */
-	float scoringFunction(const alignment::Hypothesis &h) const;
+	float scoringFunction(const alignment::Hypothesis &h, visualization_msgs::Marker &constraints) const;
 
 private:
 	/// The score of the filtered alignment
 	float filteredAlignmentScore;
+
+	/// Publishes marker for visualization/debugging purposes
+	ros::Publisher gpsConstraintsMarkerPublisher;
 
 	/// The radius of the constraint given by a GPS fix
 	float CONSTRAINT_RADIUS;
