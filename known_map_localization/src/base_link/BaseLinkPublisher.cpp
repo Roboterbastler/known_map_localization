@@ -76,10 +76,10 @@ bool BaseLinkPublisher::updateBaseLink(tf::StampedTransform &out) {
 		const alignment::Alignment &alignment = filter::Filter::instance()->getAlignment();
 
 		// get pose for alignment
-		tf::Pose copterPose = getPoseForAlignment(alignment);
+		tf::Stamped<tf::Pose> copterPose = getPoseForAlignment(alignment);
 
 		// create base link
-		out = tf::StampedTransform(copterPose, ros::Time::now(),
+		out = tf::StampedTransform(copterPose, copterPose.stamp_,
 					"/known_map_localization/anchor",
 					"/known_map_localization/base_link");
 
@@ -96,17 +96,17 @@ bool BaseLinkPublisher::updateBaseLink(tf::StampedTransform &out) {
 	}
 }
 
-tf::Pose BaseLinkPublisher::getPoseForAlignment(const alignment::Alignment &alignment) {
+tf::Stamped<tf::Pose> BaseLinkPublisher::getPoseForAlignment(const alignment::Alignment &alignment) {
 	tf::StampedTransform slamMapFrame_to_slamBaseLink;
 	tf::Transform slamMapFrame_to_knownMapFrame = alignment.toTfTransform();
 
 	listener.lookupTransform("orb_slam/map", "ORB_base_link", ros::Time(0), slamMapFrame_to_slamBaseLink);
 	
 	// convert pose to real world scale
-	float x = slamMapFrame_to_slamBaseLink.getOrigin().x();
 	slamMapFrame_to_slamBaseLink = SlamScaleManager::instance()->convertTransform(slamMapFrame_to_slamBaseLink);
 
-	tf::Pose pose;
+	tf::Stamped<tf::Pose> pose;
+	pose.stamp_ = slamMapFrame_to_slamBaseLink.stamp_;
 	pose.setIdentity();
 	pose *= slamMapFrame_to_knownMapFrame.inverse();
 	pose *= slamMapFrame_to_slamBaseLink;
@@ -129,7 +129,8 @@ void BaseLinkPublisher::updatePositionError(const tf::StampedTransform &baseLink
 
 		// publish pose error
 		PoseError poseError;
-		poseError.error = poseToPoseAbsDistance(estimatedPose, groundTruthPose);
+		poseError.translational_error = poseToPoseAbsDistance(estimatedPose, groundTruthPose);
+		poseError.rotational_error = 2. * estimatedPose.getRotation().angle(groundTruthPose.getRotation());
 		poseError.header.stamp = baseLink.stamp_;
 		poseErrorPublisher.publish(poseError);
 	} catch(tf::TransformException &e) {
