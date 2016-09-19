@@ -123,7 +123,7 @@ void BaseLinkPublisher::updatePositionError(const tf::StampedTransform &baseLink
 		// estimated pose in known map anchor frame
 		tf::Stamped<tf::Pose> estimatedPose(baseLink, baseLink.stamp_, baseLink.frame_id_);
 
-		// ground truth pose in the "/blender_scene" frame
+		// ground truth pose in known map anchor frame
 		tf::Stamped<tf::Pose> groundTruthPose;
 		tf::poseStampedMsgToTF(*groundTruth, groundTruthPose);
 
