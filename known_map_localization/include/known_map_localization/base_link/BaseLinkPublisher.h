@@ -10,14 +10,12 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <ros/duration.h>
 #include <ros/timer.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
-#include <orb_slam/ORBState.h>
-
-#include <filter/Filter.h>
 #include <geographic_msgs/GeoPose.h>
+
+#include <alignment/Alignment.h>
 
 namespace known_map_localization {
 namespace base_link {
@@ -49,6 +47,14 @@ public:
 	 * @return The distance
 	 */
 	static float poseToPoseAbsDistance(const tf::Pose &p1, const tf::Pose &p2);
+
+	/**
+	 * Compute the angle (around z axis) in degrees between two orientations.
+	 * @param q1 The first orientation
+	 * @param q2 The second orientation
+	 * @return The angle [degrees]
+	 */
+	static float orientationToOrientationAngle(const tf::Quaternion &q1, const tf::Quaternion &q2);
 
 	/**
 	 * Computes the copter pose based on the given alignment and current SLAM base link.
@@ -99,7 +105,7 @@ private:
 	 * Callback for the ground truth topic subscriber.
 	 * @param poseMessage The received pose message
 	 */
-	void receiveGroundTruth(geometry_msgs::PoseStampedConstPtr poseMessage);
+	void receiveGroundTruth(const geometry_msgs::PoseStamped &poseMessage);
 
 private:
 	static BaseLinkPublisherPtr _instance;
@@ -107,7 +113,7 @@ private:
 	/// The ROS timer causing regular updates
 	ros::WallTimer timer;
 
-	/// Broadcaster for the base link transform
+	/// Broadcaster for tf transforms
 	tf::TransformBroadcaster broadcaster;
 
 	/// Listens to tf messages to get the **ORB_base_link** transformation
@@ -116,18 +122,11 @@ private:
 	/// Receives the ground truth pose over the /pose topic
 	ros::Subscriber groundTruthSubscriber;
 
-	/// Publishes a corrected ground truth pose that takes possible offsets
-	/// between /world and /ORB_SLAM/World (due to re-localization) into account
-	ros::Publisher groundTruthPublisher;
-
 	/// Publishes the difference between estimated pose and ground truth pose
 	ros::Publisher poseErrorPublisher;
 
 	/// Publishes the estimated position in geographic coordinates
 	ros::Publisher geoPosePublisher;
-
-	/// The ground truth pose received over the /pose topic
-	geometry_msgs::PoseStampedConstPtr groundTruth;
 };
 
 } /* namespace base_link */

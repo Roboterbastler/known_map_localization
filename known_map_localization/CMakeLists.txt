@@ -251,6 +251,7 @@ catkin_add_gtest(${PROJECT_NAME}-test
   test/filter_test.cpp
   test/alignment_test.cpp
   test/slam_scale_manager_test.cpp
+  test/base_link_test.cpp
 )
 if(TARGET ${PROJECT_NAME}-test)
   target_link_libraries(${PROJECT_NAME}-test

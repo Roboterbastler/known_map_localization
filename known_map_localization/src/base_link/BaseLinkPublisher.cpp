@@ -6,11 +6,12 @@
  */
 
 #include <geometry_msgs/PoseStamped.h>
-#include <std_msgs/Float32.h>
 
 #include <base_link/BaseLinkPublisher.h>
 #include <Exception.h>
+#include <Utils.h>
 #include <SlamScaleManager.h>
+#include <filter/Filter.h>
 #include <known_map_server/KnownMapServer.h>
 #include <known_map_localization/PoseError.h>
 
@@ -31,7 +32,6 @@ BaseLinkPublisher::BaseLinkPublisher() {
 		timer = nh.createWallTimer(interval, &BaseLinkPublisher::update, this);
 
 		groundTruthSubscriber = nh.subscribe("/pose", 10, &BaseLinkPublisher::receiveGroundTruth, this);
-		groundTruthPublisher = nh.advertise<geometry_msgs::PoseStamped>("ground_truth", 1000);
 		geoPosePublisher = nh.advertise<geographic_msgs::GeoPose>("geo_pose", 1000);
 		poseErrorPublisher = nh.advertise<PoseError>("pose_error", 1000);
 	}
@@ -114,27 +114,22 @@ tf::Stamped<tf::Pose> BaseLinkPublisher::getPoseForAlignment(const alignment::Al
 }
 
 void BaseLinkPublisher::updatePositionError(const tf::StampedTransform &baseLink) {
-	if(!groundTruth) {
-		ROS_DEBUG_THROTTLE(2, "Ground truth pose not available. Pose error not published.");
-		return;
-	}
-
 	try {
 		// estimated pose in known map anchor frame
 		tf::Stamped<tf::Pose> estimatedPose(baseLink, baseLink.stamp_, baseLink.frame_id_);
 
 		// ground truth pose in known map anchor frame
-		tf::Stamped<tf::Pose> groundTruthPose;
-		tf::poseStampedMsgToTF(*groundTruth, groundTruthPose);
+		tf::StampedTransform groundTruthPose;
+		listener.lookupTransform("/known_map_localization/anchor", "/known_map_localization/ground_truth", estimatedPose.stamp_, groundTruthPose);
 
 		// publish pose error
 		PoseError poseError;
 		poseError.translational_error = poseToPoseAbsDistance(estimatedPose, groundTruthPose);
-		poseError.rotational_error = 2. * estimatedPose.getRotation().angle(groundTruthPose.getRotation());
+		poseError.rotational_error = orientationToOrientationAngle(estimatedPose.getRotation(), groundTruthPose.getRotation());
 		poseError.header.stamp = baseLink.stamp_;
 		poseErrorPublisher.publish(poseError);
 	} catch(tf::TransformException &e) {
-		ROS_WARN_THROTTLE(2, "Could not get estimated pose or ground truth pose: %s", e.what());
+		ROS_DEBUG("Unable to update pose error: %s", e.what());
 	}
 }
 
@@ -157,14 +152,25 @@ void BaseLinkPublisher::updateGeoPose(geographic_msgs::GeoPoseConstPtr anchor, c
 	geoPosePublisher.publish(geoPose);
 }
 
-void BaseLinkPublisher::receiveGroundTruth(geometry_msgs::PoseStampedConstPtr poseMessage) {
-	groundTruth = poseMessage;
+void BaseLinkPublisher::receiveGroundTruth(const geometry_msgs::PoseStamped &poseMessage) {
+	tf::Stamped<tf::Pose> groundTruthPose;
+	tf::poseStampedMsgToTF(poseMessage, groundTruthPose);
+	broadcaster.sendTransform(tf::StampedTransform(groundTruthPose, groundTruthPose.stamp_, "/known_map_localization/anchor", "/known_map_localization/ground_truth"));
 }
 
 float BaseLinkPublisher::poseToPoseAbsDistance(const tf::Pose &p1, const tf::Pose &p2) {
 	float dx = p2.getOrigin().x() - p1.getOrigin().x();
 	float dy = p2.getOrigin().y() - p1.getOrigin().y();
 	return sqrt(pow(dx, 2) + pow(dy, 2));
+}
+
+float BaseLinkPublisher::orientationToOrientationAngle(const tf::Quaternion &q1, const tf::Quaternion &q2) {
+	double yaw1 = quaternionToYawRad(q1);
+	double yaw2 = quaternionToYawRad(q2);
+	tf::Quaternion rot1, rot2;
+	rot1.setRPY(0, 0, yaw1);
+	rot2.setRPY(0, 0, yaw2);
+	return radToDeg(rot1.angle(rot2) * 2.);
 }
 
 } /* namespace base_link */
