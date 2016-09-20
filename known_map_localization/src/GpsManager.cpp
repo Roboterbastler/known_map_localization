@@ -35,6 +35,7 @@ GpsManager::GpsManager() {
 	gpsFixSubscriber = nh.subscribe("/gps_fix", 1000, &GpsManager::receiveGpsFix, this);
 	timer = nh.createWallTimer(interval, &GpsManager::updateKeyPoints, this);
 	gpsPositionMarkerPublisher = nh.advertise<visualization_msgs::Marker>("gps_position_marker", 1);
+	gpsHintsUpdatedPublisher = nh.advertise<std_msgs::Empty>("gps_hints_updated", 1);
 }
 
 void GpsManager::receiveGpsFix(const sensor_msgs::NavSatFix &fix) {
@@ -65,6 +66,8 @@ void GpsManager::receiveGpsFix(const sensor_msgs::NavSatFix &fix) {
 }
 
 void GpsManager::updateKeyPoints(const ros::WallTimerEvent& event) {
+	bool modified = false;
+
 	for(GpsHintVect::iterator hint = hintQueue.begin(); hint != hintQueue.end();) {
 		try {
 			GpsKeyPoint kp(*hint);
@@ -72,6 +75,7 @@ void GpsManager::updateKeyPoints(const ros::WallTimerEvent& event) {
 
 			// add new key point
 			keypoints.push_back(kp);
+			modified = true;
 
 			// remove GPS fix from queue
 			hint = hintQueue.erase(hint);
@@ -84,9 +88,14 @@ void GpsManager::updateKeyPoints(const ros::WallTimerEvent& event) {
 	// remove front if queue too full
 	while(keypoints.size() > MAX_KEYPOINT_SIZE) {
 		keypoints.erase(keypoints.begin());
+		modified = true;
 	}
 
 	publishKeyPointMarker();
+
+	if (modified) {
+		gpsHintsUpdatedPublisher.publish(std_msgs::Empty());
+	}
 
 	ROS_DEBUG("Key points: %ld", keypoints.size());
 }
@@ -154,42 +163,26 @@ geometry_msgs::Pose GpsKeyPoint::getRobotPose(const alignment::Alignment &alignm
 }
 
 void GpsManager::publishKeyPointMarker() {
-	if(gpsPositionMarkerPublisher.getNumSubscribers() > 0) {
-//		visualization_msgs::Marker constraintsMarker;
-//		constraintsMarker.header.frame_id = KnownMapServer::instance()->getKnownMap()->header.frame_id;
-//		constraintsMarker.header.stamp = ros::Time::now();
-//		constraintsMarker.ns = "GPS-Positions";
-//		constraintsMarker.id = 0;
-//		constraintsMarker.type = visualization_msgs::Marker::SPHERE_LIST;
-//		constraintsMarker.action = visualization_msgs::Marker::ADD;
-//		constraintsMarker.color.r = 1.0;
-//		constraintsMarker.color.a = 0.5;
-//		constraintsMarker.scale.x = CONSTRAINT_RADIUS;
-//		constraintsMarker.scale.y = CONSTRAINT_RADIUS;
-//		constraintsMarker.scale.z = CONSTRAINT_RADIUS;
-//		constraintsMarker.pose.orientation.w = 1.0;
+	visualization_msgs::Marker keyPointMarker;
+	keyPointMarker.header.frame_id = KnownMapServer::instance()->getKnownMap()->header.frame_id;
+	keyPointMarker.header.stamp = ros::Time::now();
+	keyPointMarker.ns = "GPS-Positions";
+	keyPointMarker.id = 1;
+	keyPointMarker.frame_locked = true;
+	keyPointMarker.type = visualization_msgs::Marker::POINTS;
+	keyPointMarker.action = visualization_msgs::Marker::ADD;
+	keyPointMarker.color.g = 1.0;
+	keyPointMarker.color.a = 1.0;
+	float pointSize = 0.2;
+	keyPointMarker.scale.x = pointSize;
+	keyPointMarker.scale.y = pointSize;
+	keyPointMarker.pose.orientation.w = 1.0;
 
-		visualization_msgs::Marker keyPointMarker;
-		keyPointMarker.header.frame_id = KnownMapServer::instance()->getKnownMap()->header.frame_id;
-		keyPointMarker.header.stamp = ros::Time::now();
-		keyPointMarker.ns = "GPS-Positions";
-		keyPointMarker.id = 1;
-		keyPointMarker.frame_locked = true;
-		keyPointMarker.type = visualization_msgs::Marker::POINTS;
-		keyPointMarker.action = visualization_msgs::Marker::ADD;
-		keyPointMarker.color.g = 1.0;
-		keyPointMarker.color.a = 1.0;
-		float pointSize = 0.2;
-		keyPointMarker.scale.x = pointSize;
-		keyPointMarker.scale.y = pointSize;
-		keyPointMarker.pose.orientation.w = 1.0;
-		for(GpsKeyPointVect::const_iterator keyPoint = keypoints.begin(); keyPoint != keypoints.end(); ++keyPoint) {
-			keyPointMarker.points.push_back(keyPoint->gpsPosition);
-			//constraintsMarker.points.push_back(keyPoint->gpsPosition);
-		}
-		//gpsPositionMarkerPublisher.publish(constraintsMarker);
-		gpsPositionMarkerPublisher.publish(keyPointMarker);
+	for(GpsKeyPointVect::const_iterator keyPoint = keypoints.begin(); keyPoint != keypoints.end(); ++keyPoint) {
+		keyPointMarker.points.push_back(keyPoint->gpsPosition);
 	}
+
+	gpsPositionMarkerPublisher.publish(keyPointMarker);
 }
 
 void GpsManager::publishGpsFixMarker() {

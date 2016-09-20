@@ -29,18 +29,6 @@ typedef enum {
 	GPS ///< Uses GPS fixes to estimate the SLAM scale
 } SlamScaleMode;
 
-/**
- * Element of the position cache used when running in GPS mode.
- */
-class PositionElement {
-public:
-	PositionElement(geodesy::UTMPoint gps, geometry_msgs::Point slam) : gps(gps), slam(slam) {
-	}
-
-	geodesy::UTMPoint gps;
-	geometry_msgs::Point slam;
-};
-
 class SlamScaleManager;
 typedef boost::shared_ptr<SlamScaleManager> SlamScaleManagerPtr;
 typedef boost::shared_ptr<SlamScaleManager const> SlamScaleManagerConstPtr;
@@ -59,6 +47,7 @@ typedef boost::shared_ptr<SlamScaleManager const> SlamScaleManagerConstPtr;
  *
  * ## Subscribed Topics
  * - __/robot/gps__ (only in GPS mode): GPS fixes are received via this topic
+ * - **gps_hints_updated**: Signal that the GPS key points have been updated
  */
 class SlamScaleManager {
 public:
@@ -106,15 +95,6 @@ public:
 	geometry_msgs::Pose convertPoseMsg(geometry_msgs::Pose pose) const;
 
 	/**
-	 * Computes the Euclidean distance between two UTM points (on the xy plane).
-	 * @param p1 The first point
-	 * @param p2 The second point
-	 * @return The distance
-	 * @note It is assumed that both points lie in the same UTM grid zone.
-	 */
-	static double distance(const geodesy::UTMPoint &p1, const geodesy::UTMPoint &p2);
-
-	/**
 	 * Computes the distance between two points (on the xy plane).
 	 * @param p1 The first point
 	 * @param p2 The second point
@@ -133,30 +113,23 @@ protected:
 	SlamScaleManager();
 
 	/**
-	 * Callback method to receive GPS fixes. If the corresponding UTM point lies in a different
-	 * UTM grid zone than the former received positions, the vector of received GPS fixes is cleared.
-	 * @param fix The GPS fix message
-	 * @note This has no effect if the SLAM scale manager
-	 * is not in the GPS mode.
-	 */
-	void receiveGpsFix(const sensor_msgs::NavSatFix &fix);
-
-	/**
 	 * Tries to read the mode parameter and returns the according mode.
 	 * @return The mode
 	 */
 	SlamScaleMode determineMode() const;
 
 	/**
+	 * Is called when a message arrives that signals that the GPS hints have been updated.
+	 *
 	 * Computes an estimate of the SLAM map scale by comparing two distances.
 	 * The distance between two GPS fixes and the distance between the corresponding
 	 * SLAM map positions. The position pair with the greatest distance is chosen in
 	 * order to minimize influence of position inaccuracy.
 	 *
 	 * If a scale estimate was computed, the scale is updated.
-	 * @param pointData Positions from the GPS fixes and from SLAM base link
+	 * @param signal Empty message working as a signal
 	 */
-	void estimateScale(const std::vector<PositionElement> &pointData);
+	void estimateScale(const std_msgs::Empty &signal);
 
 private:
 	static SlamScaleManagerPtr _instance;
@@ -170,14 +143,11 @@ private:
 	/// The current scale estimation
 	float scale;
 
-	/// The GPS fix subscriber
-	ros::Subscriber gpsFixSubscriber;
-
 	/// Listens to the **tf** topic
 	tf::TransformListener listener;
 
-	/// Caches pairs of GPS and SLAM positions when running in GPS mode
-	std::vector<PositionElement> positionCache;
+	/// Signals that the GPS hints have been updated
+	ros::Subscriber gpsHintsUpdatedSubscriber;
 };
 
 } /* namespace known_map_localization */

@@ -68,6 +68,7 @@ typedef boost::shared_ptr<GpsManager const> GpsManagerConstPtr;
  *
  * ## Published topics
  * - **gps_position_marker**: The GPS positions for visualization purposes
+ * - **gps_hints_updated**: Signal that the GPS key points have been updated
  *
  * ## Subscribed topics
  * - __/gps_fix__: The GPS fix topic
@@ -138,6 +139,9 @@ private:
 
 	/// Publishes marker for visualization/debugging purposes
 	ros::Publisher gpsPositionMarkerPublisher;
+
+	/// Publishes an empty message as a signal that the GPS key points have been updated
+	ros::Publisher gpsHintsUpdatedPublisher;
 
 	/// queue of GPS fixes waiting to be paired with the according SLAM base links
 	GpsHintVect hintQueue;
