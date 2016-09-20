@@ -10,10 +10,13 @@
 
 namespace known_map_localization {
 
+/**
+ * Defines algorithm identifiers for different aligning algorithm choices.
+ */
 typedef enum {
-	MAPSTITCH = 0,
-	MAPMERGE = 1,
-	CSMERGE = 2
+	MAPSTITCH = 0,//!< MAPSTITCH Uses the mapstitch package
+	MAPMERGE = 1, //!< MAPMERGE Uses the mapmerge library by Stefano Carpin
+	CSMERGE = 2   //!< CSMERGE Uses the cs_merge package (not yet implemented)
 } Algorithm;
 
 }

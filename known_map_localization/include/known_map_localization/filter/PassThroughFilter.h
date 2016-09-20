@@ -16,7 +16,8 @@ namespace filter {
 /**
  * # PassThroughFilter
  *
- * Default filter that just passes through the last added alignment.
+ * Default filter that just passes through the last added hypothesis,
+ * choosing the first in the vector if it contains multiple hypotheses.
  */
 class PassThroughFilter: public Filter {
 public:
@@ -24,7 +25,7 @@ public:
 
 	/**
 	 * Update the filtered alignment by simply overwriting it with the first new hypothesis.
-	 * @param alignment The new alignment
+	 * @param hypotheses The vector of new hypotheses
 	 */
 	void addHypotheses(const alignment::HypothesesVect &hypotheses);
 };

@@ -15,10 +15,26 @@
 namespace known_map_localization {
 namespace aligning {
 
+/**
+ * # Mapmerge Aligner
+ *
+ * This aligning algorithm uses the mapmerge library by Stefano Carpin to align two maps.
+ *
+ * ## Parameters
+ * - **use_randomized_hough_transform**: Enable/disable randomized Hough transform
+ * - **use_robust_algorithm**: Enable/disable use of robust algorithm version of mapmerge
+ * - **number_of_hypotheses**: The number of hypotheses mapmerge should compute
+ */
 class MapmergeAligner: public Aligner {
 public:
 	MapmergeAligner();
 
+	/**
+	 * Aligns the two maps using the mapmerge algorithm and returns a vector of hypotheses.
+	 * @param knownMap The known map
+	 * @param slamMap The SLAM map
+	 * @return A vector of hypotheses
+	 */
 	alignment::HypothesesVect align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap);
 protected:
 	/**

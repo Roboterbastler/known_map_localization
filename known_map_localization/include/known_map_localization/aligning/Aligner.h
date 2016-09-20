@@ -19,6 +19,13 @@ class Aligner;
 typedef boost::shared_ptr<Aligner> AlignerPtr;
 typedef boost::shared_ptr<Aligner const> AlignerConstPtr;
 
+/**
+ * # Aligner
+ *
+ * Base class for aligning algorithms, that take two maps as occupancy grid maps
+ * and return one or multiple hypotheses about how the should be aligned.
+ * The algorithm to be used is determined by the AlgorithmSelector class.
+ */
 class Aligner {
 public:
 	static AlignerPtr instance();
@@ -26,7 +33,7 @@ public:
 	virtual ~Aligner();
 
 	/**
-	 *Aligns the two maps and returns an alignment.
+	 * Aligns the two maps and returns an alignment.
 	 * @param knownMap The known map
 	 * @param slamMap The SLAM map
 	 * @return A vector of hypotheses, with some aligning algorithms

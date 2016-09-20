@@ -22,6 +22,8 @@ typedef boost::shared_ptr<Filter const> FilterConstPtr;
 
 /**
  * # Filter
+ * Base class for filter implementations, which choose from the given hypotheses
+ * following specific strategies.
  */
 class Filter {
 public:
