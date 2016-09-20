@@ -7,6 +7,9 @@
 
 #include <gtest/gtest.h>
 
+#include <sensor_msgs/NavSatFix.h>
+#include <geographic_msgs/GeoPose.h>
+
 #include <Exception.h>
 #include <filter/Filter.h>
 #include <filter/PassThroughFilter.h>
@@ -43,60 +46,60 @@ TEST_F(Filter, isNotReadyAtBeginning) {
 	ASSERT_THROW(filter->getAlignment(), AlignmentNotAvailable);
 }
 
-TEST_F(GpsFilter, convertGPSPositionToAnchorFrameDifferentZones) {
-	geographic_msgs::GeoPose anchor;
-	anchor.position.latitude = 52.51273962;
-	anchor.position.longitude = 13.32486415;
-	tf::Quaternion anchorHeading = tf::Quaternion::getIdentity();
-	tf::quaternionTFToMsg(anchorHeading, anchor.orientation);
-
-	sensor_msgs::NavSatFix fix2;
-	fix2.latitude = 48.86421235;
-	fix2.longitude = 2.32709909;
-
-	EXPECT_THROW(filter::GpsFilter::convertGPSPositionToAnchorFrame(fix2, anchor), DifferentUTMGridZones);
-}
-
-TEST_F(GpsFilter, convertGPSPositionToAnchorFrameNoRotation) {
-	geographic_msgs::GeoPose anchor;
-	anchor.position.latitude = 52.51273962;
-	anchor.position.longitude = 13.32486415;
-	tf::Quaternion anchorHeading = tf::Quaternion::getIdentity();
-	tf::quaternionTFToMsg(anchorHeading, anchor.orientation);
-
-	sensor_msgs::NavSatFix fix1;
-	fix1.latitude = 52.51145984;
-	fix1.longitude = 13.32782531;
-	fix1.header.stamp = ros::Time::now();
-
-	geometry_msgs::PointStamped result;
-	ASSERT_NO_THROW(result = filter::GpsFilter::convertGPSPositionToAnchorFrame(fix1, anchor));
-
-	EXPECT_EQ(fix1.header.stamp, result.header.stamp);
-	EXPECT_NEAR(197.6, result.point.x, 0.1);
-	EXPECT_NEAR(-147, result.point.y, 0.1);
-	EXPECT_EQ(0, result.point.z);
-}
-
-TEST_F(GpsFilter, convertGPSPositionToAnchorFrameRotation) {
-	geographic_msgs::GeoPose anchor;
-	anchor.position.latitude = 52.51273962;
-	anchor.position.longitude = 13.32486415;
-	tf::Quaternion anchorHeading;
-
-	sensor_msgs::NavSatFix fix1;
-	fix1.latitude = 52.51145984;
-	fix1.longitude = 13.32782531;
-	fix1.header.stamp = ros::Time::now();
-
-	anchorHeading.setRPY(0, 0, M_PI / 2.);
-	tf::quaternionTFToMsg(anchorHeading, anchor.orientation);
-
-	geometry_msgs::PointStamped result = filter::GpsFilter::convertGPSPositionToAnchorFrame(fix1, anchor);
-	EXPECT_NEAR(-147, result.point.x, 0.1);
-	EXPECT_NEAR(-197.6, result.point.y, 0.1);
-	EXPECT_EQ(0, result.point.z);
-}
+//TEST_F(GpsFilter, convertGPSPositionToAnchorFrameDifferentZones) {
+//	geographic_msgs::GeoPose anchor;
+//	anchor.position.latitude = 52.51273962;
+//	anchor.position.longitude = 13.32486415;
+//	tf::Quaternion anchorHeading = tf::Quaternion::getIdentity();
+//	tf::quaternionTFToMsg(anchorHeading, anchor.orientation);
+//
+//	sensor_msgs::NavSatFix fix2;
+//	fix2.latitude = 48.86421235;
+//	fix2.longitude = 2.32709909;
+//
+//	EXPECT_THROW(filter::GpsFilter::convertGPSPositionToAnchorFrame(fix2, anchor), DifferentUTMGridZones);
+//}
+//
+//TEST_F(GpsFilter, convertGPSPositionToAnchorFrameNoRotation) {
+//	geographic_msgs::GeoPose anchor;
+//	anchor.position.latitude = 52.51273962;
+//	anchor.position.longitude = 13.32486415;
+//	tf::Quaternion anchorHeading = tf::Quaternion::getIdentity();
+//	tf::quaternionTFToMsg(anchorHeading, anchor.orientation);
+//
+//	sensor_msgs::NavSatFix fix1;
+//	fix1.latitude = 52.51145984;
+//	fix1.longitude = 13.32782531;
+//	fix1.header.stamp = ros::Time::now();
+//
+//	geometry_msgs::PointStamped result;
+//	ASSERT_NO_THROW(result = filter::GpsFilter::convertGPSPositionToAnchorFrame(fix1, anchor));
+//
+//	EXPECT_EQ(fix1.header.stamp, result.header.stamp);
+//	EXPECT_NEAR(197.6, result.point.x, 0.1);
+//	EXPECT_NEAR(-147, result.point.y, 0.1);
+//	EXPECT_EQ(0, result.point.z);
+//}
+//
+//TEST_F(GpsFilter, convertGPSPositionToAnchorFrameRotation) {
+//	geographic_msgs::GeoPose anchor;
+//	anchor.position.latitude = 52.51273962;
+//	anchor.position.longitude = 13.32486415;
+//	tf::Quaternion anchorHeading;
+//
+//	sensor_msgs::NavSatFix fix1;
+//	fix1.latitude = 52.51145984;
+//	fix1.longitude = 13.32782531;
+//	fix1.header.stamp = ros::Time::now();
+//
+//	anchorHeading.setRPY(0, 0, M_PI / 2.);
+//	tf::quaternionTFToMsg(anchorHeading, anchor.orientation);
+//
+//	geometry_msgs::PointStamped result = filter::GpsFilter::convertGPSPositionToAnchorFrame(fix1, anchor);
+//	EXPECT_NEAR(-147, result.point.x, 0.1);
+//	EXPECT_NEAR(-197.6, result.point.y, 0.1);
+//	EXPECT_EQ(0, result.point.z);
+//}
 
 //TEST_F(PassThroughFilter, isReadyAfterAdding) {
 //	filter::FilterPtr filter(new filter::PassThroughFilter());
