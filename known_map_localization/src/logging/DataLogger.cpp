@@ -128,8 +128,6 @@ void DataLogger::logError(const PoseError &error) {
 void DataLogger::logScale(float scale, SlamScaleMode mode) {
 	if(!enabled) return;
 
-	ROS_WARN("Logged scale...");
-
 	scalesFile << ros::WallTime::now().toSec() << '\t'
 			<< scale << '\t'
 			<< mode << endl;
