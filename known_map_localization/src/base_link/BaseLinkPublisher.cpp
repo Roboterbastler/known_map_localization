@@ -14,6 +14,7 @@
 #include <filter/Filter.h>
 #include <known_map_server/KnownMapServer.h>
 #include <known_map_localization/PoseError.h>
+#include <logging/DataLogger.h>
 
 namespace known_map_localization {
 namespace base_link {
@@ -128,6 +129,7 @@ void BaseLinkPublisher::updatePositionError(const tf::StampedTransform &baseLink
 		poseError.rotational_error = orientationToOrientationAngle(estimatedPose.getRotation(), groundTruthPose.getRotation());
 		poseError.header.stamp = baseLink.stamp_;
 		poseErrorPublisher.publish(poseError);
+		logging::DataLogger::instance()->logError(poseError);
 	} catch(tf::TransformException &e) {
 		ROS_DEBUG("Unable to update pose error: %s", e.what());
 	}

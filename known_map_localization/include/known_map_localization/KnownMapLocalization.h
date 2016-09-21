@@ -11,8 +11,6 @@
 #include <ros/ros.h>
 #include <nav_msgs/OccupancyGrid.h>
 
-#include <logging/DataLogger.h>
-
 namespace known_map_localization {
 
 /**
@@ -38,9 +36,6 @@ private:
 private:
 	/// Subscribes to the map topic released by the SLAM package
 	ros::Subscriber slamMapSubscriber;
-
-	/// Data logger for later analysis
-	logging::DataLogger dataLogger;
 };
 
 } /* namespace known_map_localization */

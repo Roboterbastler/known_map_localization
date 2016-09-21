@@ -13,6 +13,7 @@
 #include <base_link/BaseLinkPublisher.h>
 #include <SlamScaleManager.h>
 #include <aligning/Aligner.h>
+#include <logging/DataLogger.h>
 #include <GpsManager.h>
 #include <alignment/Hypothesis.h>
 #include <Utils.h>
@@ -23,8 +24,7 @@ using namespace known_map_server;
 using namespace alignment;
 using namespace preprocessing;
 
-KnownMapLocalization::KnownMapLocalization() :
-		dataLogger(true) {
+KnownMapLocalization::KnownMapLocalization() {
 
 	// initialize Singletons
 	KnownMapServer::instance();
@@ -35,6 +35,7 @@ KnownMapLocalization::KnownMapLocalization() :
 	GpsManager::instance();
 	filter::Filter::instance();
 	base_link::BaseLinkPublisher::instance();
+	logging::DataLogger::instance();
 
 	// subscribe to topics
 	ros::NodeHandle nh("~");
@@ -67,7 +68,7 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 		ROS_INFO("Got %ld new hypotheses.", hypotheses.size());
 
 		for(HypothesesVect::const_iterator it = hypotheses.begin(); it != hypotheses.end(); ++it) {
-			ROS_INFO("  - [x=%.2f, y=%.2f, theta=%.2f, scale=%.2f]. Score = %.4f",
+			ROS_DEBUG("  - [x=%.2f, y=%.2f, theta=%.2f, scale=%.2f]. Score = %.4f",
 					it->x,
 					it->y,
 					radToDeg(it->theta),
@@ -75,7 +76,7 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 					it->score);
 		}
 
-		dataLogger.logComputation(hypotheses, duration, KnownMapServer::instance()->getKnownMap()->info, slamMapFixed->info);
+		logging::DataLogger::instance()->logComputation(hypotheses, duration, KnownMapServer::instance()->getKnownMap()->info, slamMapFixed->info);
 
 		filter::Filter::instance()->addHypotheses(hypotheses);
 	} catch(AlignerInternalError &e) {

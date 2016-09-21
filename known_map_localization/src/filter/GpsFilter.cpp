@@ -10,6 +10,7 @@
 #include <known_map_server/KnownMapServer.h>
 #include <Exception.h>
 #include <GpsManager.h>
+#include <logging/DataLogger.h>
 
 #define MAX_HINT_CACHE_SIZE 10
 
@@ -73,6 +74,8 @@ void GpsFilter::addHypotheses(const HypothesesVect &hypotheses) {
 			ROS_DEBUG("        -> New best alignment.");
 		}
 	}
+
+	logging::DataLogger::instance()->logFilter(filteredAlignment);
 
 	gpsConstraintsMarkerPublisher.publish(constraintsMarker);
 }

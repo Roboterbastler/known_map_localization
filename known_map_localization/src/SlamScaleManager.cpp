@@ -14,6 +14,7 @@
 
 #include <GpsManager.h>
 #include <Exception.h>
+#include <logging/DataLogger.h>
 
 #define MAX_POSITION_CACHE_SIZE 100
 #define MIN_GPS_DISTANCE_M 0.5
@@ -34,6 +35,7 @@ SlamScaleManager::SlamScaleManager() :
 		if (nh.getParam("slam_map_scale", scale)) {
 			ROS_INFO("    Scale: %f", scale);
 			isValid = true;
+			logging::DataLogger::instance()->logScale(scale, mode);
 		} else {
 			ROS_FATAL("No SLAM scale parameter found.");
 			ros::shutdown();
@@ -95,6 +97,7 @@ void SlamScaleManager::updateSlamScale(float scale) {
 	if (mode == ALIGNMENT) {
 		this->scale = scale;
 		isValid = true;
+		logging::DataLogger::instance()->logScale(scale, mode);
 	}
 }
 
@@ -161,6 +164,7 @@ void SlamScaleManager::estimateScale(const std_msgs::Empty &signal) {
 		if (!scales.empty()) {
 			scale = median(scales);
 			isValid = true;
+			logging::DataLogger::instance()->logScale(scale, mode);
 			ROS_INFO("  - Estimated scale by GPS (median from %ld values): %.4f",
 					scales.size(), scale);
 		} else {
