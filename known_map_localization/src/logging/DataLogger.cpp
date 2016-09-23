@@ -26,6 +26,8 @@ DataLogger::DataLogger() :
 		computationId(0) {
 	ROS_INFO("Data logger initialization...");
 
+	referenceTime = ros::WallTime::now();
+
 	ros::NodeHandle nh("~");
 
 	enabled = nh.param("logging_enabled", true);
@@ -87,9 +89,9 @@ void DataLogger::logComputation(const alignment::HypothesesVect &hypotheses,
 		const nav_msgs::MapMetaData &slamMap) {
 	if(!enabled) return;
 
-	ros::WallTime stamp = ros::WallTime::now();
+	ros::WallDuration time = ros::WallTime::now() - referenceTime;
 
-	computationsFile << stamp.toSec() << '\t'
+	computationsFile << time.toSec() << '\t'
 			<< computationId << '\t'
 			<< duration.toSec() << '\t'
 			<< hypotheses.size() << '\t'
@@ -128,7 +130,8 @@ void DataLogger::logError(const PoseError &error) {
 void DataLogger::logScale(float scale, SlamScaleMode mode) {
 	if(!enabled) return;
 
-	scalesFile << ros::WallTime::now().toSec() << '\t'
+	ros::WallDuration time = ros::WallTime::now() - referenceTime;
+	scalesFile << time.toSec() << '\t'
 			<< scale << '\t'
 			<< mode << endl;
 }
@@ -136,7 +139,8 @@ void DataLogger::logScale(float scale, SlamScaleMode mode) {
 void DataLogger::logFilter(const alignment::Alignment &filteredAlignment) {
 	if(!enabled) return;
 
-	filterFile << ros::WallTime::now().toSec() << '\t'
+	ros::WallDuration time = ros::WallTime::now() - referenceTime;
+	filterFile << time.toSec() << '\t'
 			<< filteredAlignment.x << '\t'
 			<< filteredAlignment.y << '\t'
 			<< filteredAlignment.theta << '\t'
@@ -168,7 +172,7 @@ void DataLogger::writeAlignmentsHeader() {
 void DataLogger::writeComputationsHeader() {
 	stringstream attributeNames;
 
-	attributeNames << "Timestamp\t"
+	attributeNames << "Time\t"
 			<< "ID\t"
 			<< "Duration\t"
 			<< "Number of hypotheses\t"
@@ -191,7 +195,7 @@ void DataLogger::writeErrorsHeader() {
 void DataLogger::writeScalesHeader() {
 	stringstream attributeNames;
 
-	attributeNames << "Timestamp\t"
+	attributeNames << "Time\t"
 			<< "Scale\t"
 			<< "Mode";
 
@@ -201,7 +205,7 @@ void DataLogger::writeScalesHeader() {
 void DataLogger::writeFilterHeader() {
 	stringstream attributeNames;
 
-	attributeNames << "Timestamp\t"
+	attributeNames << "Time\t"
 			<< "X\t"
 			<< "Y\t"
 			<< "Rotation\t"

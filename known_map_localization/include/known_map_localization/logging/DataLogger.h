@@ -105,6 +105,9 @@ protected:
 
 private:
 	static DataLoggerPtr _instance;
+
+	/// Initialization time used as a reference for logged events
+	ros::WallTime referenceTime;
 };
 
 } /* namespace logging */
