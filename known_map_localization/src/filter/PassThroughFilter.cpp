@@ -21,7 +21,7 @@ void PassThroughFilter::addHypotheses(const alignment::HypothesesVect &hypothese
 		return;
 	}
 
-	filteredAlignment = *(hypotheses.begin());
+	filteredAlignment = hypotheses.front();
 	SlamScaleManager::instance()->updateSlamScale(filteredAlignment.scale);
 	logging::DataLogger::instance()->logFilter(filteredAlignment);
 	ready = true;
