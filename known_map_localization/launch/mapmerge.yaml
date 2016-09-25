@@ -15,4 +15,4 @@ number_of_hypotheses: 4
 
 # filter parameters
 gps_constraint_radius: 1.
-aging_rate: 0.95
+aging_rate: 1.0
