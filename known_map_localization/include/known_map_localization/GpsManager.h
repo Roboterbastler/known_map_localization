@@ -107,6 +107,14 @@ private:
 	tf::StampedTransform getSlamBaseLink(ros::Time t);
 
 	/**
+	 * A GPS hint is considered out of date when its age (the difference between the
+	 * current time and it's time stamp) is greater than the cache time of the tf listener.
+	 * @param hint The GPS hint to be tested
+	 * @return True if it is out of date, otherwise false
+	 */
+	bool hintIsOutdated(const GpsHint &hint);
+
+	/**
 	 * Converts a GPS fix to the known map anchor frame. If the GPS fix lies in a different UTM grid zone
 	 * than the known map anchor an exception is thrown.
 	 * @param gpsFix The GPS fix

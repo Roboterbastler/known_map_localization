@@ -69,6 +69,13 @@ void GpsManager::updateKeyPoints(const ros::WallTimerEvent& event) {
 	bool modified = false;
 
 	for(GpsHintVect::iterator hint = hintQueue.begin(); hint != hintQueue.end();) {
+//		if(hintIsOutdated(*hint)) {
+//			// remove GPS fix from queue, since there is no chance anymore
+//			// to get a SLAM base link for this time
+//			hint = hintQueue.erase(hint);
+//			continue;
+//		}
+
 		try {
 			GpsKeyPoint kp(*hint);
 			kp.baseLink = getSlamBaseLink(kp.stamp);
@@ -214,6 +221,11 @@ GpsKeyPoint::GpsKeyPoint(const GpsHint &hint) :
 
 double GpsHint::distanceTo(const geometry_msgs::Point &p) const {
 	return sqrt(pow(gpsPosition.x - p.x, 2) + pow(gpsPosition.y - p.y, 2));
+}
+
+bool GpsManager::hintIsOutdated(const GpsHint &hint) {
+	ros::Duration age = ros::Time::now() - hint.stamp;
+	return age.toSec() > listener.getCacheLength().toSec();
 }
 
 } /* namespace known_map_localization */
