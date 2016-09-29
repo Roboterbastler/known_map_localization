@@ -31,24 +31,6 @@ TEST(SlamScaleManager, geometryPointDistance) {
 	EXPECT_FLOAT_EQ(sqrt(2), SlamScaleManager::distance(p1, p2));
 }
 
-TEST(SlamScaleManager, utmPointDistance) {
-	UTMPoint p1, p2;
-	p1.northing = 0;
-	p1.easting = 0;
-	p2.northing = 0;
-	p2.easting = 0;
-
-	EXPECT_FLOAT_EQ(0., SlamScaleManager::distance(p1, p2));
-
-	p2.northing = 1;
-
-	EXPECT_FLOAT_EQ(1., SlamScaleManager::distance(p1, p2));
-
-	p2.easting = 1;
-
-	EXPECT_FLOAT_EQ(sqrt(2), SlamScaleManager::distance(p1, p2));
-}
-
 TEST(SlamScaleManager, medianEmpty) {
 	std::vector<double> empty;
 
