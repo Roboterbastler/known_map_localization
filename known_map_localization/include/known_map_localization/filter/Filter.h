@@ -43,7 +43,7 @@ public:
 	 * @return The filtered alignment
 	 * @throw AlignmentNotAvailable, if filtered alignment is not available
 	 */
-	const alignment::Alignment& getAlignment() const;
+	virtual const alignment::Alignment& getAlignment() const;
 
 	/**
 	 * Check if the filtered alignment is available.
