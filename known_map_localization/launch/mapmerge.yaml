@@ -1,12 +1,12 @@
 algorithm: mapmerge
 slam_preprocessing_enabled: true
 known_preprocessing_enabled: true
-known_map_config_file: data/known_map.yaml
+known_map_config_file: data/campus.yaml
 known_map_frame_id: /known_map_localization/anchor
 
-# SLAM map cell size [meters]
+# SLAM map unit size [meters]
 slam_scale_mode: parameter #[parameter/alignment/gps]
-slam_map_scale: 1.7
+slam_map_scale: 9.6
 
 # algorithm parameters
 use_randomized_hough_transform: false
@@ -15,4 +15,4 @@ number_of_hypotheses: 4
 
 # filter parameters
 gps_constraint_radius: 1.
-aging_rate: 1.0
+aging_rate: 0.99
