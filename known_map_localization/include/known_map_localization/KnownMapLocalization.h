@@ -36,6 +36,10 @@ private:
 private:
 	/// Subscribes to the map topic released by the SLAM package
 	ros::Subscriber slamMapSubscriber;
+
+	/// Minimal duration between processing of SLAM maps
+	ros::WallDuration rate;
+	ros::WallTime lastProcessing;
 };
 
 } /* namespace known_map_localization */

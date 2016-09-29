@@ -24,7 +24,7 @@ using namespace known_map_server;
 using namespace alignment;
 using namespace preprocessing;
 
-KnownMapLocalization::KnownMapLocalization() {
+KnownMapLocalization::KnownMapLocalization() : rate(2.0), lastProcessing(0) {
 
 	// initialize Singletons
 	KnownMapServer::instance();
@@ -43,6 +43,12 @@ KnownMapLocalization::KnownMapLocalization() {
 }
 
 void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap) {
+	if((ros::WallTime::now() - lastProcessing).toSec() < rate.toSec()) {
+		ROS_DEBUG("Skipped SLAM map...");
+		return;
+	}
+	lastProcessing = ros::WallTime::now();
+
 	// TODO: initialize orientation for slam map (workaround until fixed in ORB_SLAM)
 	nav_msgs::OccupancyGridPtr slamMapFixed(new nav_msgs::OccupancyGrid(*slamMap));
 	tf::quaternionTFToMsg(tf::Quaternion(0, 0, 0, 1), slamMapFixed->info.origin.orientation);
