@@ -103,6 +103,9 @@ tf::Stamped<tf::Pose> BaseLinkPublisher::getPoseForAlignment(const alignment::Al
 
 	listener.lookupTransform("orb_slam/map", "ORB_base_link", ros::Time(0), slamMapFrame_to_slamBaseLink);
 	
+	// discard z component
+	slamMapFrame_to_slamBaseLink.getOrigin().setZ(0);
+
 	// convert pose to real world scale
 	slamMapFrame_to_slamBaseLink = SlamScaleManager::instance()->convertTransform(slamMapFrame_to_slamBaseLink);
 
