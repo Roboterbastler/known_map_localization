@@ -5,14 +5,14 @@ known_map_config_file: data/campus.yaml
 known_map_frame_id: /known_map_localization/anchor
 
 # SLAM map unit size [meters]
-slam_scale_mode: parameter #[parameter/alignment/gps]
+slam_scale_mode: gps #[parameter/alignment/gps]
 slam_map_scale: 9.6
 
 # algorithm parameters
 use_randomized_hough_transform: false
 use_robust_algorithm: false
-number_of_hypotheses: 4
+number_of_hypotheses: 6
 
 # filter parameters
-gps_constraint_radius: 1.
-aging_rate: 0.99
+gps_constraint_radius: 2.
+aging_rate: 0.95
