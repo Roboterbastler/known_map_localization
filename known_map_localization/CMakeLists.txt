@@ -164,6 +164,7 @@ add_library(known_map_localization
   src/alignment/GpsScoredHypothesis.cpp
   src/filter/Filter.cpp
   src/filter/PassThroughFilter.cpp
+  src/filter/DecayFilter.cpp
   src/filter/GpsFilter.cpp
   src/base_link/BaseLinkPublisher.cpp
   src/visualization/VisualizationSlamMapPublisher.cpp
