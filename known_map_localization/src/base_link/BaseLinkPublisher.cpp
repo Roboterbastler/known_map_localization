@@ -6,6 +6,7 @@
  */
 
 #include <geometry_msgs/PoseStamped.h>
+#include <geodesy/utm.h>
 
 #include <base_link/BaseLinkPublisher.h>
 #include <Exception.h>
@@ -141,18 +142,23 @@ void BaseLinkPublisher::updatePositionError(const tf::StampedTransform &baseLink
 void BaseLinkPublisher::updateGeoPose(geographic_msgs::GeoPoseConstPtr anchor, const tf::StampedTransform &baseLink) {
 	tf::Quaternion anchorRotation;
 	tf::quaternionMsgToTF(anchor->orientation, anchorRotation);
-	tf::Transform t(anchorRotation.inverse());
+	tf::Transform t(anchorRotation);
 
 	// transform base link to align x axis with circles of latitude
 	tf::Pose cartesianPose = t * baseLink;
 
-	// use the quick and dirty estimate that 111,111 meters (111.111 km) in the y direction is 1 degree (of latitude)
-	// and 111,111 * cos(latitude) meters in the x direction is 1 degree (of longitude).
+	// get robot position in UTM coordinates
+	geodesy::UTMPoint utmAnchor(anchor->position);
+	geodesy::UTMPoint utmGeoPosition(
+			utmAnchor.easting + cartesianPose.getOrigin().x(),
+			utmAnchor.northing + cartesianPose.getOrigin().y(),
+			utmAnchor.zone,
+			utmAnchor.band);
+
+	// convert to geographic position and add orientation
 	geographic_msgs::GeoPose geoPose;
+	geoPose.position = geodesy::toMsg(utmGeoPosition);
 	tf::quaternionTFToMsg(cartesianPose.getRotation(), geoPose.orientation);
-	geoPose.position.altitude = anchor->position.altitude + cartesianPose.getOrigin().getZ();
-	geoPose.position.latitude = anchor->position.latitude + (cartesianPose.getOrigin().getY() / 111111.);
-	geoPose.position.longitude = anchor->position.longitude + (cartesianPose.getOrigin().getX() / (111111. * cos(geoPose.position.latitude)));
 
 	geoPosePublisher.publish(geoPose);
 }
