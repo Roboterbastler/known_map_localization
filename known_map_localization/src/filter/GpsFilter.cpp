@@ -130,6 +130,9 @@ void GpsFilter::addConstraintMarker(const GpsKeyPoint &hint, visualization_msgs:
 }
 
 const alignment::Alignment& GpsFilter::getAlignment() const {
+	if(!ready) {
+		throw AlignmentNotAvailable("Filtered alignment is not yet available");
+	}
 	return filteredHypothesis;
 }
 
