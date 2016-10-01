@@ -10,7 +10,7 @@
 
 #include <stdexcept>
 
-namespace known_map_localization {
+namespace kml {
 
 class KnownMapLocalizationException : public std::runtime_error {
 public:
@@ -62,6 +62,11 @@ public:
 	DifferentUTMGridZones(std::string msg) : KnownMapLocalizationException(msg) {};
 };
 
-} /* namespace known_map_localization */
+class InvalidAssociation : public KnownMapLocalizationException {
+public:
+	InvalidAssociation(std::string msg) : KnownMapLocalizationException(msg) {};
+};
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_EXCEPTION_H_ */

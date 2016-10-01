@@ -10,8 +10,7 @@
 
 #include <aligning/Aligner.h>
 
-namespace known_map_localization {
-namespace aligning {
+namespace kml {
 
 /**
  * # Mapstitch Aligner
@@ -30,13 +29,11 @@ public:
 	 * @param slamMap The SLAM map
 	 * @return A vector containing the hypothesis
 	 */
-	alignment::HypothesesVect align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap);
-
-protected:
-	static tf::Transform getOriginTransform(nav_msgs::OccupancyGridConstPtr map);
+	HypothesesVect align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap);
 };
 
-} /* namespace aligning */
-} /* namespace known_map_localization */
+tf::Transform getOriginTransform(nav_msgs::OccupancyGridConstPtr map);
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_ALIGNING_MAPSTITCHALIGNER_H_ */

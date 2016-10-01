@@ -8,18 +8,14 @@
 #ifndef KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_SLAMSCALEMANAGER_H_
 #define KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_SLAMSCALEMANAGER_H_
 
-#include <utility>
-
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <ros/ros.h>
-#include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
 #include <geometry_msgs/Pose.h>
-#include <sensor_msgs/NavSatFix.h>
-#include <geodesy/utm.h>
 
-namespace known_map_localization {
+#include <gps/GpsManager.h>
+#include <logging/DataLogger.h>
+
+namespace kml {
 
 /// The mode of the SLAM scale manager
 typedef enum {
@@ -28,10 +24,6 @@ typedef enum {
 	ALIGNMENT, ///< Uses the scale estimates provided by the aligning algorithms (not all algorithms support that)
 	GPS ///< Uses GPS fixes to estimate the SLAM scale
 } SlamScaleMode;
-
-class SlamScaleManager;
-typedef boost::shared_ptr<SlamScaleManager> SlamScaleManagerPtr;
-typedef boost::shared_ptr<SlamScaleManager const> SlamScaleManagerConstPtr;
 
 /**
  * # SLAM Scale Manager
@@ -51,7 +43,7 @@ typedef boost::shared_ptr<SlamScaleManager const> SlamScaleManagerConstPtr;
  */
 class SlamScaleManager {
 public:
-	static SlamScaleManagerPtr instance();
+	SlamScaleManager(GpsManagerConstPtr pGpsManager, DataLoggerPtr pDataLogger = DataLoggerPtr());
 
 	/**
 	 * Gets the SLAM scale
@@ -94,24 +86,7 @@ public:
 	 */
 	geometry_msgs::Pose convertPoseMsg(geometry_msgs::Pose pose) const;
 
-	/**
-	 * Computes the distance between two points (on the xy plane).
-	 * @param p1 The first point
-	 * @param p2 The second point
-	 * @return The distance
-	 */
-	static double distance(const geometry_msgs::Point &p1, const geometry_msgs::Point &p2);
-
-	/**
-	 * Computes the median of a vector of values.
-	 * @param values The values
-	 * @return The median
-	 */
-	static double median(std::vector<double> &values);
-
 protected:
-	SlamScaleManager();
-
 	/**
 	 * Tries to read the mode parameter and returns the according mode.
 	 * @return The mode
@@ -132,24 +107,44 @@ protected:
 	void estimateScale(const std_msgs::Empty &signal);
 
 private:
-	static SlamScaleManagerPtr _instance;
-
 	/// The mode of the SLAM scale manager
-	SlamScaleMode mode;
+	SlamScaleMode mMode_;
 
 	/// This flag indicates if a scale (estimation) is available
-	bool isValid;
+	bool mIsValid_;
 
 	/// The current scale estimation
-	float scale;
+	float mScale_;
 
 	/// Listens to the **tf** topic
-	tf::TransformListener listener;
+	tf::TransformListener mListener_;
 
 	/// Signals that the GPS hints have been updated
-	ros::Subscriber gpsHintsUpdatedSubscriber;
+	ros::Subscriber mGpsHintsUpdatedSubscriber_;
+
+private:
+	DataLoggerPtr pDataLogger_;
+	GpsManagerConstPtr pGpsManager_;
 };
 
-} /* namespace known_map_localization */
+typedef boost::shared_ptr<SlamScaleManager> SlamScaleManagerPtr;
+typedef boost::shared_ptr<SlamScaleManager const> SlamScaleManagerConstPtr;
+
+/**
+ * Computes the distance between two points (on the xy plane).
+ * @param p1 The first point
+ * @param p2 The second point
+ * @return The distance
+ */
+double distance(const geometry_msgs::Point &p1, const geometry_msgs::Point &p2);
+
+/**
+ * Computes the median of a vector of values.
+ * @param values The values
+ * @return The median
+ */
+double median(std::vector<double> &values);
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_SLAMSCALEMANAGER_H_ */

@@ -6,26 +6,24 @@
  */
 
 #include <filter/PassThroughFilter.h>
-#include <SlamScaleManager.h>
-#include <logging/DataLogger.h>
 
-namespace known_map_localization {
-namespace filter {
+namespace kml {
 
-PassThroughFilter::PassThroughFilter() {
+PassThroughFilter::PassThroughFilter(SlamScaleManagerPtr pSlamScaleManager,
+		DataLoggerPtr pDataLogger) :
+		Filter(pSlamScaleManager, pDataLogger) {
 	ROS_INFO("    Type: Pass through filter");
 }
 
-void PassThroughFilter::addHypotheses(const alignment::HypothesesVect &hypotheses) {
-	if(hypotheses.empty()) {
+void PassThroughFilter::addHypotheses(const HypothesesVect &hypotheses) {
+	if (hypotheses.empty()) {
 		return;
 	}
 
-	filteredAlignment = hypotheses.front();
-	SlamScaleManager::instance()->updateSlamScale(filteredAlignment.scale);
-	logging::DataLogger::instance()->logFilter(filteredAlignment);
-	ready = true;
+	mFilteredAlignment_ = hypotheses.front();
+	pSlamScaleManager_->updateSlamScale(mFilteredAlignment_.scale);
+	logAlignment(mFilteredAlignment_);
+	mReady_ = true;
 }
 
-} /* namespace filter */
-} /* namespace known_map_localization */
+} /* namespace kml */

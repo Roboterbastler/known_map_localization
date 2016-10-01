@@ -10,7 +10,7 @@
 
 #include <math.h>
 
-namespace known_map_localization {
+namespace kml {
 
 /**
  * Conversion from radians to degree.

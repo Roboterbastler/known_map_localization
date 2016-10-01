@@ -46,7 +46,7 @@ struct convert<geographic_msgs::GeoPose> {
 			gp.position.latitude = node["position"]["latitude"].as<double>();
 			gp.position.longitude = node["position"]["longitude"].as<double>();
 
-			gp.orientation = tf::createQuaternionMsgFromYaw(known_map_localization::degToRad(node["heading"].as<double>()));
+			gp.orientation = tf::createQuaternionMsgFromYaw(kml::degToRad(node["heading"].as<double>()));
 
 			return true;
 		} catch (InvalidNode &in) {

@@ -148,7 +148,6 @@ include_directories(
 # )
 add_library(known_map_localization
   src/KnownMapLocalization.cpp
-  src/AlgorithmSelector.cpp
   src/aligning/Aligner.cpp
   src/aligning/MapstitchAligner.cpp
   src/aligning/MapmergeAligner.cpp
@@ -169,10 +168,10 @@ add_library(known_map_localization
   src/filter/DecayFilter.cpp
   src/filter/GpsFilter.cpp
   src/base_link/BaseLinkPublisher.cpp
-  src/visualization/VisualizationSlamMapPublisher.cpp
   src/logging/DataLogger.cpp
   src/SlamScaleManager.cpp
   src/GpsManager.cpp
+  src/factory/KmlFactory.cpp
 )
 
 ## Add cmake target dependencies of the library

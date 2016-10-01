@@ -12,30 +12,32 @@
 #include <ros/ros.h>
 #include <geodesy/wgs84.h>
 
-#include <GpsManager.h>
 #include <Exception.h>
-#include <logging/DataLogger.h>
 
 #define MAX_POSITION_CACHE_SIZE 100
 #define MIN_GPS_DISTANCE_M 0.5
 
-namespace known_map_localization {
+namespace kml {
 
-SlamScaleManagerPtr SlamScaleManager::_instance;
+SlamScaleManager::SlamScaleManager(GpsManagerConstPtr pGpsManager,
+		DataLoggerPtr pDataLogger) :
+		mMode_(determineMode()), mIsValid_(false), mScale_(1.0), pDataLogger_(
+				pDataLogger), pGpsManager_(pGpsManager) {
+	assert(pGpsManager_);
 
-SlamScaleManager::SlamScaleManager() :
-		mode(determineMode()), isValid(false), scale(1.0) {
 	ros::NodeHandle nh("~");
 
 	ROS_INFO("SLAM scale manager initialization...");
 
-	switch (mode) {
+	switch (mMode_) {
 	case PARAMETER:
 		ROS_INFO("    Mode: PARAMETER");
-		if (nh.getParam("slam_map_scale", scale)) {
-			ROS_INFO("    Scale: %f", scale);
-			isValid = true;
-			logging::DataLogger::instance()->logScale(scale, mode);
+		if (nh.getParam("slam_map_scale", mScale_)) {
+			ROS_INFO("    Scale: %f", mScale_);
+			mIsValid_ = true;
+			if (pDataLogger_) {
+				pDataLogger_->logScale(mScale_, mMode_);
+			}
 		} else {
 			ROS_FATAL("No SLAM scale parameter found.");
 			ros::shutdown();
@@ -47,7 +49,8 @@ SlamScaleManager::SlamScaleManager() :
 		break;
 	case GPS:
 		ROS_INFO("    Mode: GPS");
-		gpsHintsUpdatedSubscriber = nh.subscribe("gps_hints_updated", 1, &SlamScaleManager::estimateScale, this);
+		mGpsHintsUpdatedSubscriber_ = nh.subscribe("gps_hints_updated", 1,
+				&SlamScaleManager::estimateScale, this);
 		break;
 	default:
 		ROS_FATAL("    Illegal or not specified SLAM scale manager mode.");
@@ -57,14 +60,7 @@ SlamScaleManager::SlamScaleManager() :
 }
 
 SlamScaleMode SlamScaleManager::getMode() const {
-	return mode;
-}
-
-SlamScaleManagerPtr SlamScaleManager::instance() {
-	if (!_instance) {
-		_instance = SlamScaleManagerPtr(new SlamScaleManager());
-	}
-	return _instance;
+	return mMode_;
 }
 
 SlamScaleMode SlamScaleManager::determineMode() const {
@@ -86,18 +82,20 @@ SlamScaleMode SlamScaleManager::determineMode() const {
 }
 
 float SlamScaleManager::getSlamScale() const {
-	if (isValid) {
-		return scale;
+	if (mIsValid_) {
+		return mScale_;
 	} else {
 		throw ScaleNotAvailable("Scale estimate not available");
 	}
 }
 
 void SlamScaleManager::updateSlamScale(float scale) {
-	if (mode == ALIGNMENT) {
-		this->scale = scale;
-		isValid = true;
-		logging::DataLogger::instance()->logScale(scale, mode);
+	if (mMode_ == ALIGNMENT) {
+		this->mScale_ = scale;
+		mIsValid_ = true;
+		if (pDataLogger_) {
+			pDataLogger_->logScale(scale, mMode_);
+		}
 	}
 }
 
@@ -123,17 +121,17 @@ geometry_msgs::Pose SlamScaleManager::convertPoseMsg(
 }
 
 void SlamScaleManager::estimateScale(const std_msgs::Empty &signal) {
-	const GpsKeyPointVect &gpsKeyPoints = GpsManager::instance()->getKeyPoints();
+	const GpsHintVect &gpsHints = pGpsManager_->getGpsHints();
 
 	ROS_INFO("Estimate new scale using GPS hints...");
 
-	if (gpsKeyPoints.size() >= 2) {
+	if (gpsHints.size() >= 2) {
 		std::vector<double> scales;
 
-		for (GpsKeyPointVect::const_iterator first = gpsKeyPoints.begin();
-				first != gpsKeyPoints.end(); ++first) {
-			for (GpsKeyPointVect::const_iterator second = gpsKeyPoints.begin();
-					second != gpsKeyPoints.end(); ++second) {
+		for (GpsHintVect::const_iterator first = gpsHints.begin();
+				first != gpsHints.end(); ++first) {
+			for (GpsHintVect::const_iterator second = gpsHints.begin();
+					second != gpsHints.end(); ++second) {
 				if (first == second) {
 					continue;
 				}
@@ -143,16 +141,18 @@ void SlamScaleManager::estimateScale(const std_msgs::Empty &signal) {
 				tf::pointTFToMsg(second->baseLink.getOrigin(), secondPoint);
 
 				double slamMapDistance = distance(firstPoint, secondPoint);
-				double realWorldDistance = distance(first->gpsPosition, second->gpsPosition);
+				double realWorldDistance = distance(first->gpsPosition,
+						second->gpsPosition);
 
-				if (realWorldDistance < MIN_GPS_DISTANCE_M || slamMapDistance < 0.01) {
+				if (realWorldDistance < MIN_GPS_DISTANCE_M
+						|| slamMapDistance < 0.01) {
 					// avoid small distances
 					continue;
 				}
 
 				double scaleEstimate = realWorldDistance / slamMapDistance;
 
-				if(scaleEstimate > 10.) {
+				if (scaleEstimate > 10.) {
 					// drop too big estimates
 					continue;
 				}
@@ -162,32 +162,34 @@ void SlamScaleManager::estimateScale(const std_msgs::Empty &signal) {
 		};
 
 		if (!scales.empty()) {
-			scale = median(scales);
-			isValid = true;
-			logging::DataLogger::instance()->logScale(scale, mode);
-			ROS_INFO("  - Estimated scale by GPS (median from %ld values): %.4f",
-					scales.size(), scale);
+			mScale_ = median(scales);
+			mIsValid_ = true;
+			if (pDataLogger_) {
+				pDataLogger_->logScale(mScale_, mMode_);
+			}
+			ROS_INFO(
+					"  - Estimated scale by GPS (median from %ld values): %.4f",
+					scales.size(), mScale_);
 		} else {
 			ROS_INFO("  - No new scale estimation available.");
 		}
 	}
 }
 
-double SlamScaleManager::distance(const geometry_msgs::Point &p1,
+double distance(const geometry_msgs::Point &p1,
 		const geometry_msgs::Point &p2) {
 	return sqrt(pow(p1.x - p2.x, 2.) + pow(p1.y - p2.y, 2.));
 }
 
-double SlamScaleManager::median(std::vector<double> &values) {
+double median(std::vector<double> &values) {
 	std::sort(values.begin(), values.end());
 	size_t size = values.size();
 
 	if (size % 2 == 0) {
-		return (values.at(size / 2 - 1) + values.at(size / 2))
-				/ 2.;
+		return (values.at(size / 2 - 1) + values.at(size / 2)) / 2.;
 	} else {
 		return values.at(values.size() / 2);
 	}
 }
 
-} /* namespace known_map_localization */
+} /* namespace kml */

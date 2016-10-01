@@ -13,8 +13,7 @@
 
 #include <tf/transform_datatypes.h>
 
-namespace known_map_localization {
-namespace alignment {
+namespace kml {
 
 /**
  * # Alignment
@@ -56,7 +55,6 @@ public:
 	static Alignment getIdentity();
 };
 
-} /* namespace alignment */
-} /* namespace known_map_localization */
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_ALIGNMENT_ALIGNMENT_H_ */

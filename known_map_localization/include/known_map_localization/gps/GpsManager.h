@@ -16,52 +16,11 @@
 #include <tf/transform_listener.h>
 
 #include <alignment/Alignment.h>
+#include <known_map_server/KnownMapServer.h>
+#include <SlamScaleManager.h>
+#include <gps/GpsHint.h>
 
-namespace known_map_localization {
-
-class GpsHint {
-public:
-	/**
-	 * Computes the distance of the GPS hint position to another point.
-	 * Both positions are assumed to be relative to the anchor frame.
-	 * @param p The other point
-	 * @return The distance
-	 */
-	double distanceTo(const geometry_msgs::Point &p) const;
-
-	/// the time stamp of the associated positions
-	ros::Time stamp;
-
-	/// the GPS fix
-	sensor_msgs::NavSatFix gpsFix;
-
-	/// GPS position in the anchor frame
-	geometry_msgs::Point gpsPosition;
-};
-
-class GpsKeyPoint : public GpsHint {
-public:
-	/// Initialize from hint
-	GpsKeyPoint(const GpsHint &hint);
-
-	/**
-	 * Computes the estimated robot pose in the anchor frame, based on the
-	 * given map alignment and the scaled SLAM base link.
-	 * @param alignment The map alignment to be used
-	 * @return The robot's estimated pose
-	 */
-	geometry_msgs::Pose getRobotPose(const alignment::Alignment &alignment) const;
-
-	/// the associated SLAM base link (not scaled!)
-	tf::Transform baseLink;
-};
-
-typedef std::vector<GpsHint> GpsHintVect;
-typedef std::vector<GpsKeyPoint> GpsKeyPointVect;
-
-class GpsManager;
-typedef boost::shared_ptr<GpsManager> GpsManagerPtr;
-typedef boost::shared_ptr<GpsManager const> GpsManagerConstPtr;
+namespace kml {
 
 /**
  * # GPS Manager
@@ -75,16 +34,13 @@ typedef boost::shared_ptr<GpsManager const> GpsManagerConstPtr;
  */
 class GpsManager {
 public:
-	static GpsManagerPtr instance();
+	GpsManager(KnownMapServerConstPtr pKnownMapServer);
 
 	/**
-	 * Gives read-only access to the stored GPS position/SLAM base link key points.
-	 * @return Vector
+	 * Gives read-only access to the stored GPS position/SLAM base link hints.
+	 * @return Vector of hints
 	 */
-	const GpsKeyPointVect& getKeyPoints() const;
-
-protected:
-	GpsManager();
+	const GpsHintVect& getGpsHints() const;
 
 private:
 	/**
@@ -97,7 +53,7 @@ private:
 	 * Timer callback function.
 	 * @param event
 	 */
-	void updateKeyPoints(const ros::WallTimerEvent& event);
+	void updateGpsHints(const ros::WallTimerEvent& event);
 
 	/**
 	 * Returns the SLAM base link for the requested time.
@@ -107,12 +63,12 @@ private:
 	tf::StampedTransform getSlamBaseLink(ros::Time t);
 
 	/**
-	 * A GPS hint is considered out of date when its age (the difference between the
+	 * A GPS position is considered out of date when its age (the difference between the
 	 * current time and it's time stamp) is greater than the cache time of the tf listener.
-	 * @param hint The GPS hint to be tested
+	 * @param pos The GPS position to be tested
 	 * @return True if it is out of date, otherwise false
 	 */
-	bool hintIsOutdated(const GpsHint &hint);
+	bool gpsPositionIsOutdated(const GpsPosition &pos);
 
 	/**
 	 * Converts a GPS fix to the known map anchor frame. If the GPS fix lies in a different UTM grid zone
@@ -127,37 +83,41 @@ private:
 	/**
 	 * Publishes key point marker for visualization/debugging purposes.
 	 */
-	void publishKeyPointMarker();
+	void publishGpsHintMarker();
 
 	/**
 	 * Publishes GPS fix marker for visualization/debugging purposes.
 	 */
-	void publishGpsFixMarker();
+	void publishGpsPositionMarker();
 
 private:
-	static GpsManagerPtr _instance;
-
 	/// Transform listener
-	tf::TransformListener listener;
+	tf::TransformListener mListener_;
 
-	ros::WallTimer timer;
+	ros::WallTimer mTimer_;
 
 	/// Subscriber for the GPS fix topic
-	ros::Subscriber gpsFixSubscriber;
+	ros::Subscriber mGpsPositionSubscriber_;
 
 	/// Publishes marker for visualization/debugging purposes
-	ros::Publisher gpsPositionMarkerPublisher;
+	ros::Publisher mGpsMarkerPublisher_;
 
-	/// Publishes an empty message as a signal that the GPS key points have been updated
-	ros::Publisher gpsHintsUpdatedPublisher;
+	/// Publishes an empty message as a signal that the GPS hints have been updated
+	ros::Publisher mGpsHintsUpdatedPublisher_;
 
 	/// queue of GPS fixes waiting to be paired with the according SLAM base links
-	GpsHintVect hintQueue;
+	GpsPositionVect mPositions_;
 
 	/// GPS position/SLAM base link pairs
-	GpsKeyPointVect keypoints;
+	GpsHintVect mHints_;
+
+private:
+	KnownMapServerConstPtr pKnownMapServer_;
 };
 
-} /* namespace known_map_localization */
+typedef boost::shared_ptr<GpsManager> GpsManagerPtr;
+typedef boost::shared_ptr<GpsManager const> GpsManagerConstPtr;
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_GPSMANAGER_H_ */

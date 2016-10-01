@@ -12,24 +12,16 @@
 
 #include "alignment/Hypothesis.h"
 
-namespace known_map_localization {
-namespace aligning {
-
-class Aligner;
-typedef boost::shared_ptr<Aligner> AlignerPtr;
-typedef boost::shared_ptr<Aligner const> AlignerConstPtr;
+namespace kml {
 
 /**
  * # Aligner
  *
  * Base class for aligning algorithms, that take two maps as occupancy grid maps
  * and return one or multiple hypotheses about how the should be aligned.
- * The algorithm to be used is determined by the AlgorithmSelector class.
  */
 class Aligner {
 public:
-	static AlignerPtr instance();
-
 	virtual ~Aligner();
 
 	/**
@@ -39,16 +31,12 @@ public:
 	 * @return A vector of hypotheses, with some aligning algorithms
 	 * it just contains one hypothesis (the alignment)
 	 */
-	virtual alignment::HypothesesVect align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) = 0;
-
-protected:
-	Aligner();
-
-private:
-	static AlignerPtr _instance;
+	virtual HypothesesVect align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) = 0;
 };
 
-} /* namespace aligning */
-} /* namespace known_map_localization */
+typedef boost::shared_ptr<Aligner> AlignerPtr;
+typedef boost::shared_ptr<Aligner const> AlignerConstPtr;
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_ALIGNING_ALIGNER_H_ */

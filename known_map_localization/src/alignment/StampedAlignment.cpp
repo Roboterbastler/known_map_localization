@@ -7,8 +7,7 @@
 
 #include <alignment/StampedAlignment.h>
 
-namespace known_map_localization {
-namespace alignment {
+namespace kml {
 
 StampedAlignment::StampedAlignment() :
 		Alignment(), stamp(ros::Time::now()) {
@@ -28,5 +27,4 @@ StampedAlignment StampedAlignment::getIdentity() {
 
 typedef std::vector<StampedAlignment> StampedHypothesesVect;
 
-} /* namespace alignment */
-} /* namespace known_map_localization */
+} /* namespace kml */

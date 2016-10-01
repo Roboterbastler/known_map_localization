@@ -16,13 +16,8 @@
 
 #include <alignment/Hypothesis.h>
 #include <known_map_localization/PoseError.h>
-#include <SlamScaleManager.h>
 
-namespace known_map_localization {
-namespace logging {
-
-class DataLogger;
-typedef boost::shared_ptr<DataLogger> DataLoggerPtr;
+namespace kml {
 
 /**
  * # Data Logger
@@ -33,24 +28,23 @@ typedef boost::shared_ptr<DataLogger> DataLoggerPtr;
  */
 class DataLogger {
 public:
-	static DataLoggerPtr instance();
+	DataLogger();
 
 	~DataLogger();
 
-	void logComputation(const alignment::HypothesesVect &hypotheses,
+	void logComputation(const HypothesesVect &hypotheses,
 			ros::WallDuration duration, const nav_msgs::MapMetaData &knownMap,
 			const nav_msgs::MapMetaData &slamMap);
 
-	void logHypothesis(const alignment::Hypothesis &h);
+	void logHypothesis(const Hypothesis &h);
 
-	void logError(const PoseError &error);
+	void logError(const known_map_localization::PoseError &error);
 
-	void logScale(float scale, SlamScaleMode mode);
+	void logScale(float scale, int mode);
 
-	void logFilter(const alignment::Alignment &filteredAlignment);
+	void logFilter(const Alignment &filteredAlignment);
 
 protected:
-	DataLogger();
 
 	/**
 	 * Determines the full file path where to log data.
@@ -89,28 +83,27 @@ protected:
 	 */
 	void writeFilterHeader();
 
-protected:
+private:
 	/// Log file streams
-	std::ofstream alignmentsFile;
-	std::ofstream computationsFile;
-	std::ofstream errorsFile;
-	std::ofstream scalesFile;
-	std::ofstream filterFile;
+	std::ofstream mAlignmentsFile_;
+	std::ofstream mComputationsFile_;
+	std::ofstream mErrorsFile_;
+	std::ofstream mScalesFile_;
+	std::ofstream mFilterFile_;
 
 	/// ID of computations
-	unsigned long computationId;
+	unsigned long mComputationId_;
 
 	/// flag indicating if logging is enabled/disabled
-	bool enabled;
-
-private:
-	static DataLoggerPtr _instance;
+	bool mEnabled_;
 
 	/// Initialization time used as a reference for logged events
-	ros::WallTime referenceTime;
+	ros::WallTime mReferenceTime_;
 };
 
-} /* namespace logging */
-} /* namespace known_map_localization */
+typedef boost::shared_ptr<DataLogger> DataLoggerPtr;
+typedef boost::shared_ptr<DataLogger const> DataLoggerConstPtr;
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_LOGGING_DATALOGGER_H_ */

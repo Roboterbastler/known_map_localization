@@ -13,10 +13,9 @@
 #include <Exception.h>
 #include <Utils.h>
 
-namespace known_map_localization {
-namespace aligning {
+namespace kml {
 
-alignment::HypothesesVect MapstitchAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) {
+HypothesesVect MapstitchAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) {
 	ros::NodeHandle nh("~");
 
 	float max_pairwise_distance;
@@ -44,7 +43,7 @@ alignment::HypothesesVect MapstitchAligner::align(nav_msgs::OccupancyGridConstPt
 		throw AlignerFailed("Aligning failed");
 	}
 
-	alignment::StampedAlignment alignment;
+	StampedAlignment alignment;
 
 	// let scale be the mean of x and y scale, assuming both are approximately equal
 	alignment.scale = (stitchedMap->scalex + stitchedMap->scaley) / 2.0;
@@ -116,11 +115,11 @@ alignment::HypothesesVect MapstitchAligner::align(nav_msgs::OccupancyGridConstPt
 	ROS_INFO("Successfully completed aligning in %f sec", duration.toSec());
 
 	// No score available, so all are scored 0
-	alignment::HypothesesVect hypotheses(1, alignment::Hypothesis(alignment));
+	HypothesesVect hypotheses(1, Hypothesis(alignment));
 	return hypotheses;
 }
 
-tf::Transform MapstitchAligner::getOriginTransform(nav_msgs::OccupancyGridConstPtr map) {
+tf::Transform getOriginTransform(nav_msgs::OccupancyGridConstPtr map) {
 	tf::Quaternion orientation;
 	tf::quaternionMsgToTF(map->info.origin.orientation, orientation);
 	return tf::Transform(orientation,
@@ -128,5 +127,4 @@ tf::Transform MapstitchAligner::getOriginTransform(nav_msgs::OccupancyGridConstP
 					map->info.origin.position.z));
 }
 
-} /* namespace aligning */
-} /* namespace known_map_localization */
+} /* namespace kml */

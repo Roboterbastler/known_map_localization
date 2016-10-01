@@ -10,8 +10,7 @@
 
 #include <filter/Filter.h>
 
-namespace known_map_localization {
-namespace filter {
+namespace kml {
 
 /**
  * # PassThroughFilter
@@ -21,16 +20,15 @@ namespace filter {
  */
 class PassThroughFilter: public Filter {
 public:
-	PassThroughFilter();
+	PassThroughFilter(SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger = DataLoggerPtr());
 
 	/**
 	 * Update the filtered alignment by simply overwriting it with the first new hypothesis.
 	 * @param hypotheses The vector of new hypotheses
 	 */
-	void addHypotheses(const alignment::HypothesesVect &hypotheses);
+	void addHypotheses(const HypothesesVect &hypotheses);
 };
 
-} /* namespace filter */
-} /* namespace known_map_localization */
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_FILTER_PASSTHROUGHFILTER_H_ */

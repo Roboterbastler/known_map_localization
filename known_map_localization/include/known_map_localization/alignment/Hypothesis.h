@@ -10,8 +10,7 @@
 
 #include <alignment/StampedAlignment.h>
 
-namespace known_map_localization {
-namespace alignment {
+namespace kml {
 
 /**
  * # Hypothesis
@@ -44,7 +43,6 @@ public:
 
 typedef std::vector<Hypothesis> HypothesesVect;
 
-} /* namespace alignment */
-} /* namespace known_map_localization */
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_ALIGNMENT_HYPOTHESIS_H_ */

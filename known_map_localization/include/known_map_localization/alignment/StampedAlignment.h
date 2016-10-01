@@ -12,8 +12,7 @@
 
 #include "Alignment.h"
 
-namespace known_map_localization {
-namespace alignment {
+namespace kml {
 
 /**
  * # StampedAlignment
@@ -41,7 +40,6 @@ public:
 	ros::Time stamp;
 };
 
-} /* namespace alignment */
-} /* namespace known_map_localization */
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_ALIGNMENT_STAMPEDALIGNMENT_H_ */

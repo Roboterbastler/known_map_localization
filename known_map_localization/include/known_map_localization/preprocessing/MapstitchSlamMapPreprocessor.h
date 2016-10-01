@@ -10,15 +10,13 @@
 
 #include <preprocessing/SlamMapPreprocessor.h>
 
-namespace known_map_localization {
-namespace preprocessing {
+namespace kml {
 
 class MapstitchSlamMapPreprocessor: public SlamMapPreprocessor {
 protected:
 	virtual bool processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData);
 };
 
-} /* namespace preprocessing */
-} /* namespace known_map_localization */
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_PREPROCESSING_MAPSTITCHSLAMMAPPREPROCESSOR_H_ */

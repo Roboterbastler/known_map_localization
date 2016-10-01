@@ -10,8 +10,7 @@
 
 #include <filter/Filter.h>
 
-namespace known_map_localization {
-namespace filter {
+namespace kml {
 
 /**
  * # Decay Filter
@@ -23,13 +22,13 @@ namespace filter {
  */
 class DecayFilter: public Filter {
 public:
-	DecayFilter();
+	DecayFilter(SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger = DataLoggerPtr());
 
 	/**
 	 * Update the filtered hypothesis.
 	 * @param hypotheses A vector of new hypotheses
 	 */
-	virtual void addHypotheses(const alignment::HypothesesVect &hypotheses);
+	virtual void addHypotheses(const HypothesesVect &hypotheses);
 
 protected:
 	/**
@@ -38,21 +37,21 @@ protected:
 	 * @param betterHypothesis [out] The better hypothesis, if any is found
 	 * @return True if a better hypothesis was found, otherwise false
 	 */
-	bool checkForBetterHypothesis(const alignment::HypothesesVect &hypotheses, alignment::Hypothesis &betterHypothesis) const;
+	bool checkForBetterHypothesis(const HypothesesVect &hypotheses, Hypothesis &betterHypothesis) const;
 
 	/**
 	 * Returns whether it is a better hypothesis than the currently used one.
 	 * @param hypothesis The hypothesis to be checked
 	 * @return True if it it considered better
 	 */
-	virtual bool isBetter(const alignment::Hypothesis &hypothesis) const;
+	virtual bool isBetter(const Hypothesis &hypothesis) const;
 
 	/**
 	 * Degrade the score of the current filtered alignment by the decay factor.
 	 */
 	void scoreDecay();
 
-protected:
+private:
 	/// Score of the current filtered alignment
 	float mScore_;
 
@@ -60,7 +59,9 @@ protected:
 	float mDecayFactor_;
 };
 
-} /* namespace filter */
-} /* namespace known_map_localization */
+typedef boost::shared_ptr<DecayFilter> DecayFilterPtr;
+typedef boost::shared_ptr<DecayFilter const> DecayFilterConstPtr;
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_FILTER_DECAYFILTER_H_ */

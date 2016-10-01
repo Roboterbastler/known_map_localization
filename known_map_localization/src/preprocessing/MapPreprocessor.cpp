@@ -13,17 +13,16 @@
 #include <mapstitch/utils.h>
 #include <tf/transform_datatypes.h>
 
-namespace known_map_localization {
-namespace preprocessing {
+namespace kml {
 
 MapPreprocessor::MapPreprocessor(std::string topicName, std::string paramName) :
-		enabled(false) {
+		mEnabled_(false) {
 	if (ros::isInitialized()) {
 		ros::NodeHandle nh("~");
 
-		preprocessedMapPublisher = nh.advertise<sensor_msgs::Image>(topicName,
+		mPreprocessedMapPublisher_ = nh.advertise<sensor_msgs::Image>(topicName,
 				1, true);
-		nh.getParam(paramName, enabled);
+		nh.getParam(paramName, mEnabled_);
 	}
 }
 
@@ -37,7 +36,7 @@ bool MapPreprocessor::process(nav_msgs::OccupancyGridPtr map) {
 	// convert to matrix
 	cv::Mat img = matFromOccupancyGrid(map);
 
-	if (enabled) {
+	if (mEnabled_) {
 		success = processMap(img, map->info);
 		overwriteMapContent(map, img);
 	}
@@ -75,7 +74,7 @@ void MapPreprocessor::publishResult(const cv::Mat &img) {
 		intermediateResultImage.encoding = sensor_msgs::image_encodings::MONO8;
 		intermediateResultImage.image = img;
 		intermediateResultImage.header.stamp = ros::Time::now();
-		preprocessedMapPublisher.publish(intermediateResultImage.toImageMsg());
+		mPreprocessedMapPublisher_.publish(intermediateResultImage.toImageMsg());
 	}
 }
 
@@ -116,5 +115,4 @@ void MapPreprocessor::restoreMap(cv::Mat &img) {
 	cv::threshold(img, img, 254, 0, cv::THRESH_TRUNC);
 }
 
-} /* namespace preprocessing */
-} /* namespace known_map_localization */
+} /* namespace kml */

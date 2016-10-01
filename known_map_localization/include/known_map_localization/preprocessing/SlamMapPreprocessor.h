@@ -10,23 +10,16 @@
 
 #include "MapPreprocessor.h"
 
-namespace known_map_localization {
-namespace preprocessing {
-
-class SlamMapPreprocessor;
-typedef boost::shared_ptr<SlamMapPreprocessor> SlamMapPreprocessorPtr;
-typedef boost::shared_ptr<SlamMapPreprocessor const> SlamMapPreprocessorConstPtr;
+namespace kml {
 
 class SlamMapPreprocessor: public MapPreprocessor {
 public:
-	static SlamMapPreprocessorPtr instance();
-protected:
 	SlamMapPreprocessor();
-private:
-	static SlamMapPreprocessorPtr _instance;
 };
 
-} /* namespace preprocessing */
-} /* namespace known_map_localization */
+typedef boost::shared_ptr<SlamMapPreprocessor> SlamMapPreprocessorPtr;
+typedef boost::shared_ptr<SlamMapPreprocessor const> SlamMapPreprocessorConstPtr;
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_PREPROCESSING_SLAMMAPPREPROCESSOR_H_ */

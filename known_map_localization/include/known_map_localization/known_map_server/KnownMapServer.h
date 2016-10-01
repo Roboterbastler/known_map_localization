@@ -14,12 +14,9 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <geographic_msgs/GeoPose.h>
 
-namespace known_map_localization {
-namespace known_map_server {
+#include <preprocessing/KnownMapPreprocessor.h>
 
-class KnownMapServer;
-typedef boost::shared_ptr<KnownMapServer> KnownMapServerPtr;
-typedef boost::shared_ptr<KnownMapServer const> KnownMapServerConstPtr;
+namespace kml {
 
 /**
  * # Known Map Server
@@ -37,7 +34,7 @@ typedef boost::shared_ptr<KnownMapServer const> KnownMapServerConstPtr;
  */
 class KnownMapServer {
 public:
-	static KnownMapServerPtr instance();
+	KnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor);
 
 	/**
 	 * Get the known map.
@@ -51,12 +48,7 @@ public:
 	 */
 	geographic_msgs::GeoPoseConstPtr getAnchor() const;
 
-protected:
-	KnownMapServer();
-
 private:
-	static KnownMapServerPtr _instance;
-
 	/**
 	 * Loads the known map from disc.
 	 * @param fileName File name of the YAML map meta data file
@@ -76,17 +68,23 @@ private:
 	 */
 	static std::string absoluteMapFileName(std::string mapFileName, std::string configFileName);
 
+private:
 	/// Publishes the known map via a latched topic
-	ros::Publisher knownMapPublisher;
+	ros::Publisher mKnownMapPublisher_;
 
 	/// The known map
-	nav_msgs::OccupancyGridPtr knownMap;
+	nav_msgs::OccupancyGridPtr mKnownMap_;
 
 	/// The anchor of the known map
-	geographic_msgs::GeoPosePtr knownMapAnchor;
+	geographic_msgs::GeoPosePtr mKnownMapAnchor_;
+
+private:
+	KnownMapPreprocessorPtr pKnownMapPreprocessor_;
 };
 
-} /* namespace known_map_server */
-} /* namespace known_map_localization */
+typedef boost::shared_ptr<KnownMapServer> KnownMapServerPtr;
+typedef boost::shared_ptr<KnownMapServer const> KnownMapServerConstPtr;
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_SERVER_KNOWNMAPSERVER_H_ */

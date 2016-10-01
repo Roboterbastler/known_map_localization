@@ -11,12 +11,11 @@
 
 #include <logging/DataLogger.h>
 
-namespace known_map_localization {
-namespace filter {
+namespace kml {
 
-using namespace alignment;
-
-DecayFilter::DecayFilter() : mScore_(0) {
+DecayFilter::DecayFilter(SlamScaleManagerPtr pSlamScaleManager,
+		DataLoggerPtr pDataLogger) :
+		Filter(pSlamScaleManager, pDataLogger), mScore_(0) {
 	ros::NodeHandle nh("~");
 
 	// default: decay disabled
@@ -33,29 +32,37 @@ void DecayFilter::addHypotheses(const HypothesesVect &hypotheses) {
 	// degrade score by small factor
 	scoreDecay();
 
-	ROS_DEBUG("Checking %ld new hypotheses. Current filtered alignment score: %f", hypotheses.size(), mScore_);
+	ROS_DEBUG(
+			"Checking %ld new hypotheses. Current filtered alignment score: %f",
+			hypotheses.size(), mScore_);
 
 	Hypothesis betterHypothesis;
-	if(checkForBetterHypothesis(hypotheses, betterHypothesis)) {
-		filteredAlignment = betterHypothesis;
+	if (checkForBetterHypothesis(hypotheses, betterHypothesis)) {
+		mFilteredAlignment_ = betterHypothesis;
 		mScore_ = betterHypothesis.score;
-		ready = true;
+		mReady_ = true;
+		pSlamScaleManager_->updateSlamScale(mFilteredAlignment_.scale);
 
-		logging::DataLogger::instance()->logFilter(filteredAlignment);
+		logAlignment(mFilteredAlignment_);
 	}
 }
 
-bool DecayFilter::checkForBetterHypothesis(const HypothesesVect &hypotheses, Hypothesis &betterHypothesis) const {
+bool DecayFilter::checkForBetterHypothesis(const HypothesesVect &hypotheses,
+		Hypothesis &betterHypothesis) const {
 	bool foundBetterHypothesis = false;
 
-	for(HypothesesVect::const_iterator h = hypotheses.begin(); h != hypotheses.end(); ++h) {
-		ROS_DEBUG("  - Hypothesis: x = %.2f, y = %.2f theta = %.2f score = %.4f", h->x, h->y, h->theta, h->score);
+	for (HypothesesVect::const_iterator h = hypotheses.begin();
+			h != hypotheses.end(); ++h) {
+		ROS_DEBUG(
+				"  - Hypothesis: x = %.2f, y = %.2f theta = %.2f score = %.4f",
+				h->x, h->y, h->theta, h->score);
 
-		if(isBetter(*h)) {
+		if (isBetter(*h)) {
 			betterHypothesis = *h;
 			foundBetterHypothesis = true;
 
-			ROS_DEBUG("    -> Found better hypothesis. New filtered alignment.");
+			ROS_DEBUG(
+					"    -> Found better hypothesis. New filtered alignment.");
 		}
 	}
 	return foundBetterHypothesis;
@@ -65,5 +72,4 @@ bool DecayFilter::isBetter(const Hypothesis &hypothesis) const {
 	return hypothesis.score >= mScore_;
 }
 
-} /* namespace filter */
-} /* namespace known_map_localization */
+} /* namespace kml */

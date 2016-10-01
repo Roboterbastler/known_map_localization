@@ -11,37 +11,45 @@
 
 #define KNOWN_MAP_RESOLUTION_UNAVAILABLE -1
 
-namespace known_map_localization {
-namespace preprocessing {
+namespace kml {
 
-MapmergeSlamMapPreprocessor::MapmergeSlamMapPreprocessor() : knownMapResolution(KNOWN_MAP_RESOLUTION_UNAVAILABLE) {
+MapmergeSlamMapPreprocessor::MapmergeSlamMapPreprocessor(
+		SlamScaleManagerConstPtr pSlamScaleManager) :
+		mKnownMapResolution_(KNOWN_MAP_RESOLUTION_UNAVAILABLE), pSlamScaleManager_(
+				pSlamScaleManager) {
 	ros::NodeHandle nh("~");
 
 	// subscribe to known map topic to get known map resolution
-	knownMapSubscriber = nh.subscribe("visualization_known_map", 1, &MapmergeSlamMapPreprocessor::receiveKnownMap, this);
+	mKnownMapSubscriber_ = nh.subscribe("visualization_known_map", 1,
+			&MapmergeSlamMapPreprocessor::receiveKnownMap, this);
 }
 
-bool MapmergeSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData) {
+bool MapmergeSlamMapPreprocessor::processMap(cv::Mat &img,
+		nav_msgs::MapMetaData &mapMetaData) {
 	ROS_INFO("Preprocessing of SLAM map...");
 
 	assert(img.rows == mapMetaData.height);
 	assert(img.cols == mapMetaData.width);
 
 	// scale SLAM map
-	if(knownMapResolution == KNOWN_MAP_RESOLUTION_UNAVAILABLE) {
-		ROS_WARN("Known map resolution unavailable, SLAM map preprocessing cancelled.");
+	if (mKnownMapResolution_ == KNOWN_MAP_RESOLUTION_UNAVAILABLE) {
+		ROS_WARN(
+				"Known map resolution unavailable, SLAM map preprocessing cancelled.");
 		return false;
 	}
 
 	try {
-		float realSlamResolution = mapMetaData.resolution * SlamScaleManager::instance()->getSlamScale();
-		float imgScaleFactor = realSlamResolution / knownMapResolution;
-		cv::resize(img, img, cv::Size(), imgScaleFactor, imgScaleFactor, CV_INTER_NN);
+		float realSlamResolution = mapMetaData.resolution
+				* pSlamScaleManager_->getSlamScale();
+		float imgScaleFactor = realSlamResolution / mKnownMapResolution_;
+		cv::resize(img, img, cv::Size(), imgScaleFactor, imgScaleFactor,
+				CV_INTER_NN);
 		mapMetaData.resolution = realSlamResolution / imgScaleFactor;
-		mapMetaData.origin = SlamScaleManager::instance()->convertPoseMsg(mapMetaData.origin);
+		mapMetaData.origin = pSlamScaleManager_->convertPoseMsg(
+				mapMetaData.origin);
 		mapMetaData.height = img.rows;
 		mapMetaData.width = img.cols;
-	} catch(ScaleNotAvailable &e) {
+	} catch (ScaleNotAvailable &e) {
 		ROS_WARN("SLAM map preprocessing aborted: %s", e.what());
 		return false;
 	}
@@ -51,15 +59,15 @@ bool MapmergeSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData
 //	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(2*kernelSize+1, 2*kernelSize+1));
 //	cv::morphologyEx(img, img, cv::MORPH_CLOSE, kernel);
 
-	// crop image to occupied region
+// crop image to occupied region
 	crop(img, mapMetaData);
 
 	return true;
 }
 
-void MapmergeSlamMapPreprocessor::receiveKnownMap(nav_msgs::OccupancyGridConstPtr knownMap) {
-	knownMapResolution = knownMap->info.resolution;
+void MapmergeSlamMapPreprocessor::receiveKnownMap(
+		nav_msgs::OccupancyGridConstPtr knownMap) {
+	mKnownMapResolution_ = knownMap->info.resolution;
 }
 
-} /* namespace preprocessing */
-} /* namespace known_map_localization */
+} /* namespace kml */

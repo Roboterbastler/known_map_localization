@@ -6,68 +6,75 @@
  */
 
 #include <KnownMapLocalization.h>
-#include <known_map_server/KnownMapServer.h>
-#include <preprocessing/SlamMapPreprocessor.h>
-#include <visualization/VisualizationSlamMapPublisher.h>
-#include <preprocessing/KnownMapPreprocessor.h>
-#include <base_link/BaseLinkPublisher.h>
-#include <SlamScaleManager.h>
-#include <aligning/Aligner.h>
-#include <logging/DataLogger.h>
-#include <GpsManager.h>
-#include <alignment/Hypothesis.h>
-#include <Utils.h>
+
 #include <Exception.h>
+#include <Utils.h>
 
-namespace known_map_localization {
-using namespace known_map_server;
-using namespace alignment;
-using namespace preprocessing;
+namespace kml {
 
-KnownMapLocalization::KnownMapLocalization() : rate(2.0), lastProcessing(0) {
+KnownMapLocalization::KnownMapLocalization() : mRate_(2.0), mLastProcessing_(0) {
+	// TODO: create factory accordingly
+	KmlFactoryConstPtr factory;
 
-	// initialize Singletons
-	KnownMapServer::instance();
-	aligning::Aligner::instance();
-	KnownMapPreprocessor::instance();
-	SlamMapPreprocessor::instance();
-	SlamScaleManager::instance();
-	GpsManager::instance();
-	filter::Filter::instance();
-	base_link::BaseLinkPublisher::instance();
-	logging::DataLogger::instance();
+	// let the factory do it's work...
+	pDataLogger_ = factory->createDataLogger();
+	pKnownMapPreprocessor_ = factory->createKnownMapPreprocessor();
+	pSlamMapPreprocessor_ = factory->createSlamMapPreprocessor();
+	pAligner_ = factory->createAligner();
+	pKnownMapServer_ = factory->createKnownMapServer(pKnownMapPreprocessor_);
+	pGpsManager_ = factory->createGpsManager(pKnownMapServer_);
+	pSlamScaleManager_ = factory->createSlamScaleManager(pGpsManager_, pDataLogger_);
+	pFilter_ = factory->createFilter(pGpsManager_, pKnownMapServer_, pSlamScaleManager_, pDataLogger_);
+	pBaseLinkPublisher_ = factory->createBaseLinkPublisher(pKnownMapServer_, pFilter_, pSlamScaleManager_, pDataLogger_);
 
 	// subscribe to topics
 	ros::NodeHandle nh("~");
-	slamMapSubscriber = nh.subscribe("slam_map", 1, &KnownMapLocalization::receiveSlamMap, this);
+	mSlamMapSubscriber_ = nh.subscribe("slam_map", 1, &KnownMapLocalization::receiveSlamMap, this);
+	mSlamMapPublisher_ = nh.advertise<nav_msgs::OccupancyGrid>("visualization_slam_map", 10);
+}
+
+KmlFactoryConstPtr KnownMapLocalization::selectStrategy() const {
+	ros::NodeHandle nh("~");
+	std::string algorithmSpecifier;
+
+	if(!nh.getParam("algorithm", algorithmSpecifier)) {
+		throw AlgorithmNotSpecified("Algorithm parameter is missing");
+	}
+
+	if(algorithmSpecifier == "") {
+		// TODO
+		return KmlFactoryConstPtr();
+	} else {
+		throw IllegalAlgorithm("Illegal algorithm specifier: " + algorithmSpecifier);
+	}
 }
 
 void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap) {
-	if((ros::WallTime::now() - lastProcessing).toSec() < rate.toSec()) {
+	if((ros::WallTime::now() - mLastProcessing_).toSec() < mRate_.toSec()) {
 		ROS_DEBUG("Skipped SLAM map...");
 		return;
 	}
-	lastProcessing = ros::WallTime::now();
+	mLastProcessing_ = ros::WallTime::now();
 
 	// TODO: initialize orientation for slam map (workaround until fixed in ORB_SLAM)
 	nav_msgs::OccupancyGridPtr slamMapFixed(new nav_msgs::OccupancyGrid(*slamMap));
 	tf::quaternionTFToMsg(tf::Quaternion(0, 0, 0, 1), slamMapFixed->info.origin.orientation);
 
 	// preprocess the SLAM map
-	if(!SlamMapPreprocessor::instance()->process(slamMapFixed)) {
+	if(!pSlamMapPreprocessor_->process(slamMapFixed)) {
 		// preprocessing failed
 		ROS_WARN("SLAM map preprocessing failed. Aligning cancelled.");
 		return;
 	}
 
 	// publish visualization SLAM map
-	visualization::VisualizationSlamMapPublisher::instance()->publishSlamMap(slamMapFixed);
+	publishSlamMap(slamMapFixed);
 
 	try {
 		ros::WallTime start = ros::WallTime::now();
 
 		// compute hypotheses (alignments)
-		HypothesesVect hypotheses = aligning::Aligner::instance()->align(KnownMapServer::instance()->getKnownMap(), slamMapFixed);
+		HypothesesVect hypotheses = pAligner_->align(pKnownMapServer_->getKnownMap(), slamMapFixed);
 
 		ros::WallDuration duration = ros::WallTime::now() - start;
 
@@ -82,9 +89,9 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 					it->score);
 		}
 
-		logging::DataLogger::instance()->logComputation(hypotheses, duration, KnownMapServer::instance()->getKnownMap()->info, slamMapFixed->info);
+		pDataLogger_->logComputation(hypotheses, duration, pKnownMapServer_->getKnownMap()->info, slamMapFixed->info);
 
-		filter::Filter::instance()->addHypotheses(hypotheses);
+		pFilter_->addHypotheses(hypotheses);
 	} catch(AlignerInternalError &e) {
 		ROS_WARN_STREAM("Internal aligner error: " << e.what());
 	} catch(AlignerFailed &e) {
@@ -93,4 +100,20 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 	}
 }
 
-} /* namespace known_map_localization */
+void KnownMapLocalization::publishSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap) const {
+	nav_msgs::OccupancyGridPtr correctedSlamMap(new nav_msgs::OccupancyGrid(*slamMap));
+	Alignment alignment;
+	try {
+		alignment = pFilter_->getAlignment();
+	} catch(AlignmentNotAvailable &e) {
+		return;
+	}
+
+	correctedSlamMap->info.resolution *= alignment.scale;
+	correctedSlamMap->info.origin.position.x *= alignment.scale;
+	correctedSlamMap->info.origin.position.y *= alignment.scale;
+
+	mSlamMapPublisher_.publish(correctedSlamMap);
+}
+
+} /* namespace kml */

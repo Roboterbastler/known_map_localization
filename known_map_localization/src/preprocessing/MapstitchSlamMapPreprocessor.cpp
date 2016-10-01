@@ -7,13 +7,11 @@
 
 #include <preprocessing/MapstitchSlamMapPreprocessor.h>
 
-namespace known_map_localization {
-namespace preprocessing {
+namespace kml {
 
 bool MapstitchSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData) {
 	// TODO
 	return true;
 }
 
-} /* namespace preprocessing */
-} /* namespace known_map_localization */
+} /* namespace kml */

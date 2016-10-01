@@ -8,17 +8,11 @@
 #ifndef KNOWN_MAP_LOCALIZATION_INCLUDE_FILTER_FILTER_H_
 #define KNOWN_MAP_LOCALIZATION_INCLUDE_FILTER_FILTER_H_
 
-#include <vector>
-#include <exception>
+#include <alignment/Hypothesis.h>
+#include <SlamScaleManager.h>
+#include <logging/DataLogger.h>
 
-#include "alignment/Hypothesis.h"
-
-namespace known_map_localization {
-namespace filter {
-
-class Filter;
-typedef boost::shared_ptr<Filter> FilterPtr;
-typedef boost::shared_ptr<Filter const> FilterConstPtr;
+namespace kml {
 
 /**
  * # Filter
@@ -27,7 +21,7 @@ typedef boost::shared_ptr<Filter const> FilterConstPtr;
  */
 class Filter {
 public:
-	static FilterPtr instance();
+	Filter(SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger = DataLoggerPtr());
 
 	virtual ~Filter();
 
@@ -36,14 +30,14 @@ public:
 	 * Multiple possible implementations are given by subclasses of Filter.
 	 * @param hypotheses New hypotheses
 	 */
-	virtual void addHypotheses(const alignment::HypothesesVect &hypotheses) = 0;
+	virtual void addHypotheses(const HypothesesVect &hypotheses) = 0;
 
 	/**
 	 * Get the filtered alignment, if available. If it isn't available, an exception is thrown.
 	 * @return The filtered alignment
 	 * @throw AlignmentNotAvailable, if filtered alignment is not available
 	 */
-	virtual const alignment::Alignment& getAlignment() const;
+	const Alignment& getAlignment() const;
 
 	/**
 	 * Check if the filtered alignment is available.
@@ -52,20 +46,29 @@ public:
 	bool isAvailable() const;
 
 protected:
-	Filter();
+	/**
+	 * Logs the alignment using the data logger.
+	 * @param alignment The alignment to log
+	 */
+	void logAlignment(const Alignment &alignment);
 
 protected:
 	/// the current filtered alignment
-	alignment::Alignment filteredAlignment;
+	Alignment mFilteredAlignment_;
 
 	/// flag indicating if filtered alignment is available
-	bool ready;
+	bool mReady_;
+
+protected:
+	SlamScaleManagerPtr pSlamScaleManager_;
 
 private:
-	static FilterPtr _instance;
+	DataLoggerPtr pDataLogger_;
 };
 
-} /* namespace filter */
-} /* namespace known_map_localization */
+typedef boost::shared_ptr<Filter> FilterPtr;
+typedef boost::shared_ptr<Filter const> FilterConstPtr;
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_FILTER_FILTER_H_ */

@@ -12,8 +12,7 @@
 
 #include <aligning/Aligner.h>
 
-namespace known_map_localization {
-namespace aligning {
+namespace kml {
 
 /**
  * # Mapmerge Aligner
@@ -35,27 +34,27 @@ public:
 	 * @param slamMap The SLAM map
 	 * @return A vector of hypotheses
 	 */
-	alignment::HypothesesVect align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap);
-protected:
-	/**
-	 * Copies the map to a grid_map, assuming, that the target gridMap already has the needed size.
-	 * @param occGrid The source map
-	 * @param gridMap The target map
-	 * @return True if map contains at least on occupied cell.
-	 */
-	static bool copyOccupancyGridToGridMap(nav_msgs::OccupancyGridConstPtr occGrid, mapmerge::grid_map &gridMap);
+	HypothesesVect align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap);
 
+protected:
 	/// This flag determines whether the randomized Hough transform should be used
-	bool useRandomizedHoughTransform;
+	bool mUseRandomizedHoughTransform_;
 
 	/// This flag determines whether the robust version of the algorithm should be used
-	bool useRobust;
+	bool mUseRobustAlgorithm_;
 
 	/// The number of hypotheses to be computed
-	int numberOfHypotheses;
+	int mNumberOfHypotheses_;
 };
 
-} /* namespace aligning */
-} /* namespace known_map_localization */
+/**
+ * Copies the map to a grid_map, assuming, that the target gridMap already has the needed size.
+ * @param occGrid The source map
+ * @param gridMap The target map
+ * @return True if map contains at least on occupied cell.
+ */
+bool copyOccupancyGridToGridMap(nav_msgs::OccupancyGridConstPtr occGrid, mapmerge::grid_map &gridMap);
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_ALIGNING_MAPMERGEALIGNER_H_ */

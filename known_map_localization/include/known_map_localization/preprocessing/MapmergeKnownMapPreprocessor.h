@@ -10,15 +10,13 @@
 
 #include <preprocessing/KnownMapPreprocessor.h>
 
-namespace known_map_localization {
-namespace preprocessing {
+namespace kml {
 
 class MapmergeKnownMapPreprocessor: public KnownMapPreprocessor {
 protected:
 	virtual bool processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData);
 };
 
-} /* namespace preprocessing */
-} /* namespace known_map_localization */
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_PREPROCESSING_MAPMERGEKNOWNMAPPREPROCESSOR_H_ */

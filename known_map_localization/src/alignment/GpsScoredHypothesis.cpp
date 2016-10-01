@@ -7,8 +7,7 @@
 
 #include <alignment/GpsScoredHypothesis.h>
 
-namespace known_map_localization {
-namespace alignment {
+namespace kml {
 
 GpsScoredHypothesis::GpsScoredHypothesis() : gpsSupported(false) {
 }
@@ -17,5 +16,4 @@ GpsScoredHypothesis::GpsScoredHypothesis(const Hypothesis &h) : Hypothesis(h), g
 
 }
 
-} /* namespace alignment */
-} /* namespace known_map_localization */
+} /* namespace kml */

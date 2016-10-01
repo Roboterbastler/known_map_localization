@@ -6,39 +6,37 @@
  */
 
 #include <filter/Filter.h>
-#include <filter/PassThroughFilter.h>
-#include <filter/GpsFilter.h>
+
 #include <Exception.h>
 
-namespace known_map_localization {
-namespace filter {
+namespace kml {
 
-FilterPtr Filter::_instance;
+Filter::Filter(SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger) :
+		mReady_(false), pSlamScaleManager_(pSlamScaleManager), pDataLogger_(
+				pDataLogger) {
+	assert(pSlamScaleManager_);
 
-Filter::Filter() : ready(false) {
 	ROS_INFO("Filter initialization...");
-}
-
-FilterPtr Filter::instance() {
-	if(!_instance) {
-		_instance = FilterPtr(new GpsFilter());
-	}
-	return _instance;
 }
 
 Filter::~Filter() {
 }
 
-const alignment::Alignment& Filter::getAlignment() const {
-	if(!ready) {
+const Alignment& Filter::getAlignment() const {
+	if (!mReady_) {
 		throw AlignmentNotAvailable("Filtered alignment is not yet available");
 	}
-	return filteredAlignment;
+	return mFilteredAlignment_;
 }
 
 bool Filter::isAvailable() const {
-	return ready;
+	return mReady_;
 }
 
-} /* namespace filter */
-} /* namespace known_map_localization */
+void Filter::logAlignment(const Alignment &alignment) {
+	if (pDataLogger_) {
+		pDataLogger_->logFilter(alignment);
+	}
+}
+
+} /* namespace kml */

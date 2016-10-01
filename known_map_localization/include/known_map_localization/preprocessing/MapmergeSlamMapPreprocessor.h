@@ -10,15 +10,18 @@
 
 #include <preprocessing/SlamMapPreprocessor.h>
 
-namespace known_map_localization {
-namespace preprocessing {
+#include <SlamScaleManager.h>
+
+namespace kml {
 
 class MapmergeSlamMapPreprocessor: public SlamMapPreprocessor {
 public:
-	MapmergeSlamMapPreprocessor();
+	MapmergeSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager);
+
 protected:
 	virtual bool processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData);
 
+private:
 	/**
 	 * Callback function used to receive known map meta data.
 	 * @param knownMap The received known map
@@ -26,13 +29,15 @@ protected:
 	void receiveKnownMap(nav_msgs::OccupancyGridConstPtr knownMap);
 
 	/// The resolution of the known map used to rescale the SLAM map.
-	float knownMapResolution;
+	float mKnownMapResolution_;
 
 	/// Subscribes to the known map topic
-	ros::Subscriber knownMapSubscriber;
+	ros::Subscriber mKnownMapSubscriber_;
+
+private:
+	SlamScaleManagerConstPtr pSlamScaleManager_;
 };
 
-} /* namespace preprocessing */
-} /* namespace known_map_localization */
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_PREPROCESSING_MAPMERGESLAMMAPPREPROCESSOR_H_ */

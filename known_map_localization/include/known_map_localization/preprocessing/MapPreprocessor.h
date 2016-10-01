@@ -16,8 +16,7 @@
 #include <ros/ros.h>
 #include <nav_msgs/OccupancyGrid.h>
 
-namespace known_map_localization {
-namespace preprocessing {
+namespace kml {
 
 class MapPreprocessor {
 public:
@@ -39,13 +38,13 @@ private:
 	static void overwriteMapContent(nav_msgs::OccupancyGridPtr map, const cv::Mat &content);
 	void publishResult(const cv::Mat &img);
 
-	ros::Publisher preprocessedMapPublisher;
-	bool enabled;
+	ros::Publisher mPreprocessedMapPublisher_;
+	bool mEnabled_;
 };
 
 typedef boost::shared_ptr<MapPreprocessor> MapPreprocessorPtr;
 typedef boost::shared_ptr<MapPreprocessor const> MapPreprocessorConstPtr;
-} /* namespace preprocessing */
-} /* namespace known_map_localization */
+
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_PREPROCESSING_MAPPREPROCESSOR_H_ */

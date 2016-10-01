@@ -7,8 +7,7 @@
 
 #include <alignment/Hypothesis.h>
 
-namespace known_map_localization {
-namespace alignment {
+namespace kml {
 
 Hypothesis::Hypothesis() :
 		StampedAlignment(), score(0.) {
@@ -18,5 +17,4 @@ Hypothesis::Hypothesis(const StampedAlignment &a, float score) :
 		StampedAlignment(a), score(score) {
 }
 
-} /* namespace alignment */
-} /* namespace known_map_localization */
+} /* namespace kml */

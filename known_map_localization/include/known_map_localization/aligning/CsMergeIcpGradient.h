@@ -10,15 +10,12 @@
 
 #include <aligning/CsMergeAligner.h>
 
-namespace known_map_localization {
-namespace aligning {
+namespace kml {
 
 class CsMergeIcpGradient: public CsMergeAligner {
-public:
-	CsMergeIcpGradient();
+	// TODO
 };
 
-} /* namespace aligning */
-} /* namespace known_map_localization */
+} /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_ALIGNING_CSMERGEICPGRADIENT_H_ */

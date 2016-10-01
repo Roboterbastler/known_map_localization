@@ -19,19 +19,17 @@
 #define MRGS_LOW_PROB_THRESH 10
 #define MRGS_HIGH_PROB_THRESH 70
 
-namespace known_map_localization {
-namespace aligning {
+namespace kml {
 
-using namespace alignment;
 using namespace std;
 
 MapmergeAligner::MapmergeAligner() :
-		useRandomizedHoughTransform(false), useRobust(false), numberOfHypotheses(4) {
+		mUseRandomizedHoughTransform_(false), mUseRobustAlgorithm_(false), mNumberOfHypotheses_(4) {
 	ros::NodeHandle nh("~");
 
-	nh.getParam("use_randomized_hough_transform", useRandomizedHoughTransform);
-	nh.getParam("use_robust_algorithm", useRobust);
-	nh.getParam("number_of_hypotheses", numberOfHypotheses);
+	nh.getParam("use_randomized_hough_transform", mUseRandomizedHoughTransform_);
+	nh.getParam("use_robust_algorithm", mUseRobustAlgorithm_);
+	nh.getParam("number_of_hypotheses", mNumberOfHypotheses_);
 }
 
 HypothesesVect MapmergeAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) {
@@ -73,10 +71,10 @@ HypothesesVect MapmergeAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, 
 
 	// compute hypotheses
 	std::vector<mapmerge::transformation> hypotheses;
-	if(useRobust) {
-		hypotheses = mapmerge::get_hypothesis_robust(slamGrid, knownGrid, numberOfHypotheses, 1, useRandomizedHoughTransform);
+	if(mUseRobustAlgorithm_) {
+		hypotheses = mapmerge::get_hypothesis_robust(slamGrid, knownGrid, mNumberOfHypotheses_, 1, mUseRandomizedHoughTransform_);
 	} else {
-		hypotheses = mapmerge::get_hypothesis(slamGrid, knownGrid, numberOfHypotheses, 1, useRandomizedHoughTransform);
+		hypotheses = mapmerge::get_hypothesis(slamGrid, knownGrid, mNumberOfHypotheses_, 1, mUseRandomizedHoughTransform_);
 	}
 
 	tf::Quaternion rotation;
@@ -140,7 +138,7 @@ HypothesesVect MapmergeAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, 
 	return resultHypotheses;
 }
 
-bool MapmergeAligner::copyOccupancyGridToGridMap(nav_msgs::OccupancyGridConstPtr occGrid, mapmerge::grid_map &gridMap) {
+bool copyOccupancyGridToGridMap(nav_msgs::OccupancyGridConstPtr occGrid, mapmerge::grid_map &gridMap) {
 	assert(occGrid);
 	assert(gridMap.get_cols() >= occGrid->info.width);
 	assert(gridMap.get_rows() >= occGrid->info.height);
@@ -185,5 +183,4 @@ bool MapmergeAligner::copyOccupancyGridToGridMap(nav_msgs::OccupancyGridConstPtr
 	return containsOccupiedCell;
 }
 
-} /* namespace aligning */
-} /* namespace known_map_localization */
+} /* namespace kml */

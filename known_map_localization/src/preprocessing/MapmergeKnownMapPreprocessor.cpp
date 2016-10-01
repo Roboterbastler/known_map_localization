@@ -7,11 +7,9 @@
 
 #include <preprocessing/MapmergeKnownMapPreprocessor.h>
 
-namespace known_map_localization {
-namespace preprocessing {
+namespace kml {
 
 bool MapmergeKnownMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData) {
-
 	// edge detection using Canny detector
 	cv::Mat edges;
 	cv::Canny(img, edges, 50, 150, 3);
@@ -32,5 +30,4 @@ bool MapmergeKnownMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaDat
 	return true;
 }
 
-} /* namespace preprocessing */
-} /* namespace known_map_localization */
+} /* namespace kml */

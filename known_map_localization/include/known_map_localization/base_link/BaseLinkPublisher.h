@@ -16,13 +16,12 @@
 #include <geographic_msgs/GeoPose.h>
 
 #include <alignment/Alignment.h>
+#include <logging/DataLogger.h>
+#include <known_map_server/KnownMapServer.h>
+#include <SlamScaleManager.h>
+#include <filter/Filter.h>
 
-namespace known_map_localization {
-namespace base_link {
-
-class BaseLinkPublisher;
-typedef boost::shared_ptr<BaseLinkPublisher> BaseLinkPublisherPtr;
-typedef boost::shared_ptr<BaseLinkPublisher const> BaseLinkPublisherConstPtr;
+namespace kml {
 
 /**
  * # BaseLinkPublisher
@@ -38,7 +37,7 @@ typedef boost::shared_ptr<BaseLinkPublisher const> BaseLinkPublisherConstPtr;
  */
 class BaseLinkPublisher {
 public:
-	static BaseLinkPublisherPtr instance();
+	BaseLinkPublisher(KnownMapServerConstPtr pKnownMapServer, FilterConstPtr pFilter, SlamScaleManagerConstPtr pSlamScaleManager, DataLoggerPtr pDataLogger = DataLoggerPtr());
 
 	/**
 	 * Computes the absolute distance between two poses, ignoring differences in z direction.
@@ -64,10 +63,7 @@ public:
 	 * @throws tf::TransformException If tf lookup of SLAM base link fails.
 	 * @throws ScaleNotAvailable If no scale is available.
 	 */
-	tf::Stamped<tf::Pose> getPoseForAlignment(const alignment::Alignment &alignment);
-
-protected:
-	BaseLinkPublisher();
+	tf::Stamped<tf::Pose> getPoseForAlignment(const Alignment &alignment);
 
 private:
 	/**
@@ -108,28 +104,35 @@ private:
 	void receiveGroundTruth(const geometry_msgs::PoseStamped &poseMessage);
 
 private:
-	static BaseLinkPublisherPtr _instance;
 
 	/// The ROS timer causing regular updates
-	ros::WallTimer timer;
+	ros::WallTimer mTimer_;
 
 	/// Broadcaster for tf transforms
-	tf::TransformBroadcaster broadcaster;
+	tf::TransformBroadcaster mBroadcaster_;
 
 	/// Listens to tf messages to get the **ORB_base_link** transformation
-	tf::TransformListener listener;
+	tf::TransformListener mListener_;
 
 	/// Receives the ground truth pose over the /pose topic
-	ros::Subscriber groundTruthSubscriber;
+	ros::Subscriber mGroundTruthSubscriber_;
 
 	/// Publishes the difference between estimated pose and ground truth pose
-	ros::Publisher poseErrorPublisher;
+	ros::Publisher mPoseErrorPublisher_;
 
 	/// Publishes the estimated position in geographic coordinates
-	ros::Publisher geoPosePublisher;
+	ros::Publisher mGeoPosePublisher_;
+
+private:
+	KnownMapServerConstPtr pKnownMapServer_;
+	FilterConstPtr pFilter_;
+	SlamScaleManagerConstPtr pSlamScaleManager_;
+	DataLoggerPtr pDataLogger_;
 };
 
-} /* namespace base_link */
+typedef boost::shared_ptr<BaseLinkPublisher> BaseLinkPublisherPtr;
+typedef boost::shared_ptr<BaseLinkPublisher const> BaseLinkPublisherConstPtr;
+
 } /* namespace known_map_localization */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_BASE_LINK_BASELINKPUBLISHER_H_ */

@@ -15,19 +15,14 @@
 
 #include <known_map_server/KnownMapServer.h>
 #include <known_map_server/YAMLConversions.h>
-#include <preprocessing/KnownMapPreprocessor.h>
 
-namespace known_map_localization {
-namespace known_map_server {
-using namespace preprocessing;
+namespace kml {
 
-KnownMapServerPtr KnownMapServer::_instance;
-
-KnownMapServer::KnownMapServer() {
+KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) : pKnownMapPreprocessor_(pKnownMapPreprocessor) {
 	ROS_INFO("Known map server initialization...");
 
 	ros::NodeHandle nh("~");
-	knownMapPublisher = nh.advertise<nav_msgs::OccupancyGrid>("visualization_known_map", 10, true);
+	mKnownMapPublisher_ = nh.advertise<nav_msgs::OccupancyGrid>("visualization_known_map", 10, true);
 
 	std::string fileName;
 	nh.getParam("known_map_config_file", fileName);
@@ -44,21 +39,14 @@ KnownMapServer::KnownMapServer() {
 	}
 
 	ROS_INFO("    Preprocessing of known map...");
-	assert(knownMap);
+	assert(mKnownMap_);
 
-	if(!KnownMapPreprocessor::instance()->process(knownMap)) {
+	if(!pKnownMapPreprocessor_->process(mKnownMap_)) {
 		ROS_ERROR("    Known map preprocessing failed.");
 		return;
 	}
 
-	knownMapPublisher.publish(knownMap);
-}
-
-KnownMapServerPtr KnownMapServer::instance() {
-	if(!_instance) {
-		_instance = KnownMapServerPtr(new KnownMapServer());
-	}
-	return _instance;
+	mKnownMapPublisher_.publish(mKnownMap_);
 }
 
 bool KnownMapServer::loadKnownMap(std::string fileName) {
@@ -70,11 +58,11 @@ bool KnownMapServer::loadKnownMap(std::string fileName) {
 		return false;
 	}
 
-	if(!knownMapAnchor) {
-		knownMapAnchor = geographic_msgs::GeoPosePtr(new geographic_msgs::GeoPose());
+	if(!mKnownMapAnchor_) {
+		mKnownMapAnchor_ = geographic_msgs::GeoPosePtr(new geographic_msgs::GeoPose());
 	}
-	if(!knownMap) {
-		knownMap = nav_msgs::OccupancyGridPtr(new nav_msgs::OccupancyGrid());
+	if(!mKnownMap_) {
+		mKnownMap_ = nav_msgs::OccupancyGridPtr(new nav_msgs::OccupancyGrid());
 	}
 
 	double freeThresh, occupiedTresh, resolution, yaw;
@@ -83,7 +71,7 @@ bool KnownMapServer::loadKnownMap(std::string fileName) {
 	std::string mapFileName;
 
 	try {
-		*knownMapAnchor = mapMetaData["anchor"].as<geographic_msgs::GeoPose>();
+		*mKnownMapAnchor_ = mapMetaData["anchor"].as<geographic_msgs::GeoPose>();
 		freeThresh = mapMetaData["free_thresh"].as<double>();
 		occupiedTresh = mapMetaData["occupied_thresh"].as<double>();
 		resolution = mapMetaData["resolution"].as<double>();
@@ -113,9 +101,9 @@ bool KnownMapServer::loadKnownMap(std::string fileName) {
 		return false;
 	}
 
-	*knownMap = mapResp.map;
-	ros::NodeHandle("~").getParam("known_map_frame_id", knownMap->header.frame_id);
-	knownMap->info.origin.orientation = tf::createQuaternionMsgFromYaw(yaw);
+	*mKnownMap_ = mapResp.map;
+	ros::NodeHandle("~").getParam("known_map_frame_id", mKnownMap_->header.frame_id);
+	mKnownMap_->info.origin.orientation = tf::createQuaternionMsgFromYaw(yaw);
 
 	return true;
 }
@@ -128,14 +116,13 @@ std::string KnownMapServer::absoluteMapFileName(std::string mapFileName, std::st
 }
 
 nav_msgs::OccupancyGridConstPtr KnownMapServer::getKnownMap() const {
-	assert(knownMap);
-	return knownMap;
+	assert(mKnownMap_);
+	return mKnownMap_;
 }
 
 geographic_msgs::GeoPoseConstPtr KnownMapServer::getAnchor() const {
-	assert(knownMapAnchor);
-	return knownMapAnchor;
+	assert(mKnownMapAnchor_);
+	return mKnownMapAnchor_;
 }
 
-} /* namespace known_map_server */
-} /* namespace known_map_localization */
+} /* namespace kml */
