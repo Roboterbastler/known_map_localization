@@ -20,6 +20,8 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   map_server
   visualization_msgs
+  cs_merge_msgs
+  cs_merge_methods
 )
 
 ## System dependencies are found with CMake's conventions
