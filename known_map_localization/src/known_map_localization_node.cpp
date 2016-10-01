@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 
 	ROS_INFO_STREAM("---------- Known Map Localization initialization started...");
 
-	known_map_localization::KnownMapLocalization kml;
+	kml::KnownMapLocalization system;
 
 	ROS_INFO_STREAM("---------- Known Map Localization initialization finished.");
 

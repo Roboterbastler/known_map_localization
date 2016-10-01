@@ -140,8 +140,8 @@ void SlamScaleManager::estimateScale(const std_msgs::Empty &signal) {
 				tf::pointTFToMsg(first->baseLink.getOrigin(), firstPoint);
 				tf::pointTFToMsg(second->baseLink.getOrigin(), secondPoint);
 
-				double slamMapDistance = distance(firstPoint, secondPoint);
-				double realWorldDistance = distance(first->gpsPosition,
+				double slamMapDistance = kml::distance(firstPoint, secondPoint);
+				double realWorldDistance = kml::distance(first->gpsPosition,
 						second->gpsPosition);
 
 				if (realWorldDistance < MIN_GPS_DISTANCE_M

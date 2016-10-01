@@ -45,13 +45,13 @@ void GpsManager::receiveGpsFix(const sensor_msgs::NavSatFix &fix) {
 	}
 
 	try {
-		GpsHint hint;
-		hint.gpsPosition = convertGPSPositionToAnchorFrame(fix,
+		GpsPosition position;
+		position.gpsPosition = convertGPSPositionToAnchorFrame(fix,
 				*(pKnownMapServer_->getAnchor()));
-		hint.stamp = fix.header.stamp;
-		hint.gpsFix = fix;
+		position.stamp = fix.header.stamp;
+		position.gpsFix = fix;
 
-		mPositions_.push_back(hint);
+		mPositions_.push_back(position);
 
 		// remove front if queue too full
 		if (mPositions_.size() > MAX_QUEUE_SIZE) {
@@ -79,11 +79,14 @@ void GpsManager::updateGpsHints(const ros::WallTimerEvent& event) {
 //		}
 
 		try {
-			GpsHint kp(*pos);
-			kp.baseLink = getSlamBaseLink(kp.stamp);
+			GpsHint hint;
+			hint.stamp = pos->stamp;
+			hint.gpsFix = pos->gpsFix;
+			hint.gpsPosition = pos->gpsPosition;
+			hint.baseLink = getSlamBaseLink(hint.stamp);
 
 			// add new key point
-			mHints_.push_back(kp);
+			mHints_.push_back(hint);
 			modified = true;
 
 			// remove GPS fix from queue

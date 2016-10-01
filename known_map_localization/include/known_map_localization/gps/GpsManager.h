@@ -17,7 +17,6 @@
 
 #include <alignment/Alignment.h>
 #include <known_map_server/KnownMapServer.h>
-#include <SlamScaleManager.h>
 #include <gps/GpsHint.h>
 
 namespace kml {

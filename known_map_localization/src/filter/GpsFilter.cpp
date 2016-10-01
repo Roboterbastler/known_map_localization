@@ -80,7 +80,7 @@ void GpsFilter::addHypotheses(const HypothesesVect &hypotheses) {
 	}
 
 	if (filteredHypothesisModified) {
-		logAlignment (mFilteredGpsHypothesis);
+		logAlignment (mFilteredGpsHypothesis_);
 	}
 
 	mGpsConstraintsMarkerPublisher_.publish(mConstraintsMarker_);
@@ -111,7 +111,7 @@ void GpsFilter::scoringFunction(GpsScoredHypothesis &h,
 		for (GpsHintVect::const_iterator hint = gpsHints.begin();
 				hint != gpsHints.end(); ++hint) {
 			geometry_msgs::Pose robotPose = estimatedRobotPose(h, *hint);
-			float d = distance(hint->gpsPosition, robotPose.position);
+			float d = kml::distance(hint->gpsPosition, robotPose.position);
 			bool supportingConstraint = d < kGpsConstraintRadius_;
 			float confirmation =
 					supportingConstraint ?
