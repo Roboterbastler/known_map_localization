@@ -9,6 +9,10 @@
 
 namespace kml {
 
+KmlFactory::~KmlFactory() {
+
+}
+
 BaseLinkPublisherPtr KmlFactory::createBaseLinkPublisher(KnownMapServerConstPtr pKnownMapServer, FilterConstPtr pFilter, SlamScaleManagerConstPtr pSlamScaleManager, DataLoggerPtr pDataLogger) const {
 	return BaseLinkPublisherPtr(new BaseLinkPublisher(pKnownMapServer, pFilter, pSlamScaleManager, pDataLogger));
 }

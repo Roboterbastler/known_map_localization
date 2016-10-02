@@ -22,9 +22,9 @@ BaseLinkPublisher::BaseLinkPublisher(KnownMapServerConstPtr pKnownMapServer,
 		DataLoggerPtr pDataLogger) :
 		pKnownMapServer_(pKnownMapServer), pFilter_(pFilter), pSlamScaleManager_(
 				pSlamScaleManager), pDataLogger_(pDataLogger) {
-	assert(pKnownMapServer_);
-	assert(pFilter_);
-	assert(pSlamScaleManager_);
+	ROS_ASSERT(pKnownMapServer_);
+	ROS_ASSERT(pFilter_);
+	ROS_ASSERT(pSlamScaleManager_);
 
 	ROS_INFO("Base link publisher initialization...");
 
@@ -178,10 +178,10 @@ void BaseLinkPublisher::receiveGroundTruth(
 		const geometry_msgs::PoseStamped &poseMessage) {
 	tf::Stamped<tf::Pose> groundTruthPose;
 	tf::poseStampedMsgToTF(poseMessage, groundTruthPose);
-	mBroadcaster_.sendTransform(
-			tf::StampedTransform(groundTruthPose, groundTruthPose.stamp_,
-					"/known_map_localization/anchor",
-					"/known_map_localization/ground_truth"));
+	tf::StampedTransform groundTruth(groundTruthPose, groundTruthPose.stamp_,
+			"/known_map_localization/anchor",
+			"/known_map_localization/ground_truth");
+	mBroadcaster_.sendTransform(groundTruth);
 }
 
 float BaseLinkPublisher::poseToPoseAbsDistance(const tf::Pose &p1,

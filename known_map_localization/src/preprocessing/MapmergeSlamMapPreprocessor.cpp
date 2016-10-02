@@ -17,6 +17,8 @@ MapmergeSlamMapPreprocessor::MapmergeSlamMapPreprocessor(
 		SlamScaleManagerConstPtr pSlamScaleManager) :
 		mKnownMapResolution_(KNOWN_MAP_RESOLUTION_UNAVAILABLE), pSlamScaleManager_(
 				pSlamScaleManager) {
+	ROS_ASSERT(pSlamScaleManager_);
+
 	ros::NodeHandle nh("~");
 
 	// subscribe to known map topic to get known map resolution

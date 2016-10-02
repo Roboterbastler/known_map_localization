@@ -17,16 +17,17 @@ namespace kml {
 GpsFilter::GpsFilter(GpsManagerConstPtr pGpsManager,
 		KnownMapServerConstPtr pKnownMapServer,
 		SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger) :
-		Filter(pSlamScaleManager, pDataLogger), mConstraintsMarker_(
-				setUpContraintMarker()), pGpsManager_(pGpsManager), pKnownMapServer_(
+		Filter(pSlamScaleManager, pDataLogger), pGpsManager_(pGpsManager), pKnownMapServer_(
 				pKnownMapServer) {
-	assert(pGpsManager_);
-	assert(pKnownMapServer_);
+	ROS_ASSERT(pGpsManager_);
+	ROS_ASSERT(pKnownMapServer_);
+	ROS_ASSERT(pSlamScaleManager_);
 
 	ROS_INFO("    Type: GPS filter");
 
 	ros::NodeHandle nh("~");
 
+	mConstraintsMarker_ = setUpContraintMarker();
 	mGpsConstraintsMarkerPublisher_ = nh.advertise<visualization_msgs::Marker>(
 			"gps_position_marker", 1);
 
@@ -81,10 +82,17 @@ void GpsFilter::addHypotheses(const HypothesesVect &hypotheses) {
 	}
 
 	if (filteredHypothesisModified) {
-		logAlignment (mFilteredGpsHypothesis_);
+		logAlignment(mFilteredGpsHypothesis_);
 	}
 
 	mGpsConstraintsMarkerPublisher_.publish(mConstraintsMarker_);
+}
+
+const Alignment& GpsFilter::getAlignment() const {
+	if (!mReady_) {
+		throw AlignmentNotAvailable("Filtered hypothesis is not yet available");
+	}
+	return mFilteredGpsHypothesis_;
 }
 
 geometry_msgs::Pose GpsFilter::estimatedRobotPose(const Alignment &alignment,

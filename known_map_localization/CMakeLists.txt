@@ -172,6 +172,7 @@ add_library(known_map_localization
   src/SlamScaleManager.cpp
   src/GpsManager.cpp
   src/factory/KmlFactory.cpp
+  src/factory/KmlMapmergeFactory.cpp
   src/Utils.cpp
 )
 

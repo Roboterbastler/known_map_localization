@@ -20,7 +20,7 @@ namespace kml {
 
 GpsManager::GpsManager(KnownMapServerConstPtr pKnownMapServer) :
 		pKnownMapServer_(pKnownMapServer) {
-	assert(pKnownMapServer_);
+	ROS_ASSERT(pKnownMapServer_);
 
 	ROS_INFO("GPS manager initialization...");
 

@@ -9,21 +9,22 @@
 
 #include <Exception.h>
 #include <Utils.h>
+#include <factory/KmlMapmergeFactory.h>
 
 namespace kml {
 
 KnownMapLocalization::KnownMapLocalization() : mRate_(2.0), mLastProcessing_(0) {
-	// TODO: create factory accordingly
-	KmlFactoryConstPtr factory;
+	// create factory accordingly
+	KmlFactoryConstPtr factory = selectStrategy();
 
 	// let the factory do it's work...
 	pDataLogger_ = factory->createDataLogger();
 	pKnownMapPreprocessor_ = factory->createKnownMapPreprocessor();
-	pSlamMapPreprocessor_ = factory->createSlamMapPreprocessor();
 	pAligner_ = factory->createAligner();
 	pKnownMapServer_ = factory->createKnownMapServer(pKnownMapPreprocessor_);
 	pGpsManager_ = factory->createGpsManager(pKnownMapServer_);
 	pSlamScaleManager_ = factory->createSlamScaleManager(pGpsManager_, pDataLogger_);
+	pSlamMapPreprocessor_ = factory->createSlamMapPreprocessor(pSlamScaleManager_);
 	pFilter_ = factory->createFilter(pGpsManager_, pKnownMapServer_, pSlamScaleManager_, pDataLogger_);
 	pBaseLinkPublisher_ = factory->createBaseLinkPublisher(pKnownMapServer_, pFilter_, pSlamScaleManager_, pDataLogger_);
 
@@ -41,9 +42,8 @@ KmlFactoryConstPtr KnownMapLocalization::selectStrategy() const {
 		throw AlgorithmNotSpecified("Algorithm parameter is missing");
 	}
 
-	if(algorithmSpecifier == "") {
-		// TODO
-		return KmlFactoryConstPtr();
+	if(algorithmSpecifier == "mapmerge") {
+		return boost::make_shared<KmlMapmergeFactory>();
 	} else {
 		throw IllegalAlgorithm("Illegal algorithm specifier: " + algorithmSpecifier);
 	}

@@ -24,7 +24,7 @@ SlamScaleManager::SlamScaleManager(GpsManagerConstPtr pGpsManager,
 		DataLoggerPtr pDataLogger) :
 		mMode_(determineMode()), mIsValid_(false), mScale_(1.0), pDataLogger_(
 				pDataLogger), pGpsManager_(pGpsManager) {
-	assert(pGpsManager_);
+	ROS_ASSERT(pGpsManager_);
 
 	ros::NodeHandle nh("~");
 

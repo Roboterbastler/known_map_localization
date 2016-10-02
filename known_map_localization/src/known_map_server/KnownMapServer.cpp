@@ -19,6 +19,8 @@
 namespace kml {
 
 KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) : pKnownMapPreprocessor_(pKnownMapPreprocessor) {
+	ROS_ASSERT(pKnownMapPreprocessor_);
+
 	ROS_INFO("Known map server initialization...");
 
 	ros::NodeHandle nh("~");
@@ -59,10 +61,10 @@ bool KnownMapServer::loadKnownMap(std::string fileName) {
 	}
 
 	if(!mKnownMapAnchor_) {
-		mKnownMapAnchor_ = geographic_msgs::GeoPosePtr(new geographic_msgs::GeoPose());
+		mKnownMapAnchor_ = boost::make_shared<geographic_msgs::GeoPose>();
 	}
 	if(!mKnownMap_) {
-		mKnownMap_ = nav_msgs::OccupancyGridPtr(new nav_msgs::OccupancyGrid());
+		mKnownMap_ = boost::make_shared<nav_msgs::OccupancyGrid>();nav_msgs::OccupancyGridPtr(new nav_msgs::OccupancyGrid());
 	}
 
 	double freeThresh, occupiedTresh, resolution, yaw;
