@@ -8,6 +8,8 @@
 #ifndef KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_FACTORY_KMLFACTORY_H_
 #define KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_FACTORY_KMLFACTORY_H_
 
+#include <boost/shared_ptr.hpp>
+
 #include <aligning/Aligner.h>
 #include <preprocessing/KnownMapPreprocessor.h>
 #include <preprocessing/SlamMapPreprocessor.h>

@@ -7,12 +7,10 @@
 
 #include <factory/KmlMapmergeFactory.h>
 
-#include <boost/shared_ptr.hpp>
-
 #include <aligning/MapmergeAligner.h>
-#include <preprocessing/MapmergeKnownMapPreprocessor.h>
 #include <preprocessing/MapmergeSlamMapPreprocessor.h>
 #include <filter/GpsFilter.h>
+#include <preprocessing/EdgeDetectionKnownMapPreprocessor.h>
 
 namespace kml {
 
@@ -23,7 +21,7 @@ AlignerPtr KmlMapmergeFactory::createAligner() const {
 }
 
 KnownMapPreprocessorPtr KmlMapmergeFactory::createKnownMapPreprocessor() const {
-	return make_shared<MapmergeKnownMapPreprocessor>();
+	return make_shared<EdgeDetectionKnownMapPreprocessor>();
 }
 
 SlamMapPreprocessorPtr KmlMapmergeFactory::createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager) const {

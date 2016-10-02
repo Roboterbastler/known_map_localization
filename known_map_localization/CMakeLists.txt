@@ -151,12 +151,14 @@ add_library(known_map_localization
   src/aligning/Aligner.cpp
   src/aligning/MapstitchAligner.cpp
   src/aligning/MapmergeAligner.cpp
+  src/aligning/CsMergeAligner.cpp
+  src/aligning/CsMergeIcpGradientAligner.cpp
   src/preprocessing/MapPreprocessor.cpp
   src/preprocessing/KnownMapPreprocessor.cpp
   src/preprocessing/SlamMapPreprocessor.cpp
   src/preprocessing/MapstitchKnownMapPreprocessor.cpp
   src/preprocessing/MapstitchSlamMapPreprocessor.cpp
-  src/preprocessing/MapmergeKnownMapPreprocessor.cpp
+  src/preprocessing/EdgeDetectionKnownMapPreprocessor.cpp
   src/preprocessing/MapmergeSlamMapPreprocessor.cpp
   src/known_map_server/KnownMapServer.cpp
   src/alignment/Alignment.cpp
@@ -173,6 +175,7 @@ add_library(known_map_localization
   src/GpsManager.cpp
   src/factory/KmlFactory.cpp
   src/factory/KmlMapmergeFactory.cpp
+  src/factory/KmlCsMergeIcpGradientFactory.cpp
   src/Utils.cpp
 )
 

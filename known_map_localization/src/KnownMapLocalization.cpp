@@ -10,6 +10,7 @@
 #include <Exception.h>
 #include <Utils.h>
 #include <factory/KmlMapmergeFactory.h>
+#include <factory/KmlCsMergeIcpGradientFactory.h>
 
 namespace kml {
 
@@ -44,6 +45,8 @@ KmlFactoryConstPtr KnownMapLocalization::selectStrategy() const {
 
 	if(algorithmSpecifier == "mapmerge") {
 		return boost::make_shared<KmlMapmergeFactory>();
+	} if(algorithmSpecifier == "cs_merge_icp_gradient") {
+		return boost::make_shared<KmlCsMergeIcpGradientFactory>();
 	} else {
 		throw IllegalAlgorithm("Illegal algorithm specifier: " + algorithmSpecifier);
 	}

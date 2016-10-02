@@ -4,7 +4,22 @@
 		<node pkg="known_map_localization" type="known_map_localization_node" name="localization_node" output="screen" required="true">
 			<remap from="localization_node/slam_map" to="/orb_slam/projected_map" />
 			<remap from="/gps_fix" to="/robot/gps" />
-			<rosparam command="load" file="$(find known_map_localization)/launch/mapmerge.yaml" />
+			<rosparam command="load" file="$(find known_map_localization)/launch/cs_merge_icp_gradient.yaml" />
+		</node>
+		
+		<!-- The cs_merge aligning nodes -->
+		<node pkg="cs_merge_methods" type="cs_merge_hough_ccr" name="cs_merge_hough_ccr"/>
+		<node pkg="cs_merge_methods" type="cs_merge_hough_corner" name="cs_merge_hough_corner">
+			<param name="threshold" value="1.0" />
+		</node>
+		<node pkg="cs_merge_methods" type="cs_merge_icp_gradient" name="cs_merge_icp_gradient">
+			<param name="ransac_amount" value="0.5" />
+			<param name="repetitions" value="25" />
+		</node>
+		<node pkg="cs_merge_methods" type="cs_merge_icp_svd" name="cs_merge_icp_svd">
+			<param name="repetitions" value="25" />
+			<param name="fraction" value="0.5" />
+			<param name="startPos" value="0" />
 		</node>
 	</group>
 </launch>

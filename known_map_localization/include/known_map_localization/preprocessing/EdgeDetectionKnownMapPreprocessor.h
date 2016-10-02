@@ -12,7 +12,7 @@
 
 namespace kml {
 
-class MapmergeKnownMapPreprocessor: public KnownMapPreprocessor {
+class EdgeDetectionKnownMapPreprocessor: public KnownMapPreprocessor {
 protected:
 	virtual bool processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData);
 };

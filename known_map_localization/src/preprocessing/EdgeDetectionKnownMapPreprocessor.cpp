@@ -5,11 +5,11 @@
  *      Author: jacob
  */
 
-#include <preprocessing/MapmergeKnownMapPreprocessor.h>
+#include <preprocessing/EdgeDetectionKnownMapPreprocessor.h>
 
 namespace kml {
 
-bool MapmergeKnownMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData) {
+bool EdgeDetectionKnownMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData) {
 	// edge detection using Canny detector
 	cv::Mat edges;
 	cv::Canny(img, edges, 50, 150, 3);
@@ -19,7 +19,7 @@ bool MapmergeKnownMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaDat
 	img = cv::Scalar::all(255) - img;
 
 	// make edges thicker; edgeRadius is half the width of the edge in meters
-	float edgeRadius = 0.1;
+	float edgeRadius = 0.2;
 	unsigned int kernelRadius = std::max(1., floor(edgeRadius / mapMetaData.resolution));
 	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2*kernelRadius+1, 2*kernelRadius+1));
 	cv::erode(img, img, kernel);
