@@ -153,11 +153,6 @@ void SlamScaleManager::estimateScale(const std_msgs::Empty &signal) {
 
 				double scaleEstimate = realWorldDistance / slamMapDistance;
 
-				if (scaleEstimate > 10.) {
-					// drop too big estimates
-					continue;
-				}
-
 				scales.push_back(scaleEstimate);
 			}
 		};
