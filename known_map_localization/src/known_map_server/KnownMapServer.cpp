@@ -36,7 +36,7 @@ KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) : 
 	ROS_INFO("    Load known map...");
 	if(!loadKnownMap(fileName)) {
 		ROS_FATAL("Known map could not be loaded: %s", fileName.c_str());
-		ros::shutdown();
+		ROS_BREAK();
 		return;
 	}
 

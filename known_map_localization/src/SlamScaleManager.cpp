@@ -41,7 +41,7 @@ SlamScaleManager::SlamScaleManager(GpsManagerConstPtr pGpsManager,
 			}
 		} else {
 			ROS_FATAL("No SLAM scale parameter found.");
-			ros::shutdown();
+			ROS_BREAK();
 			return;
 		}
 		break;
@@ -55,7 +55,7 @@ SlamScaleManager::SlamScaleManager(GpsManagerConstPtr pGpsManager,
 		break;
 	default:
 		ROS_FATAL("    Illegal or not specified SLAM scale manager mode.");
-		ros::shutdown();
+		ROS_BREAK();
 		return;
 	}
 }
