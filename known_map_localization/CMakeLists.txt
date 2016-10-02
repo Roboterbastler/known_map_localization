@@ -172,6 +172,7 @@ add_library(known_map_localization
   src/SlamScaleManager.cpp
   src/GpsManager.cpp
   src/factory/KmlFactory.cpp
+  src/Utils.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -251,9 +252,8 @@ target_link_libraries(known_map_localization
 ## Add gtest based cpp test target and link libraries
 catkin_add_gtest(${PROJECT_NAME}-test
   test/test.cpp
-  test/filter_test.cpp
   test/alignment_test.cpp
-  test/slam_scale_manager_test.cpp
+  test/utils_test.cpp
   test/base_link_test.cpp
 )
 if(TARGET ${PROJECT_NAME}-test)

@@ -13,6 +13,7 @@
 #include <geodesy/wgs84.h>
 
 #include <Exception.h>
+#include <Utils.h>
 
 #define MAX_POSITION_CACHE_SIZE 100
 #define MIN_GPS_DISTANCE_M 0.5
@@ -173,22 +174,6 @@ void SlamScaleManager::estimateScale(const std_msgs::Empty &signal) {
 		} else {
 			ROS_INFO("  - No new scale estimation available.");
 		}
-	}
-}
-
-double distance(const geometry_msgs::Point &p1,
-		const geometry_msgs::Point &p2) {
-	return sqrt(pow(p1.x - p2.x, 2.) + pow(p1.y - p2.y, 2.));
-}
-
-double median(std::vector<double> &values) {
-	std::sort(values.begin(), values.end());
-	size_t size = values.size();
-
-	if (size % 2 == 0) {
-		return (values.at(size / 2 - 1) + values.at(size / 2)) / 2.;
-	} else {
-		return values.at(values.size() / 2);
 	}
 }
 

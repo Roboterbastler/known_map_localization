@@ -8,6 +8,7 @@
 #include <filter/GpsFilter.h>
 
 #include <Exception.h>
+#include <Utils.h>
 
 #define MAX_HINT_CACHE_SIZE 10
 

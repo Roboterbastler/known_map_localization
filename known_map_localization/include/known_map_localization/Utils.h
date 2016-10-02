@@ -8,7 +8,7 @@
 #ifndef KNOWN_MAP_LOCALIZATION_INCLUDE_UTILS_H_
 #define KNOWN_MAP_LOCALIZATION_INCLUDE_UTILS_H_
 
-#include <math.h>
+#include <geometry_msgs/Point.h>
 
 namespace kml {
 
@@ -17,38 +17,29 @@ namespace kml {
  * @param degrees Angle in degrees
  * @return Angle in radians
  */
-inline double degToRad(double degrees) {
-	return degrees * M_PI / 180.;
-}
+double degToRad(double degrees);
 
 /**
  * Conversion from radians to degree.
  * @param radians Angle in radians
  * @return Angle in degrees
  */
-inline double radToDeg(double radians) {
-	return radians * 180. / M_PI;
-}
+double radToDeg(double radians);
 
 /**
- * Gets the yaw from a quaternion.
- * @param quaternion The quaternion
- * @return The yaw in radians
+ * Computes the distance between two points (on the xy plane).
+ * @param p1 The first point
+ * @param p2 The second point
+ * @return The distance
  */
-inline double quaternionToYawRad(const tf::Quaternion &quaternion) {
-	double roll, pitch, yaw;
-	tf::Matrix3x3(quaternion).getRPY(roll, pitch, yaw);
-	return yaw;
-}
+double distance(const geometry_msgs::Point &p1, const geometry_msgs::Point &p2);
 
 /**
- * Gets the yaw from a quaternion.
- * @param quaternion The quaternion
- * @return The yaw in degrees
+ * Computes the median of a vector of values.
+ * @param values The values
+ * @return The median
  */
-inline double quaternionToYawDegree(const tf::Quaternion &quaternion) {
-	return radToDeg(quaternionToYawRad(quaternion));
-}
+double median(std::vector<double> &values);
 
 }
 

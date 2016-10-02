@@ -79,18 +79,17 @@ HypothesesVect MapstitchAligner::align(nav_msgs::OccupancyGridConstPtr knownMap,
 			slamMap->header.frame_id.c_str(),
 			slamMapFrame_to_slamMapOrigin.getOrigin().getX(),
 			slamMapFrame_to_slamMapOrigin.getOrigin().getY(),
-			quaternionToYawDegree(slamMapFrame_to_slamMapOrigin.getRotation()));
+			radToDeg(tf::getYaw(slamMapFrame_to_slamMapOrigin.getRotation())));
 	ROS_DEBUG("Transform from SLAM map to known map: x=%f y=%f yaw=%f scale=%f",
 			slamMap_to_knownMap.getOrigin().getX(),
 			slamMap_to_knownMap.getOrigin().getY(),
-			quaternionToYawDegree(slamMap_to_knownMap.getRotation()),
+			radToDeg(tf::getYaw(slamMap_to_knownMap.getRotation())),
 			alignment.scale);
 	ROS_DEBUG("Transform from known map origin to %s: x=%f y=%f yaw=%f",
 			knownMap->header.frame_id.c_str(),
 			knownMapOrigin_to_knownMapAnchorFrame.getOrigin().getX(),
 			knownMapOrigin_to_knownMapAnchorFrame.getOrigin().getY(),
-			quaternionToYawDegree(
-					knownMapOrigin_to_knownMapAnchorFrame.getRotation()));
+			radToDeg(tf::getYaw(knownMapOrigin_to_knownMapAnchorFrame.getRotation())));
 
 	// put everything together
 	tf::Transform slamMapFrame_to_knownMapAnchorFrame;
@@ -103,7 +102,7 @@ HypothesesVect MapstitchAligner::align(nav_msgs::OccupancyGridConstPtr knownMap,
 	alignment.from = slamMap->header.frame_id;
 	alignment.to = knownMap->header.frame_id;
 	alignment.stamp = ros::Time::now();
-	alignment.theta = quaternionToYawRad(slamMapFrame_to_knownMapAnchorFrame.getRotation());
+	alignment.theta = tf::getYaw(slamMapFrame_to_knownMapAnchorFrame.getRotation());
 	alignment.x = slamMapFrame_to_knownMapAnchorFrame.getOrigin().getX();
 	alignment.y = slamMapFrame_to_knownMapAnchorFrame.getOrigin().getY();
 

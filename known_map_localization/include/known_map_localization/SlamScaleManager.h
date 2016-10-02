@@ -130,21 +130,6 @@ private:
 typedef boost::shared_ptr<SlamScaleManager> SlamScaleManagerPtr;
 typedef boost::shared_ptr<SlamScaleManager const> SlamScaleManagerConstPtr;
 
-/**
- * Computes the distance between two points (on the xy plane).
- * @param p1 The first point
- * @param p2 The second point
- * @return The distance
- */
-double distance(const geometry_msgs::Point &p1, const geometry_msgs::Point &p2);
-
-/**
- * Computes the median of a vector of values.
- * @param values The values
- * @return The median
- */
-double median(std::vector<double> &values);
-
 } /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_SLAMSCALEMANAGER_H_ */

@@ -193,8 +193,8 @@ float BaseLinkPublisher::poseToPoseAbsDistance(const tf::Pose &p1,
 
 float BaseLinkPublisher::orientationToOrientationAngle(const tf::Quaternion &q1,
 		const tf::Quaternion &q2) {
-	double yaw1 = quaternionToYawRad(q1);
-	double yaw2 = quaternionToYawRad(q2);
+	double yaw1 = tf::getYaw(q1);
+	double yaw2 = tf::getYaw(q2);
 	tf::Quaternion rot1, rot2;
 	rot1.setRPY(0, 0, yaw1);
 	rot2.setRPY(0, 0, yaw2);

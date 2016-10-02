@@ -12,8 +12,6 @@
 #include <alignment/Alignment.h>
 #include <alignment/StampedAlignment.h>
 
-using namespace known_map_localization;
-
 class StampedAlignment : public ::testing::Test {
 protected:
 	static void SetUpTestCase() {
@@ -22,7 +20,7 @@ protected:
 };
 
 TEST(Alignment, givesCorrectIdentity) {
-	alignment::Alignment a = alignment::Alignment::getIdentity();
+	kml::Alignment a = kml::Alignment::getIdentity();
 
 	ASSERT_EQ(0., a.theta);
 	ASSERT_EQ(0., a.x);
@@ -31,7 +29,7 @@ TEST(Alignment, givesCorrectIdentity) {
 }
 
 TEST(Alignment, convertsToCorrectTfTransform) {
-	alignment::Alignment id = alignment::Alignment::getIdentity();
+	kml::Alignment id = kml::Alignment::getIdentity();
 	tf::Transform tfId = id.toTfTransform();
 
 	ASSERT_FLOAT_EQ(0., tfId.getOrigin().getX());
@@ -42,7 +40,7 @@ TEST(Alignment, convertsToCorrectTfTransform) {
 	ASSERT_FLOAT_EQ(0., tfId.getRotation().getZ());
 	ASSERT_FLOAT_EQ(1., tfId.getRotation().getW());
 
-	alignment::Alignment b;
+	kml::Alignment b;
 	b.scale = 1.25;
 	b.theta = M_PI / 2;
 	b.x = 5.;
@@ -62,7 +60,7 @@ TEST(Alignment, convertsToCorrectTfTransform) {
 }
 
 TEST_F(StampedAlignment, givesCorrectIdentity) {
-	alignment::StampedAlignment a = alignment::StampedAlignment::getIdentity();
+	kml::StampedAlignment a = kml::StampedAlignment::getIdentity();
 
 	ASSERT_EQ(0., a.theta);
 	ASSERT_EQ(0., a.x);
