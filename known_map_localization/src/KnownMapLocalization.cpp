@@ -71,7 +71,7 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 	}
 
 	// publish visualization SLAM map
-	publishSlamMap(slamMapFixed);
+	mSlamMapPublisher_.publish(slamMapFixed);
 
 	try {
 		ros::WallTime start = ros::WallTime::now();
@@ -101,22 +101,6 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 		ROS_DEBUG("Aligning failed.");
 		return;
 	}
-}
-
-void KnownMapLocalization::publishSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap) const {
-	nav_msgs::OccupancyGridPtr correctedSlamMap(new nav_msgs::OccupancyGrid(*slamMap));
-	Alignment alignment;
-	try {
-		alignment = pFilter_->getAlignment();
-	} catch(AlignmentNotAvailable &e) {
-		return;
-	}
-
-	correctedSlamMap->info.resolution *= alignment.scale;
-	correctedSlamMap->info.origin.position.x *= alignment.scale;
-	correctedSlamMap->info.origin.position.y *= alignment.scale;
-
-	mSlamMapPublisher_.publish(correctedSlamMap);
 }
 
 } /* namespace kml */

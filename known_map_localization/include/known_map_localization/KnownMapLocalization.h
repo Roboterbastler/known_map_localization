@@ -45,12 +45,6 @@ private:
 	 */
 	void receiveSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap);
 
-	/**
-	 * Publishes the preprocessed SMAL map for visualization purposes.
-	 * @param slamMap The SLAM map
-	 */
-	void publishSlamMap(const nav_msgs::OccupancyGridConstPtr &slamMap) const;
-
 private:
 	/// Subscribes to the map topic released by the SLAM package
 	ros::Subscriber mSlamMapSubscriber_;
