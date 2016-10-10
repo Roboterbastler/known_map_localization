@@ -11,7 +11,9 @@
 #include <Utils.h>
 #include <factory/KmlMapmergeFactory.h>
 #include <factory/KmlCsMergeIcpGradientFactory.h>
+#include <factory/KmlCsMergeIcpSvdFactory.h>
 #include <factory/KmlCsMergeHoughCornerFactory.h>
+#include <factory/KmlCsMergeHoughCcrFactory.h>
 
 namespace kml {
 
@@ -48,8 +50,12 @@ KmlFactoryConstPtr KnownMapLocalization::selectStrategy() const {
 		return boost::make_shared<KmlMapmergeFactory>();
 	} if(algorithmSpecifier == "cs_merge_icp_gradient") {
 		return boost::make_shared<KmlCsMergeIcpGradientFactory>();
+	} if(algorithmSpecifier == "cs_merge_icp_svd") {
+		return boost::make_shared<KmlCsMergeIcpSvdFactory>();
 	} if(algorithmSpecifier == "cs_merge_hough_corner") {
 		return boost::make_shared<KmlCsMergeHoughCornerFactory>();
+	} if(algorithmSpecifier == "cs_merge_hough_ccr") {
+		return boost::make_shared<KmlCsMergeHoughCcrFactory>();
 	} else {
 		ROS_FATAL("Illegal algorithm specifier: %s", algorithmSpecifier.c_str());
 		ROS_BREAK();
