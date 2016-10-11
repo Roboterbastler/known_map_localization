@@ -153,7 +153,9 @@ add_library(known_map_localization
   src/aligning/MapmergeAligner.cpp
   src/aligning/CsMergeAligner.cpp
   src/aligning/CsMergeIcpGradientAligner.cpp
+  src/aligning/CsMergeIcpSvdAligner.cpp
   src/aligning/CsMergeHoughCornerAligner.cpp
+  src/aligning/CsMergeHoughCcrAligner.cpp
   src/preprocessing/MapPreprocessor.cpp
   src/preprocessing/KnownMapPreprocessor.cpp
   src/preprocessing/SlamMapPreprocessor.cpp
@@ -177,7 +179,9 @@ add_library(known_map_localization
   src/factory/KmlFactory.cpp
   src/factory/KmlMapmergeFactory.cpp
   src/factory/KmlCsMergeIcpGradientFactory.cpp
+  src/factory/KmlCsMergeIcpSvdFactory.cpp
   src/factory/KmlCsMergeHoughCornerFactory.cpp
+  src/factory/KmlCsMergeHoughCcrFactory.cpp
   src/Utils.cpp
 )
 

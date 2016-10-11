@@ -7,6 +7,11 @@
 
 #include <factory/KmlCsMergeIcpSvdFactory.h>
 
+#include <aligning/CsMergeIcpSvdAligner.h>
+#include <preprocessing/EdgeDetectionKnownMapPreprocessor.h>
+#include <preprocessing/MapmergeSlamMapPreprocessor.h>
+#include <filter/GpsFilter.h>
+
 namespace kml {
 
 using boost::make_shared;
