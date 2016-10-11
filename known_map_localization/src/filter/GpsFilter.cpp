@@ -34,9 +34,11 @@ GpsFilter::GpsFilter(GpsManagerConstPtr pGpsManager,
 	kGpsConstraintRadius_ = nh.param("gps_constraint_radius", 10.);
 	kDecayFactor_ = nh.param("aging_rate", 1.);
 	kConfirmationFactor_ = nh.param("gps_confirmation_factor", 1.05);
+	kPreferGpsSupported_ = nh.param("always_prefer_gps_supported", true);
 
 	ROS_INFO("    Constraint radius: %.2f", kGpsConstraintRadius_);
 	ROS_INFO("    Aging rate: %.2f", kDecayFactor_);
+	ROS_INFO("    Always prefer GPS supported: %s", kPreferGpsSupported_ ? "true" : "false");
 }
 
 void GpsFilter::addHypotheses(const HypothesesVect &hypotheses) {
@@ -67,7 +69,7 @@ void GpsFilter::addHypotheses(const HypothesesVect &hypotheses) {
 		if (scoredHypothesis.score > mFilteredGpsHypothesis_.score) {
 			// always prefer GPS-supported hypotheses
 			if (!mFilteredGpsHypothesis_.gpsSupported
-					|| scoredHypothesis.gpsSupported) {
+					|| scoredHypothesis.gpsSupported || !kPreferGpsSupported_) {
 				mFilteredGpsHypothesis_ = scoredHypothesis;
 				filteredHypothesisModified = true;
 				mReady_ = true;

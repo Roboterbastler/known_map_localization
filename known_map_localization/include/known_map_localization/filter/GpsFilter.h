@@ -94,6 +94,8 @@ private:
 
 	float kConfirmationFactor_;
 
+	bool kPreferGpsSupported_;
+
 private:
 	GpsManagerConstPtr pGpsManager_;
 	KnownMapServerConstPtr pKnownMapServer_;
