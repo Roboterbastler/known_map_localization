@@ -30,8 +30,8 @@ bool MapmergeSlamMapPreprocessor::processMap(cv::Mat &img,
 		nav_msgs::MapMetaData &mapMetaData) {
 	ROS_INFO("Preprocessing of SLAM map...");
 
-	assert(img.rows == mapMetaData.height);
-	assert(img.cols == mapMetaData.width);
+	ROS_ASSERT(img.rows == mapMetaData.height);
+	ROS_ASSERT(img.cols == mapMetaData.width);
 
 	// scale SLAM map
 	if (mKnownMapResolution_ == KNOWN_MAP_RESOLUTION_UNAVAILABLE) {

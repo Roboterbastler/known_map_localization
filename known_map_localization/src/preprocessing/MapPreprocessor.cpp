@@ -30,7 +30,7 @@ MapPreprocessor::~MapPreprocessor() {
 }
 
 bool MapPreprocessor::process(nav_msgs::OccupancyGridPtr map) {
-	assert(map);
+	ROS_ASSERT(map);
 	bool success = true;
 
 	// convert to matrix

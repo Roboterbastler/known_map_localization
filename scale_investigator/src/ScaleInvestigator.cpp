@@ -87,7 +87,7 @@ ScaleInvestigator::~ScaleInvestigator() {
 
 void ScaleInvestigator::updateRotation(int r, void *userData) {
 	ScaleInvestigator *si = (ScaleInvestigator *)userData;
-	assert(si);
+	ROS_ASSERT(si);
 	// todo rotate slam map
 }
 
@@ -105,7 +105,7 @@ ScaleInvestigator::MouseClick ScaleInvestigator::waitForMouseClick() {
 
 void ScaleInvestigator::onMouse(int event, int x, int y, int, void *userData) {
 	ScaleInvestigator *si = (ScaleInvestigator *)userData;
-	assert(si);
+	ROS_ASSERT(si);
 
 	if(event == EVENT_LBUTTONDOWN) {
 		si->lastClick.x = x;
@@ -115,7 +115,7 @@ void ScaleInvestigator::onMouse(int event, int x, int y, int, void *userData) {
 }
 
 void ScaleInvestigator::receiveSlamMap(nav_msgs::OccupancyGridPtr map) {
-	assert(map);
+	ROS_ASSERT(map);
 
 	slamMap = occupancyGridToCvMat(map.get());
 	slamMapResolution = map->info.resolution;
@@ -125,7 +125,7 @@ void ScaleInvestigator::receiveSlamMap(nav_msgs::OccupancyGridPtr map) {
 }
 
 void ScaleInvestigator::receiveKnownMap(nav_msgs::OccupancyGridPtr map) {
-	assert(map);
+	ROS_ASSERT(map);
 
 	knownMap = occupancyGridToCvMat(map.get());
 	knownMapResolution = map->info.resolution;

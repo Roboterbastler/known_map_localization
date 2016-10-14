@@ -14,7 +14,7 @@ namespace kml {
 Filter::Filter(SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger) :
 		mReady_(false), pSlamScaleManager_(pSlamScaleManager), pDataLogger_(
 				pDataLogger) {
-	assert(pSlamScaleManager_);
+	ROS_ASSERT(pSlamScaleManager_);
 
 	ROS_INFO("Filter initialization...");
 }

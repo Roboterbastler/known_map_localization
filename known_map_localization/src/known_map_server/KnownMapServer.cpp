@@ -41,7 +41,7 @@ KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) : 
 	}
 
 	ROS_INFO("    Preprocessing of known map...");
-	assert(mKnownMap_);
+	ROS_ASSERT(mKnownMap_);
 
 	if(!pKnownMapPreprocessor_->process(mKnownMap_)) {
 		ROS_ERROR("    Known map preprocessing failed.");
@@ -118,12 +118,12 @@ std::string KnownMapServer::absoluteMapFileName(std::string mapFileName, std::st
 }
 
 nav_msgs::OccupancyGridConstPtr KnownMapServer::getKnownMap() const {
-	assert(mKnownMap_);
+	ROS_ASSERT(mKnownMap_);
 	return mKnownMap_;
 }
 
 geographic_msgs::GeoPoseConstPtr KnownMapServer::getAnchor() const {
-	assert(mKnownMapAnchor_);
+	ROS_ASSERT(mKnownMapAnchor_);
 	return mKnownMapAnchor_;
 }
 

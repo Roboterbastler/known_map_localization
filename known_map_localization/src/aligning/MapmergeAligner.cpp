@@ -139,9 +139,9 @@ HypothesesVect MapmergeAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, 
 }
 
 bool copyOccupancyGridToGridMap(nav_msgs::OccupancyGridConstPtr occGrid, mapmerge::grid_map &gridMap) {
-	assert(occGrid);
-	assert(gridMap.get_cols() >= occGrid->info.width);
-	assert(gridMap.get_rows() >= occGrid->info.height);
+	ROS_ASSERT(occGrid);
+	ROS_ASSERT(gridMap.get_cols() >= occGrid->info.width);
+	ROS_ASSERT(gridMap.get_rows() >= occGrid->info.height);
 
 	if(occGrid->info.width == 0 || occGrid->info.height == 0) {
 		ROS_WARN("Tried to copy map with 0 area.");
