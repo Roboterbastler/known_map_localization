@@ -46,6 +46,27 @@
   
   <build_depend>roslib</build_depend>
   <run_depend>roslib</run_depend>
+
+  <build_depend>cv_bridge</build_depend>
+  <run_depend>cv_bridge</run_depend>
+
+  <build_depend>nav_msgs</build_depend>
+  <run_depend>nav_msgs</run_depend>
+
+  <build_depend>mapstitch</build_depend>
+  <run_depend>mapstitch</run_depend>
+
+  <build_depend>mapmerge</build_depend>
+  <run_depend>mapmerge</run_depend>
+
+  <build_depend>orb_slam</build_depend>
+  <run_depend>orb_slam</run_depend>
+
+  <build_depend>geographic_msgs</build_depend>
+  <run_depend>geographic_msgs</run_depend>
+
+  <build_depend>geodesy</build_depend>
+  <run_depend>geodesy</run_depend>
   
   <build_depend>message_generation</build_depend>
   <run_depend>message_runtime</run_depend>
@@ -53,29 +74,26 @@
   <build_depend>std_msgs</build_depend>
   <run_depend>std_msgs</run_depend>
 
-  <build_depend>cv_bridge</build_depend>
-  <run_depend>cv_bridge</run_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <run_depend>geometry_msgs</run_depend>
+
+  <build_depend>sensor_msgs</build_depend>
+  <run_depend>sensor_msgs</run_depend>
   
   <build_depend>map_server</build_depend>
   <run_depend>map_server</run_depend>
   
-  <build_depend>nav_msgs</build_depend>
-  <run_depend>nav_msgs</run_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <run_depend>visualization_msgs</run_depend>
+
+  <build_depend>cs_merge_msgs</build_depend>
+  <run_depend>cs_merge_msgs</run_depend>
   
-  <build_depend>geographic_msgs</build_depend>
-  <run_depend>geographic_msgs</run_depend>
-  
-  <build_depend>geodesy</build_depend>
-  <run_depend>geodesy</run_depend>
-  
-  <build_depend>mapstitch</build_depend>
-  <run_depend>mapstitch</run_depend>
-  
-  <build_depend>mapmerge</build_depend>
-  <run_depend>mapmerge</run_depend>
-  
-  <build_depend>mrgs_alignment</build_depend>
-  <run_depend>mrgs_alignment</run_depend>
+  <build_depend>cs_merge_methods</build_depend>
+  <run_depend>cs_merge_methods</run_depend>
+
+  <build_depend>boost-dev</build_depend>
+  <run_depend>boost</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
