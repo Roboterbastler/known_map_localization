@@ -40,7 +40,7 @@ HypothesesVect MapstitchAligner::align(nav_msgs::OccupancyGridConstPtr knownMap,
 	}
 
 	if (!stitchedMap->is_valid) {
-		throw AlignerFailed("Aligning failed");
+		throw AlignerFailed("No valid alignment found");
 	}
 
 	StampedAlignment alignment;
@@ -113,8 +113,8 @@ HypothesesVect MapstitchAligner::align(nav_msgs::OccupancyGridConstPtr knownMap,
 
 	ROS_INFO("Successfully completed aligning in %f sec", duration.toSec());
 
-	// No score available, so all are scored 0
-	HypothesesVect hypotheses(1, Hypothesis(alignment));
+	// No score available, so all are scored 1
+	HypothesesVect hypotheses(1, Hypothesis(alignment, 1.0));
 	return hypotheses;
 }
 
