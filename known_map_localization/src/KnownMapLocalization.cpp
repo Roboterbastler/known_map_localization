@@ -14,6 +14,7 @@
 #include <factory/KmlCsMergeIcpSvdFactory.h>
 #include <factory/KmlCsMergeHoughCornerFactory.h>
 #include <factory/KmlCsMergeHoughCcrFactory.h>
+#include <factory/KmlMapstitchFactory.h>
 
 namespace kml {
 
@@ -48,6 +49,8 @@ KmlFactoryConstPtr KnownMapLocalization::selectStrategy() const {
 
 	if(algorithmSpecifier == "mapmerge") {
 		return boost::make_shared<KmlMapmergeFactory>();
+	} if(algorithmSpecifier == "mapstitch") {
+		return boost::make_shared<KmlMapstitchFactory>();
 	} if(algorithmSpecifier == "cs_merge_icp_gradient") {
 		return boost::make_shared<KmlCsMergeIcpGradientFactory>();
 	} if(algorithmSpecifier == "cs_merge_icp_svd") {
@@ -109,7 +112,7 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 	} catch(AlignerInternalError &e) {
 		ROS_WARN_STREAM("Internal aligner error: " << e.what());
 	} catch(AlignerFailed &e) {
-		ROS_DEBUG("Aligning failed.");
+		ROS_WARN("Aligning failed: %s", e.what());
 		return;
 	}
 }

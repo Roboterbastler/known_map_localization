@@ -182,6 +182,7 @@ add_library(known_map_localization
   src/factory/KmlCsMergeIcpSvdFactory.cpp
   src/factory/KmlCsMergeHoughCornerFactory.cpp
   src/factory/KmlCsMergeHoughCcrFactory.cpp
+  src/factory/KmlMapstitchFactory.cpp
   src/Utils.cpp
 )
 
