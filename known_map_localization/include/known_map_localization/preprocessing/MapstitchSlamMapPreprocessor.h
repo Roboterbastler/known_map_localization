@@ -13,6 +13,8 @@
 namespace kml {
 
 class MapstitchSlamMapPreprocessor: public SlamMapPreprocessor {
+public:
+	MapstitchSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer);
 protected:
 	virtual bool processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData);
 };

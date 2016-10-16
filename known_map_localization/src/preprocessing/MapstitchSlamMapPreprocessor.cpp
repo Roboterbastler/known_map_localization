@@ -9,8 +9,27 @@
 
 namespace kml {
 
+MapstitchSlamMapPreprocessor::MapstitchSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer) :
+		SlamMapPreprocessor(pSlamScaleManager, pKnownMapServer) {
+
+}
+
 bool MapstitchSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData) {
-	// TODO
+
+	// get correct SLAM map scale
+	if(!scaleMap(img, mapMetaData)) {
+		return false;
+	}
+
+	// close small holes...
+	morphologicalOpen(img);
+
+	// ... and remove remaining noise
+	morphologicalClose(img);
+
+	// crop to region of interest
+	crop(img, mapMetaData);
+
 	return true;
 }
 

@@ -24,8 +24,8 @@ KnownMapPreprocessorPtr KmlCsMergeHoughCcrFactory::createKnownMapPreprocessor() 
 	return make_shared<EdgeDetectionKnownMapPreprocessor>();
 }
 
-SlamMapPreprocessorPtr KmlCsMergeHoughCcrFactory::createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager) const {
-	return make_shared<MapmergeSlamMapPreprocessor>(pSlamScaleManager);
+SlamMapPreprocessorPtr KmlCsMergeHoughCcrFactory::createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer) const {
+	return make_shared<MapmergeSlamMapPreprocessor>(pSlamScaleManager, pKnownMapServer);
 }
 
 FilterPtr KmlCsMergeHoughCcrFactory::createFilter(GpsManagerConstPtr pGpsManager, KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger) const {

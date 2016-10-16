@@ -24,8 +24,8 @@ KnownMapPreprocessorPtr KmlMapmergeFactory::createKnownMapPreprocessor() const {
 	return make_shared<EdgeDetectionKnownMapPreprocessor>();
 }
 
-SlamMapPreprocessorPtr KmlMapmergeFactory::createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager) const {
-	return make_shared<MapmergeSlamMapPreprocessor>(pSlamScaleManager);
+SlamMapPreprocessorPtr KmlMapmergeFactory::createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer) const {
+	return make_shared<MapmergeSlamMapPreprocessor>(pSlamScaleManager, pKnownMapServer);
 }
 
 FilterPtr KmlMapmergeFactory::createFilter(GpsManagerConstPtr pGpsManager, KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger) const {

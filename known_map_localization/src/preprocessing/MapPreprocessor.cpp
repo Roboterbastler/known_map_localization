@@ -115,4 +115,16 @@ void MapPreprocessor::restoreMap(cv::Mat &img) {
 	cv::threshold(img, img, 254, 0, cv::THRESH_TRUNC);
 }
 
+void MapPreprocessor::morphologicalOpen(cv::Mat &img, unsigned int kernelSize) {
+	// close small holes (morphological open)
+	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2*kernelSize+1, 2*kernelSize+1));
+	cv::morphologyEx(img, img, cv::MORPH_OPEN, kernel);
+}
+
+void MapPreprocessor::morphologicalClose(cv::Mat &img, unsigned int kernelSize) {
+	// remove small particles (morphological close)
+	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2*kernelSize+1, 2*kernelSize+1));
+	cv::morphologyEx(img, img, cv::MORPH_CLOSE, kernel);
+}
+
 } /* namespace kml */

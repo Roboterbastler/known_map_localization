@@ -16,7 +16,7 @@ class KmlCsMergeHoughCcrFactory: public KmlCsMergeFactory {
 public:
 	AlignerPtr createAligner() const;
 	KnownMapPreprocessorPtr createKnownMapPreprocessor() const;
-	SlamMapPreprocessorPtr createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager) const;
+	SlamMapPreprocessorPtr createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer) const;
 	FilterPtr createFilter(GpsManagerConstPtr pGpsManager, KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger = DataLoggerPtr()) const;
 };
 

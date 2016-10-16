@@ -16,26 +16,10 @@ namespace kml {
 
 class MapmergeSlamMapPreprocessor: public SlamMapPreprocessor {
 public:
-	MapmergeSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager);
+	MapmergeSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer);
 
 protected:
 	virtual bool processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData);
-
-private:
-	/**
-	 * Callback function used to receive known map meta data.
-	 * @param knownMap The received known map
-	 */
-	void receiveKnownMap(nav_msgs::OccupancyGridConstPtr knownMap);
-
-	/// The resolution of the known map used to rescale the SLAM map.
-	float mKnownMapResolution_;
-
-	/// Subscribes to the known map topic
-	ros::Subscriber mKnownMapSubscriber_;
-
-private:
-	SlamScaleManagerConstPtr pSlamScaleManager_;
 };
 
 } /* namespace kml */

@@ -8,7 +8,7 @@
 #include <factory/KmlMapstitchFactory.h>
 
 #include <aligning/MapstitchAligner.h>
-#include <preprocessing/MapmergeSlamMapPreprocessor.h>
+#include <preprocessing/MapstitchSlamMapPreprocessor.h>
 #include <filter/GpsFilter.h>
 #include <preprocessing/EdgeDetectionKnownMapPreprocessor.h>
 
@@ -24,8 +24,8 @@ KnownMapPreprocessorPtr KmlMapstitchFactory::createKnownMapPreprocessor() const 
 	return make_shared<EdgeDetectionKnownMapPreprocessor>();
 }
 
-SlamMapPreprocessorPtr KmlMapstitchFactory::createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager) const {
-	return make_shared<MapmergeSlamMapPreprocessor>(pSlamScaleManager);
+SlamMapPreprocessorPtr KmlMapstitchFactory::createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer) const {
+	return make_shared<MapstitchSlamMapPreprocessor>(pSlamScaleManager, pKnownMapServer);
 }
 
 FilterPtr KmlMapstitchFactory::createFilter(GpsManagerConstPtr pGpsManager, KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger) const {

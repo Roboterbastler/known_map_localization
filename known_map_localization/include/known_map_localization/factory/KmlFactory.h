@@ -28,7 +28,7 @@ public:
 
 	virtual AlignerPtr createAligner() const = 0;
 	virtual KnownMapPreprocessorPtr createKnownMapPreprocessor() const = 0;
-	virtual SlamMapPreprocessorPtr createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager) const = 0;
+	virtual SlamMapPreprocessorPtr createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer) const = 0;
 	virtual FilterPtr createFilter(GpsManagerConstPtr pGpsManager, KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger = DataLoggerPtr()) const = 0;
 	virtual BaseLinkPublisherPtr createBaseLinkPublisher(KnownMapServerConstPtr pKnownMapServer, FilterConstPtr pFilter, SlamScaleManagerConstPtr pSlamScaleManager, DataLoggerPtr pDataLogger = DataLoggerPtr()) const;
 	virtual KnownMapServerPtr createKnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) const;

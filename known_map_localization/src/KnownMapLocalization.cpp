@@ -29,7 +29,7 @@ KnownMapLocalization::KnownMapLocalization() : mRate_(2.0), mLastProcessing_(0) 
 	pKnownMapServer_ = factory->createKnownMapServer(pKnownMapPreprocessor_);
 	pGpsManager_ = factory->createGpsManager(pKnownMapServer_);
 	pSlamScaleManager_ = factory->createSlamScaleManager(pGpsManager_, pDataLogger_);
-	pSlamMapPreprocessor_ = factory->createSlamMapPreprocessor(pSlamScaleManager_);
+	pSlamMapPreprocessor_ = factory->createSlamMapPreprocessor(pSlamScaleManager_, pKnownMapServer_);
 	pFilter_ = factory->createFilter(pGpsManager_, pKnownMapServer_, pSlamScaleManager_, pDataLogger_);
 	pBaseLinkPublisher_ = factory->createBaseLinkPublisher(pKnownMapServer_, pFilter_, pSlamScaleManager_, pDataLogger_);
 
