@@ -10,7 +10,7 @@
 #include <aligning/MapstitchAligner.h>
 #include <preprocessing/MapstitchSlamMapPreprocessor.h>
 #include <filter/GpsFilter.h>
-#include <preprocessing/EdgeDetectionKnownMapPreprocessor.h>
+#include <preprocessing/MapstitchKnownMapPreprocessor.h>
 
 namespace kml {
 
@@ -21,7 +21,7 @@ AlignerPtr KmlMapstitchFactory::createAligner() const {
 }
 
 KnownMapPreprocessorPtr KmlMapstitchFactory::createKnownMapPreprocessor() const {
-	return make_shared<EdgeDetectionKnownMapPreprocessor>();
+	return make_shared<MapstitchKnownMapPreprocessor>();
 }
 
 SlamMapPreprocessorPtr KmlMapstitchFactory::createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer) const {

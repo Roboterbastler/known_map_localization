@@ -33,6 +33,9 @@ protected:
 	static void restoreMap(cv::Mat &img);
 	static void morphologicalOpen(cv::Mat &img, unsigned int kernelSize = 1);
 	static void morphologicalClose(cv::Mat &img, unsigned int kernelSize = 1);
+	static void morphologicalSkeleton(cv::Mat &img);
+	static void morphologicalErode(cv::Mat &img, unsigned int kernelSize = 1);
+	static void morphologicalDilate(cv::Mat &img, unsigned int kernelSize = 1);
 
 private:
 	static cv::Mat matFromOccupancyGrid(nav_msgs::OccupancyGridConstPtr map);

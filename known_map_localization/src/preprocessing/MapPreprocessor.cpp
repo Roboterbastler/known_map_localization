@@ -127,4 +127,41 @@ void MapPreprocessor::morphologicalClose(cv::Mat &img, unsigned int kernelSize) 
 	cv::morphologyEx(img, img, cv::MORPH_CLOSE, kernel);
 }
 
+void MapPreprocessor::morphologicalSkeleton(cv::Mat &img) {
+	// algorithm taken from http://felix.abecassis.me/2011/09/opencv-morphological-skeleton/
+
+	// invert
+	cv::threshold(img, img, 0, 255, cv::THRESH_BINARY_INV);
+	cv::Mat skel(img.size(), CV_8UC1, cv::Scalar(0));
+	cv::Mat temp;
+	cv::Mat eroded;
+
+	cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+
+	bool done;
+	do
+	{
+	  cv::erode(img, eroded, element);
+	  cv::dilate(eroded, temp, element); // temp = open(img)
+	  cv::subtract(img, temp, temp);
+	  cv::bitwise_or(skel, temp, skel);
+	  eroded.copyTo(img);
+
+	  done = (cv::countNonZero(img) == 0);
+	} while (!done);
+
+	// invert
+	img = cv::Scalar::all(255) - skel;
+}
+
+void MapPreprocessor::morphologicalErode(cv::Mat &img, unsigned int kernelSize) {
+	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2*kernelSize+1, 2*kernelSize+1));
+	cv::morphologyEx(img, img, cv::MORPH_ERODE, kernel);
+}
+
+void MapPreprocessor::morphologicalDilate(cv::Mat &img, unsigned int kernelSize) {
+	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2*kernelSize+1, 2*kernelSize+1));
+	cv::morphologyEx(img, img, cv::MORPH_DILATE, kernel);
+}
+
 } /* namespace kml */

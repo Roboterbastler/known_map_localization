@@ -4,7 +4,7 @@
 		<node pkg="known_map_localization" type="known_map_localization_node" name="localization_node" output="screen" required="true">
 			<remap from="localization_node/slam_map" to="/orb_slam/projected_map" />
 			<remap from="/gps_fix" to="/robot/gps" />
-			<rosparam command="load" file="$(find known_map_localization)/launch/cs_merge_hough_corner.yaml" />
+			<rosparam command="load" file="$(find known_map_localization)/launch/mapstitch.yaml" />
 		</node>
 		
 		<!-- The cs_merge aligning nodes -->

@@ -10,7 +10,9 @@
 namespace kml {
 
 bool MapstitchKnownMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaData &mapMetaData) {
-	// TODO
+
+	morphologicalErode(img, 2);
+
 	return true;
 }
 
