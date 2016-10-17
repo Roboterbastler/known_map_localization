@@ -33,4 +33,8 @@ SlamScaleManagerPtr KmlFactory::createSlamScaleManager(GpsManagerConstPtr pGpsMa
 	return SlamScaleManagerPtr(new SlamScaleManager(pGpsManager, pDataLogger));
 }
 
+StatusPublisherPtr KmlFactory::createStatusPublisher(float rate) const {
+	return boost::make_shared<StatusPublisher>(rate);
+}
+
 } /* namespace kml */

@@ -23,6 +23,7 @@ KnownMapLocalization::KnownMapLocalization() : mRate_(2.0), mLastProcessing_(0) 
 	KmlFactoryConstPtr factory = selectStrategy();
 
 	// let the factory do it's work...
+	pStatusPublisher_ = factory->createStatusPublisher();
 	pDataLogger_ = factory->createDataLogger();
 	pKnownMapPreprocessor_ = factory->createKnownMapPreprocessor();
 	pAligner_ = factory->createAligner();
@@ -37,6 +38,9 @@ KnownMapLocalization::KnownMapLocalization() : mRate_(2.0), mLastProcessing_(0) 
 	ros::NodeHandle nh("~");
 	mSlamMapSubscriber_ = nh.subscribe("slam_map", 1, &KnownMapLocalization::receiveSlamMap, this);
 	mSlamMapPublisher_ = nh.advertise<nav_msgs::OccupancyGrid>("visualization_slam_map", 10);
+
+	// initialization done
+	pStatusPublisher_->setStatus(STATUS_NO_POS);
 }
 
 KmlFactoryConstPtr KnownMapLocalization::selectStrategy() const {

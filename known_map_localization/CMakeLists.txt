@@ -68,7 +68,7 @@ endif(YAMLCPP_FOUND)
 add_message_files(
   FILES
     PoseError.msg
-#   Message2.msg
+    Status.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -184,6 +184,7 @@ add_library(known_map_localization
   src/factory/KmlCsMergeHoughCcrFactory.cpp
   src/factory/KmlMapstitchFactory.cpp
   src/Utils.cpp
+  src/StatusPublisher.cpp
 )
 
 ## Add cmake target dependencies of the library

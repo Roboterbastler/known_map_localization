@@ -66,6 +66,7 @@ private:
 	SlamScaleManagerPtr pSlamScaleManager_;
 	FilterPtr pFilter_;
 	BaseLinkPublisherConstPtr pBaseLinkPublisher_;
+	StatusPublisherPtr pStatusPublisher_;
 };
 
 } /* namespace kml */

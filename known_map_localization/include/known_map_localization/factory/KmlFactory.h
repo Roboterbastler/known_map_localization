@@ -19,6 +19,7 @@
 #include <logging/DataLogger.h>
 #include <gps/GpsManager.h>
 #include <SlamScaleManager.h>
+#include <StatusPublisher.h>
 
 namespace kml {
 
@@ -35,6 +36,7 @@ public:
 	virtual DataLoggerPtr createDataLogger() const;
 	virtual GpsManagerPtr createGpsManager(KnownMapServerConstPtr pKnownMapServer) const;
 	virtual SlamScaleManagerPtr createSlamScaleManager(GpsManagerConstPtr pGpsManager, DataLoggerPtr pDataLogger = DataLoggerPtr()) const;
+	virtual StatusPublisherPtr createStatusPublisher(float rate = 10) const;
 };
 
 typedef boost::shared_ptr<KmlFactory const> KmlFactoryConstPtr;
