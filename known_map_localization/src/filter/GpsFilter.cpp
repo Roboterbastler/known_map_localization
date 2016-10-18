@@ -62,8 +62,8 @@ void GpsFilter::addHypotheses(const HypothesesVect &hypotheses) {
 
 		GpsScoredHypothesis scoredHypothesis(*h);
 
-		// compute a score
-		scoringFunction(scoredHypothesis, hypothesisConstraints);
+		// try to validate hypothesis by checking GPS hints
+		validateHypothesis(scoredHypothesis, hypothesisConstraints);
 
 		ROS_DEBUG("      -> Hypothesis has score: %f", scoredHypothesis.score);
 
@@ -74,6 +74,12 @@ void GpsFilter::addHypotheses(const HypothesesVect &hypotheses) {
 				mFilteredGpsHypothesis_ = scoredHypothesis;
 				filteredHypothesisModified = true;
 				mReady_ = true;
+
+				if(mFilteredGpsHypothesis_.gpsSupported) {
+					pStatusPublisher_->setStatus(STATUS_VALIDATED_POS, mFilteredGpsHypothesis_.supportingHints);
+				} else {
+					pStatusPublisher_->setStatus(STATUS_POS);
+				}
 
 				mConstraintsMarker_ = hypothesisConstraints;
 				ROS_DEBUG("        -> New best alignment.");
@@ -116,7 +122,7 @@ geometry_msgs::Pose GpsFilter::estimatedRobotPose(const Alignment &alignment,
 	return poseMsg;
 }
 
-void GpsFilter::scoringFunction(GpsScoredHypothesis &h,
+void GpsFilter::validateHypothesis(GpsScoredHypothesis &h,
 		visualization_msgs::Marker &constraints) const {
 	try {
 		const GpsHintVect &gpsHints = pGpsManager_->getGpsHints();
@@ -131,6 +137,12 @@ void GpsFilter::scoringFunction(GpsScoredHypothesis &h,
 
 			h.score = confirmation * h.score;
 			h.gpsSupported |= supportingConstraint;
+
+			if(supportingConstraint) {
+				h.supportingHints++;
+			} else {
+				h.challengingHints++;
+			}
 
 			addConstraintMarker(*hint, constraints, supportingConstraint);
 

@@ -62,7 +62,7 @@ private:
 	 * @param h The hypothesis
 	 * @param constraints The marker message to add visualization info to
 	 */
-	void scoringFunction(GpsScoredHypothesis &h, visualization_msgs::Marker &constraints) const;
+	void validateHypothesis(GpsScoredHypothesis &h, visualization_msgs::Marker &constraints) const;
 
 	/**
 	 * Sets up a marker for the GPS constraints.

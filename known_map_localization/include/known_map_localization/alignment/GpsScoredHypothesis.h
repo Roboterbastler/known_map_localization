@@ -28,6 +28,12 @@ public:
 
 	/// This flag indicates if this hypothesis is supported by at least one GPS constraint
 	bool gpsSupported;
+
+	/// Number of GPS hints that support this hypothesis
+	unsigned int supportingHints;
+
+	/// Number of GPS hints that challenge this hypothesis
+	unsigned int challengingHints;
 };
 
 } /* namespace kml */

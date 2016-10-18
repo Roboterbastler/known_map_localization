@@ -42,6 +42,7 @@ void DecayFilter::addHypotheses(const HypothesesVect &hypotheses) {
 		mFilteredAlignment_ = betterHypothesis;
 		mScore_ = betterHypothesis.score;
 		mReady_ = true;
+		pStatusPublisher_->setStatus(STATUS_POS);
 		pSlamScaleManager_->updateSlamScale(mFilteredAlignment_.scale);
 
 		logAlignment(mFilteredAlignment_);

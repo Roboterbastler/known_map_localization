@@ -9,10 +9,13 @@
 
 namespace kml {
 
-GpsScoredHypothesis::GpsScoredHypothesis() : gpsSupported(false) {
+GpsScoredHypothesis::GpsScoredHypothesis() :
+		gpsSupported(false), supportingHints(0), challengingHints(0) {
 }
 
-GpsScoredHypothesis::GpsScoredHypothesis(const Hypothesis &h) : Hypothesis(h), gpsSupported(false) {
+GpsScoredHypothesis::GpsScoredHypothesis(const Hypothesis &h) :
+		Hypothesis(h), gpsSupported(false),
+		supportingHints(0), challengingHints(0) {
 
 }
 
