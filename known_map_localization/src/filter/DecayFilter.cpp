@@ -14,8 +14,9 @@
 namespace kml {
 
 DecayFilter::DecayFilter(SlamScaleManagerPtr pSlamScaleManager,
+		StatusPublisherPtr pStatusPublisher,
 		DataLoggerPtr pDataLogger) :
-		Filter(pSlamScaleManager, pDataLogger), mScore_(0) {
+		Filter(pSlamScaleManager, pStatusPublisher, pDataLogger), mScore_(0) {
 	ros::NodeHandle nh("~");
 
 	// default: decay disabled

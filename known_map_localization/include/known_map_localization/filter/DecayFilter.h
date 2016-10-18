@@ -22,7 +22,7 @@ namespace kml {
  */
 class DecayFilter: public Filter {
 public:
-	DecayFilter(SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger = DataLoggerPtr());
+	DecayFilter(SlamScaleManagerPtr pSlamScaleManager, StatusPublisherPtr pStatusPublisher, DataLoggerPtr pDataLogger = DataLoggerPtr());
 
 	/**
 	 * Update the filtered hypothesis.

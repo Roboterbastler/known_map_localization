@@ -10,8 +10,9 @@
 namespace kml {
 
 PassThroughFilter::PassThroughFilter(SlamScaleManagerPtr pSlamScaleManager,
+		StatusPublisherPtr pStatusPublisher,
 		DataLoggerPtr pDataLogger) :
-		Filter(pSlamScaleManager, pDataLogger) {
+		Filter(pSlamScaleManager, pStatusPublisher, pDataLogger) {
 	ROS_INFO("    Type: Pass through filter");
 }
 

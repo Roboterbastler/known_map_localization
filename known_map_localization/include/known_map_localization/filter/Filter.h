@@ -11,6 +11,7 @@
 #include <alignment/Hypothesis.h>
 #include <SlamScaleManager.h>
 #include <logging/DataLogger.h>
+#include <StatusPublisher.h>
 
 namespace kml {
 
@@ -21,7 +22,7 @@ namespace kml {
  */
 class Filter {
 public:
-	Filter(SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger = DataLoggerPtr());
+	Filter(SlamScaleManagerPtr pSlamScaleManager, StatusPublisherPtr pStatusPublisher, DataLoggerPtr pDataLogger = DataLoggerPtr());
 
 	virtual ~Filter();
 
@@ -61,6 +62,7 @@ protected:
 
 protected:
 	SlamScaleManagerPtr pSlamScaleManager_;
+	StatusPublisherPtr pStatusPublisher_;
 
 private:
 	DataLoggerPtr pDataLogger_;

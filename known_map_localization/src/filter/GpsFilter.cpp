@@ -16,8 +16,9 @@ namespace kml {
 
 GpsFilter::GpsFilter(GpsManagerConstPtr pGpsManager,
 		KnownMapServerConstPtr pKnownMapServer,
-		SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger) :
-		Filter(pSlamScaleManager, pDataLogger), pGpsManager_(pGpsManager), pKnownMapServer_(
+		SlamScaleManagerPtr pSlamScaleManager,
+		StatusPublisherPtr pStatusPublisher, DataLoggerPtr pDataLogger) :
+		Filter(pSlamScaleManager, pStatusPublisher, pDataLogger), pGpsManager_(pGpsManager), pKnownMapServer_(
 				pKnownMapServer) {
 	ROS_ASSERT(pGpsManager_);
 	ROS_ASSERT(pKnownMapServer_);

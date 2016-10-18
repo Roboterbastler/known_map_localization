@@ -11,8 +11,8 @@
 
 namespace kml {
 
-Filter::Filter(SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger) :
-		mReady_(false), pSlamScaleManager_(pSlamScaleManager), pDataLogger_(
+Filter::Filter(SlamScaleManagerPtr pSlamScaleManager, StatusPublisherPtr pStatusPublisher, DataLoggerPtr pDataLogger) :
+		mReady_(false), pSlamScaleManager_(pSlamScaleManager), pStatusPublisher_(pStatusPublisher), pDataLogger_(
 				pDataLogger) {
 	ROS_ASSERT(pSlamScaleManager_);
 

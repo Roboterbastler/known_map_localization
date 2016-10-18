@@ -30,7 +30,8 @@ class GpsFilter : public Filter {
 public:
 	GpsFilter(GpsManagerConstPtr pGpsManager,
 			KnownMapServerConstPtr pKnownMapServer,
-			SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger =
+			SlamScaleManagerPtr pSlamScaleManager,
+			StatusPublisherPtr pStatusPublisher, DataLoggerPtr pDataLogger =
 					DataLoggerPtr());
 
 	/**

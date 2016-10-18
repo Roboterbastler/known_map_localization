@@ -27,8 +27,4 @@ SlamMapPreprocessorPtr KmlCsMergeHoughCornerFactory::createSlamMapPreprocessor(S
 	return make_shared<MapmergeSlamMapPreprocessor>(pSlamScaleManager, pKnownMapServer);
 }
 
-FilterPtr KmlCsMergeHoughCornerFactory::createFilter(GpsManagerConstPtr pGpsManager, KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger) const {
-	return make_shared<GpsFilter>(pGpsManager, pKnownMapServer, pSlamScaleManager, pDataLogger);
-}
-
 } /* namespace kml */

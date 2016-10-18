@@ -28,8 +28,4 @@ SlamMapPreprocessorPtr KmlMapmergeFactory::createSlamMapPreprocessor(SlamScaleMa
 	return make_shared<MapmergeSlamMapPreprocessor>(pSlamScaleManager, pKnownMapServer);
 }
 
-FilterPtr KmlMapmergeFactory::createFilter(GpsManagerConstPtr pGpsManager, KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger) const {
-	return make_shared<GpsFilter>(pGpsManager, pKnownMapServer, pSlamScaleManager, pDataLogger);
-}
-
 } /* namespace kml */

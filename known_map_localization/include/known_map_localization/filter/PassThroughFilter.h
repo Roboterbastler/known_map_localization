@@ -20,7 +20,7 @@ namespace kml {
  */
 class PassThroughFilter: public Filter {
 public:
-	PassThroughFilter(SlamScaleManagerPtr pSlamScaleManager, DataLoggerPtr pDataLogger = DataLoggerPtr());
+	PassThroughFilter(SlamScaleManagerPtr pSlamScaleManager, StatusPublisherPtr pStatusPublisher, DataLoggerPtr pDataLogger = DataLoggerPtr());
 
 	/**
 	 * Update the filtered alignment by simply overwriting it with the first new hypothesis.
