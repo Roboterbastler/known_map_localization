@@ -36,7 +36,7 @@ public:
 	virtual DataLoggerPtr createDataLogger() const;
 	virtual GpsManagerPtr createGpsManager(KnownMapServerConstPtr pKnownMapServer) const;
 	virtual SlamScaleManagerPtr createSlamScaleManager(GpsManagerConstPtr pGpsManager, DataLoggerPtr pDataLogger = DataLoggerPtr()) const;
-	virtual StatusPublisherPtr createStatusPublisher(float rate = 10) const;
+	virtual StatusPublisherPtr createStatusPublisher(DataLoggerPtr pDataLogger, float rate = 10) const;
 };
 
 typedef boost::shared_ptr<KmlFactory const> KmlFactoryConstPtr;

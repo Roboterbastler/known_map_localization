@@ -37,12 +37,14 @@ DataLogger::DataLogger() :
 	string errorsFileName = getLogFilePath("errors");
 	string scalesFileName = getLogFilePath("scales");
 	string filterFileName = getLogFilePath("filter");
+	string statusFileName = getLogFilePath("status");
 
 	mAlignmentsFile_.open(alignmentsFileName.c_str());
 	mComputationsFile_.open(computationsFileName.c_str());
 	mErrorsFile_.open(errorsFileName.c_str());
 	mScalesFile_.open(scalesFileName.c_str());
 	mFilterFile_.open(filterFileName.c_str());
+	mStatusFile_.open(statusFileName.c_str());
 
 	int precision = std::numeric_limits<double>::digits10 + 2;
 	mAlignmentsFile_.precision(precision);
@@ -50,6 +52,7 @@ DataLogger::DataLogger() :
 	mErrorsFile_.precision(precision);
 	mScalesFile_.precision(precision);
 	mFilterFile_.precision(precision);
+	mStatusFile_.precision(precision);
 
 	ROS_INFO("    Opened files for logging.");
 
@@ -64,12 +67,14 @@ DataLogger::~DataLogger() {
 	mErrorsFile_.flush();
 	mScalesFile_.flush();
 	mFilterFile_.flush();
+	mStatusFile_.flush();
 
 	mAlignmentsFile_.close();
 	mComputationsFile_.close();
 	mErrorsFile_.close();
 	mScalesFile_.close();
 	mFilterFile_.close();
+	mStatusFile_.close();
 }
 
 void DataLogger::logComputation(const HypothesesVect &hypotheses,
@@ -126,12 +131,22 @@ void DataLogger::logFilter(const Alignment &filteredAlignment) {
 			<< filteredAlignment.scale << endl;
 }
 
+void DataLogger::logStatus(const known_map_localization::Status &status) {
+	if (!mEnabled_)
+		return;
+
+	mStatusFile_ << ros::WallTime::now().toSec() << '\t'
+			<< status.status << '\t'
+			<< status.n_supporting_positions << endl;
+}
+
 void DataLogger::writeHeader() {
 	writeAlignmentsHeader();
 	writeComputationsHeader();
 	writeErrorsHeader();
 	writeScalesHeader();
 	writeFilterHeader();
+	writeStatusHeader();
 }
 
 void DataLogger::writeAlignmentsHeader() {
@@ -175,6 +190,14 @@ void DataLogger::writeFilterHeader() {
 	attributeNames << "Time\t" << "X\t" << "Y\t" << "Rotation\t" << "Scale";
 
 	mFilterFile_ << attributeNames.str() << endl;
+}
+
+void DataLogger::writeStatusHeader() {
+	stringstream attributeNames;
+
+	attributeNames << "Time\t" << "Status\t" << "Supporting GPS hints";
+
+	mStatusFile_ << attributeNames.str() << endl;
 }
 
 std::string DataLogger::getLogFilePath(string name) {

@@ -14,6 +14,7 @@
 #include <ros/wall_timer.h>
 
 #include <known_map_localization/Status.h>
+#include <logging/DataLogger.h>
 
 namespace kml {
 
@@ -26,7 +27,7 @@ typedef enum {
 
 class StatusPublisher {
 public:
-	StatusPublisher(float rate = 10);
+	StatusPublisher(DataLoggerPtr pDataLogger, float rate = 10);
 
 	void setStatus(Status s, unsigned int nSupportingGpsPos = 0);
 	Status getStatus() const;
@@ -40,6 +41,9 @@ private:
 	ros::WallTimer mTimer_;
 	Status mStatus_;
 	unsigned int mNSupportingGpsPos_;
+
+private:
+	DataLoggerPtr pDataLogger_;
 };
 
 typedef boost::shared_ptr<StatusPublisher> StatusPublisherPtr;

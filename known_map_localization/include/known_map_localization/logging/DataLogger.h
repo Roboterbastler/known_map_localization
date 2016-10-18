@@ -16,6 +16,7 @@
 
 #include <alignment/Hypothesis.h>
 #include <known_map_localization/PoseError.h>
+#include <known_map_localization/Status.h>
 
 namespace kml {
 
@@ -43,6 +44,8 @@ public:
 	void logScale(float scale, int mode);
 
 	void logFilter(const Alignment &filteredAlignment);
+
+	void logStatus(const known_map_localization::Status &status);
 
 protected:
 
@@ -83,6 +86,11 @@ protected:
 	 */
 	void writeFilterHeader();
 
+	/**
+	 * Write the table header for the status table
+	 */
+	void writeStatusHeader();
+
 private:
 	/// Log file streams
 	std::ofstream mAlignmentsFile_;
@@ -90,6 +98,7 @@ private:
 	std::ofstream mErrorsFile_;
 	std::ofstream mScalesFile_;
 	std::ofstream mFilterFile_;
+	std::ofstream mStatusFile_;
 
 	/// ID of computations
 	unsigned long mComputationId_;

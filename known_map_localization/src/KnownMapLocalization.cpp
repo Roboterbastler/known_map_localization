@@ -23,8 +23,8 @@ KnownMapLocalization::KnownMapLocalization() : mRate_(2.0), mLastProcessing_(0) 
 	KmlFactoryConstPtr factory = selectStrategy();
 
 	// let the factory do it's work...
-	pStatusPublisher_ = factory->createStatusPublisher();
 	pDataLogger_ = factory->createDataLogger();
+	pStatusPublisher_ = factory->createStatusPublisher(pDataLogger_);
 	pKnownMapPreprocessor_ = factory->createKnownMapPreprocessor();
 	pAligner_ = factory->createAligner();
 	pKnownMapServer_ = factory->createKnownMapServer(pKnownMapPreprocessor_);

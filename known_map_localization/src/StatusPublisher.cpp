@@ -9,8 +9,10 @@
 
 namespace kml {
 
-StatusPublisher::StatusPublisher(float rate) :
-		mStatus_(STATUS_INIT), mNSupportingGpsPos_(0) {
+StatusPublisher::StatusPublisher(DataLoggerPtr pDataLogger, float rate) :
+		mStatus_(STATUS_INIT), mNSupportingGpsPos_(0), pDataLogger_(pDataLogger) {
+	ROS_ASSERT(pDataLogger_);
+
 	ros::NodeHandle nh("~");
 	mStatusPublisher_ = nh.advertise<known_map_localization::Status>("status", 1);
 	mTimer_ = nh.createWallTimer(ros::WallDuration(1. / rate), &StatusPublisher::tick, this);
@@ -37,6 +39,7 @@ void StatusPublisher::publishStatus() const {
 	status.n_supporting_positions = mNSupportingGpsPos_;
 
 	mStatusPublisher_.publish(status);
+	pDataLogger_->logStatus(status);
 }
 
 } /* namespace kml */
