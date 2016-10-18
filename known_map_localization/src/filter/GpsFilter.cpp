@@ -10,8 +10,6 @@
 #include <Exception.h>
 #include <Utils.h>
 
-#define MAX_HINT_CACHE_SIZE 10
-
 namespace kml {
 
 GpsFilter::GpsFilter(GpsManagerConstPtr pGpsManager,

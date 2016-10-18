@@ -13,8 +13,8 @@
 
 #include <Exception.h>
 
-#define MAX_KEYPOINT_SIZE 10
-#define MAX_QUEUE_SIZE 10
+#define MAX_HINT_VECTOR_SIZE 100
+#define MAX_FIX_QUEUE_SIZE 10
 
 namespace kml {
 
@@ -54,7 +54,7 @@ void GpsManager::receiveGpsFix(const sensor_msgs::NavSatFix &fix) {
 		mPositions_.push_back(position);
 
 		// remove front if queue too full
-		if (mPositions_.size() > MAX_QUEUE_SIZE) {
+		if (mPositions_.size() > MAX_FIX_QUEUE_SIZE) {
 			mPositions_.erase(mPositions_.begin());
 		}
 
@@ -98,7 +98,7 @@ void GpsManager::updateGpsHints(const ros::WallTimerEvent& event) {
 	}
 
 	// remove front if queue too full
-	while (mHints_.size() > MAX_KEYPOINT_SIZE) {
+	while (mHints_.size() > MAX_HINT_VECTOR_SIZE) {
 		mHints_.erase(mHints_.begin());
 		modified = true;
 	}
