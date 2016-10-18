@@ -23,8 +23,6 @@ DataLogger::DataLogger() :
 		mComputationId_(0) {
 	ROS_INFO("Data logger initialization...");
 
-	mReferenceTime_ = ros::WallTime::now();
-
 	ros::NodeHandle nh("~");
 
 	mEnabled_ = nh.param("logging_enabled", true);
@@ -80,9 +78,7 @@ void DataLogger::logComputation(const HypothesesVect &hypotheses,
 	if (!mEnabled_)
 		return;
 
-	ros::WallDuration time = ros::WallTime::now() - mReferenceTime_;
-
-	mComputationsFile_ << time.toSec() << '\t' << mComputationId_ << '\t'
+	mComputationsFile_ << ros::WallTime::now().toSec() << '\t' << mComputationId_ << '\t'
 			<< duration.toSec() << '\t' << hypotheses.size() << '\t'
 			<< slamMap.height * slamMap.width << '\t'
 			<< knownMap.height * knownMap.width << endl;
@@ -118,16 +114,14 @@ void DataLogger::logScale(float scale, int mode) {
 	if (!mEnabled_)
 		return;
 
-	ros::WallDuration time = ros::WallTime::now() - mReferenceTime_;
-	mScalesFile_ << time.toSec() << '\t' << scale << '\t' << mode << endl;
+	mScalesFile_ << ros::WallTime::now().toSec() << '\t' << scale << '\t' << mode << endl;
 }
 
 void DataLogger::logFilter(const Alignment &filteredAlignment) {
 	if (!mEnabled_)
 		return;
 
-	ros::WallDuration time = ros::WallTime::now() - mReferenceTime_;
-	mFilterFile_ << time.toSec() << '\t' << filteredAlignment.x << '\t'
+	mFilterFile_ << ros::WallTime::now().toSec() << '\t' << filteredAlignment.x << '\t'
 			<< filteredAlignment.y << '\t' << filteredAlignment.theta << '\t'
 			<< filteredAlignment.scale << endl;
 }

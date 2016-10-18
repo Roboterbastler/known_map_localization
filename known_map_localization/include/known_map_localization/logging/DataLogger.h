@@ -96,9 +96,6 @@ private:
 
 	/// flag indicating if logging is enabled/disabled
 	bool mEnabled_;
-
-	/// Initialization time used as a reference for logged events
-	ros::WallTime mReferenceTime_;
 };
 
 typedef boost::shared_ptr<DataLogger> DataLoggerPtr;
