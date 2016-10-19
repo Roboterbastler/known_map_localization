@@ -21,8 +21,12 @@ FilterPtr KmlFactory::createFilter(GpsManagerConstPtr pGpsManager, KnownMapServe
 	return make_shared<GpsFilter>(pGpsManager, pKnownMapServer, pSlamScaleManager, pStatusPublisher, pDataLogger);
 }
 
-BaseLinkPublisherPtr KmlFactory::createBaseLinkPublisher(KnownMapServerConstPtr pKnownMapServer, FilterConstPtr pFilter, SlamScaleManagerConstPtr pSlamScaleManager, DataLoggerPtr pDataLogger) const {
-	return make_shared<BaseLinkPublisher>(pKnownMapServer, pFilter, pSlamScaleManager, pDataLogger);
+LocalizationPtr KmlFactory::createLocalization(FilterConstPtr pFilter, SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer) const {
+	return make_shared<Localization>(pFilter, pSlamScaleManager, pKnownMapServer);
+}
+
+PoseErrorPublisherPtr KmlFactory::createPoseErrorPublisher(DataLoggerPtr pDataLogger) const {
+	return make_shared<PoseErrorPublisher>(pDataLogger);
 }
 
 KnownMapServerPtr KmlFactory::createKnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) const {

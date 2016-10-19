@@ -2,7 +2,6 @@ algorithm: cs_merge_hough_corner
 slam_preprocessing_enabled: true
 known_preprocessing_enabled: true
 known_map_config_file: data/known_map_slam.yaml
-known_map_frame_id: /known_map_localization/anchor
 
 # SLAM map unit size [meters]
 slam_scale_mode: parameter #[parameter/alignment/gps]

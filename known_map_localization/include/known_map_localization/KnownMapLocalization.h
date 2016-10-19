@@ -65,7 +65,8 @@ private:
 	GpsManagerConstPtr pGpsManager_;
 	SlamScaleManagerPtr pSlamScaleManager_;
 	FilterPtr pFilter_;
-	BaseLinkPublisherConstPtr pBaseLinkPublisher_;
+	LocalizationPtr pLocalization_;
+	PoseErrorPublisherConstPtr pPoseErrorPublisher_;
 	StatusPublisherPtr pStatusPublisher_;
 };
 

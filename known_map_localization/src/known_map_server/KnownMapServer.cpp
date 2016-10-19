@@ -104,7 +104,7 @@ bool KnownMapServer::loadKnownMap(std::string fileName) {
 	}
 
 	*mKnownMap_ = mapResp.map;
-	ros::NodeHandle("~").getParam("known_map_frame_id", mKnownMap_->header.frame_id);
+	mKnownMap_->header.frame_id = "anchor";
 	mKnownMap_->info.origin.orientation = tf::createQuaternionMsgFromYaw(yaw);
 
 	return true;

@@ -2,7 +2,6 @@ algorithm: mapstitch
 slam_preprocessing_enabled: true
 known_preprocessing_enabled: true
 known_map_config_file: data/known_maps/simple_indoor/simple_indoor.yaml
-known_map_frame_id: /known_map_localization/anchor
 
 # SLAM map unit size [meters]
 slam_scale_mode: gps #[parameter/alignment/gps]

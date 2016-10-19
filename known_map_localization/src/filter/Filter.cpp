@@ -17,6 +17,13 @@ Filter::Filter(SlamScaleManagerPtr pSlamScaleManager, StatusPublisherPtr pStatus
 	ROS_ASSERT(pSlamScaleManager_);
 
 	ROS_INFO("Filter initialization...");
+
+	ros::NodeHandle nh("~");
+
+	unsigned int updateRate = nh.param("map_transform_rate", 10);
+	mTimer_ = nh.createWallTimer(ros::WallDuration(1. / updateRate), &Filter::tick, this);
+
+	ROS_INFO("    Map transform rate: %d", updateRate);
 }
 
 Filter::~Filter() {
@@ -37,6 +44,17 @@ void Filter::logAlignment(const Alignment &alignment) {
 	if (pDataLogger_) {
 		pDataLogger_->logFilter(alignment);
 	}
+}
+
+void Filter::updateMapTransform() {
+	if(mReady_) {
+		// publish map transform
+		mBroadcaster_.sendTransform(StampedAlignment(mFilteredAlignment_).toTfStampedTransform());
+	}
+}
+
+void Filter::tick(const ros::WallTimerEvent& event) {
+	updateMapTransform();
 }
 
 } /* namespace kml */

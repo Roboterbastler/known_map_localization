@@ -2,7 +2,6 @@ algorithm: cs_merge_icp_gradient
 slam_preprocessing_enabled: true
 known_preprocessing_enabled: true
 known_map_config_file: data/campus.yaml
-known_map_frame_id: /known_map_localization/anchor
 
 # SLAM map unit size [meters]
 slam_scale_mode: gps #[parameter/alignment/gps]

@@ -8,6 +8,9 @@
 #ifndef KNOWN_MAP_LOCALIZATION_INCLUDE_FILTER_FILTER_H_
 #define KNOWN_MAP_LOCALIZATION_INCLUDE_FILTER_FILTER_H_
 
+#include <ros/wall_timer.h>
+#include <tf/transform_broadcaster.h>
+
 #include <alignment/Hypothesis.h>
 #include <SlamScaleManager.h>
 #include <logging/DataLogger.h>
@@ -19,6 +22,12 @@ namespace kml {
  * # Filter
  * Base class for filter implementations, which choose from the given hypotheses
  * following specific strategies.
+ *
+ * ## Parameters
+ * - **map_transform_rate**: Rate for publishing the map transform (updates per second). Defaults to 10.
+ *
+ * ## Published Topics
+ * - **tf**: Map transformation between map frames
  */
 class Filter {
 public:
@@ -53,12 +62,27 @@ protected:
 	 */
 	void logAlignment(const Alignment &alignment);
 
+	/**
+	 * Updates the tf transform from the SLAM map frame to the known map frame using current alignment.
+	 */
+	void updateMapTransform();
+
+private:
+	void tick(const ros::WallTimerEvent& event);
+
 protected:
 	/// the current filtered alignment
 	Alignment mFilteredAlignment_;
 
 	/// flag indicating if filtered alignment is available
 	bool mReady_;
+
+private:
+	/// Used to regularly update map transformation
+	ros::WallTimer mTimer_;
+
+	/// Broadcaster for tf transforms
+	tf::TransformBroadcaster mBroadcaster_;
 
 protected:
 	SlamScaleManagerPtr pSlamScaleManager_;

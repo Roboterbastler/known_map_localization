@@ -14,7 +14,8 @@
 #include <preprocessing/KnownMapPreprocessor.h>
 #include <preprocessing/SlamMapPreprocessor.h>
 #include <filter/Filter.h>
-#include <base_link/BaseLinkPublisher.h>
+#include <localization/Localization.h>
+#include <localization/PoseErrorPublisher.h>
 #include <known_map_server/KnownMapServer.h>
 #include <logging/DataLogger.h>
 #include <gps/GpsManager.h>
@@ -31,7 +32,8 @@ public:
 	virtual KnownMapPreprocessorPtr createKnownMapPreprocessor() const = 0;
 	virtual SlamMapPreprocessorPtr createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer) const = 0;
 	virtual FilterPtr createFilter(GpsManagerConstPtr pGpsManager, KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerPtr pSlamScaleManager, StatusPublisherPtr pStatusPublisher, DataLoggerPtr pDataLogger = DataLoggerPtr()) const;
-	virtual BaseLinkPublisherPtr createBaseLinkPublisher(KnownMapServerConstPtr pKnownMapServer, FilterConstPtr pFilter, SlamScaleManagerConstPtr pSlamScaleManager, DataLoggerPtr pDataLogger = DataLoggerPtr()) const;
+	virtual LocalizationPtr createLocalization(FilterConstPtr pFilter, SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer) const;
+	virtual PoseErrorPublisherPtr createPoseErrorPublisher(DataLoggerPtr pDataLogger) const;
 	virtual KnownMapServerPtr createKnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) const;
 	virtual DataLoggerPtr createDataLogger() const;
 	virtual GpsManagerPtr createGpsManager(KnownMapServerConstPtr pKnownMapServer) const;

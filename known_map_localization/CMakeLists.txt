@@ -69,6 +69,7 @@ add_message_files(
   FILES
     PoseError.msg
     Status.msg
+    GeoPoseStamped.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -89,6 +90,7 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
     std_msgs  # Or other packages containing msgs
+    geographic_msgs
 )
 
 ################################################
@@ -123,7 +125,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES known_map_localization
-  CATKIN_DEPENDS roscpp std_msgs message_runtime
+  CATKIN_DEPENDS roscpp std_msgs message_runtime geographic_msgs
 #  DEPENDS system_lib
 )
 
@@ -172,7 +174,6 @@ add_library(known_map_localization
   src/filter/PassThroughFilter.cpp
   src/filter/DecayFilter.cpp
   src/filter/GpsFilter.cpp
-  src/base_link/BaseLinkPublisher.cpp
   src/logging/DataLogger.cpp
   src/SlamScaleManager.cpp
   src/GpsManager.cpp
@@ -185,6 +186,8 @@ add_library(known_map_localization
   src/factory/KmlMapstitchFactory.cpp
   src/Utils.cpp
   src/StatusPublisher.cpp
+  src/localization/Localization.cpp
+  src/localization/PoseErrorPublisher.cpp
 )
 
 ## Add cmake target dependencies of the library

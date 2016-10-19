@@ -30,7 +30,6 @@ namespace kml {
  * ## Parameters
  * - **known_map_config_file**: The file name of the YAML configuration
  * file specifying the known map
- * - **known_map_frame_id**: The frame ID of the published known map
  */
 class KnownMapServer {
 public:

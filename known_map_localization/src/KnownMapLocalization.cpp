@@ -32,7 +32,8 @@ KnownMapLocalization::KnownMapLocalization() : mRate_(2.0), mLastProcessing_(0) 
 	pSlamScaleManager_ = factory->createSlamScaleManager(pGpsManager_, pDataLogger_);
 	pSlamMapPreprocessor_ = factory->createSlamMapPreprocessor(pSlamScaleManager_, pKnownMapServer_);
 	pFilter_ = factory->createFilter(pGpsManager_, pKnownMapServer_, pSlamScaleManager_, pStatusPublisher_, pDataLogger_);
-	pBaseLinkPublisher_ = factory->createBaseLinkPublisher(pKnownMapServer_, pFilter_, pSlamScaleManager_, pDataLogger_);
+	pLocalization_ = factory->createLocalization(pFilter_, pSlamScaleManager_, pKnownMapServer_);
+	pPoseErrorPublisher_ = factory->createPoseErrorPublisher(pDataLogger_);
 
 	// subscribe to topics
 	ros::NodeHandle nh("~");
@@ -113,6 +114,7 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 		pDataLogger_->logComputation(hypotheses, duration, pKnownMapServer_->getKnownMap()->info, slamMapFixed->info);
 
 		pFilter_->addHypotheses(hypotheses);
+		pLocalization_->localize();
 	} catch(AlignerInternalError &e) {
 		ROS_WARN_STREAM("Internal aligner error: " << e.what());
 	} catch(AlignerFailed &e) {
