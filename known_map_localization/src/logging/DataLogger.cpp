@@ -136,8 +136,8 @@ void DataLogger::logStatus(const known_map_localization::Status &status) {
 		return;
 
 	mStatusFile_ << ros::WallTime::now().toSec() << '\t'
-			<< status.status << '\t'
-			<< status.n_supporting_positions << endl;
+			<< (int)status.status << '\t'
+			<< (unsigned int)status.n_supporting_positions << endl;
 }
 
 void DataLogger::writeHeader() {
