@@ -8,7 +8,6 @@
 #include <ros/ros.h>
 #include <tf/transform_datatypes.h>
 #include <mapmerge/manipulatemap.h>
-#include <mrgs_alignment/align.h>
 
 #include <aligning/MapmergeAligner.h>
 #include <Utils.h>
