@@ -36,6 +36,9 @@ public:
 	unsigned int challengingHints;
 };
 
+typedef boost::shared_ptr<GpsScoredHypothesis> GpsScoredHypothesisPtr;
+typedef boost::shared_ptr<GpsScoredHypothesis const> GpsScoredHypothesisConstPtr;
+
 } /* namespace kml */
 
 #endif /* KNOWN_MAP_LOCALIZATION_INCLUDE_KNOWN_MAP_LOCALIZATION_ALIGNMENT_GPSSCOREDHYPOTHESIS_H_ */

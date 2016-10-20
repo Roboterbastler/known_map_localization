@@ -13,6 +13,10 @@ Alignment::Alignment() :
 		scale(1), theta(0), x(0), y(0), from(""), to("") {
 }
 
+Alignment::~Alignment() {
+
+}
+
 tf::Transform Alignment::toTfTransform() const {
 	tf::Quaternion q;
 	q.setRPY(0, 0, theta);

@@ -17,4 +17,8 @@ Hypothesis::Hypothesis(const StampedAlignment &a, float score) :
 		StampedAlignment(a), score(score) {
 }
 
+Hypothesis::~Hypothesis() {
+
+}
+
 } /* namespace kml */

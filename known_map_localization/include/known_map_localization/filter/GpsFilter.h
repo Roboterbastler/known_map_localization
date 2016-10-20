@@ -40,13 +40,6 @@ public:
 	 */
 	void addHypotheses(const HypothesesVect &hypotheses);
 
-	/**
-	 * Get the filtered alignment, if available. If it isn't available, an exception is thrown.
-	 * @return The filtered alignment
-	 * @throw AlignmentNotAvailable, if filtered alignment is not available
-	 */
-	const Alignment& getAlignment() const;
-
 private:
 	/**
 	 * Computes the estimated robot pose in the anchor frame, based on the
@@ -78,10 +71,14 @@ private:
 	 */
 	void addConstraintMarker(const GpsHint &hint, visualization_msgs::Marker &marker, bool supporting) const;
 
-private:
-	/// The last accepted scored hypothesis, used instead of the filteredAlignment of the base class Filter
-	GpsScoredHypothesis mFilteredGpsHypothesis_;
+	/**
+	 * Checks whether the given hypothesis should be preferred to the current filtered hypothesis.
+	 * @param hypothesis The hypothesis to be checked
+	 * @return True if it should be preferred, false if it should not
+	 */
+	bool preferHypothesis(const GpsScoredHypothesis &hypothesis) const;
 
+private:
 	/// Visualization marker for GPS constraints
 	visualization_msgs::Marker mConstraintsMarker_;
 

@@ -39,13 +39,13 @@ void DecayFilter::addHypotheses(const HypothesesVect &hypotheses) {
 
 	Hypothesis betterHypothesis;
 	if (checkForBetterHypothesis(hypotheses, betterHypothesis)) {
-		mFilteredAlignment_ = betterHypothesis;
+		pFilteredAlignment_ = boost::make_shared<Hypothesis>(betterHypothesis);
 		mScore_ = betterHypothesis.score;
 		mReady_ = true;
 		pStatusPublisher_->setStatus(STATUS_POS);
-		pSlamScaleManager_->updateSlamScale(mFilteredAlignment_.scale);
+		pSlamScaleManager_->updateSlamScale(pFilteredAlignment_->scale);
 
-		logAlignment(mFilteredAlignment_);
+		logAlignment(*pFilteredAlignment_);
 	}
 }
 

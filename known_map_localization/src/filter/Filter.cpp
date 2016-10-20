@@ -33,7 +33,7 @@ const Alignment& Filter::getAlignment() const {
 	if (!mReady_) {
 		throw AlignmentNotAvailable("Filtered alignment is not yet available");
 	}
-	return mFilteredAlignment_;
+	return *pFilteredAlignment_;
 }
 
 bool Filter::isAvailable() const {
@@ -49,7 +49,8 @@ void Filter::logAlignment(const Alignment &alignment) {
 void Filter::updateMapTransform() {
 	if(mReady_) {
 		// publish map transform
-		mBroadcaster_.sendTransform(StampedAlignment(mFilteredAlignment_).toTfStampedTransform());
+		ROS_ERROR("Filter pub map transform frames %s -> %s", StampedAlignment(*pFilteredAlignment_).toTfStampedTransform().frame_id_.c_str(), StampedAlignment(*pFilteredAlignment_).toTfStampedTransform().child_frame_id_.c_str());
+		mBroadcaster_.sendTransform(StampedAlignment(*pFilteredAlignment_).toTfStampedTransform());
 	}
 }
 

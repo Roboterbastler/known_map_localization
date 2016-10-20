@@ -43,14 +43,19 @@ GpsFilter::GpsFilter(GpsManagerConstPtr pGpsManager,
 void GpsFilter::addHypotheses(const HypothesesVect &hypotheses) {
 	bool filteredHypothesisModified = false;
 
-	if (mReady_) {
-		// small degradation factor
-		mFilteredGpsHypothesis_.score *= kDecayFactor_;
-	}
+	if(pFilteredAlignment_) {
+		// downcast to allow using GPS scored hypothesis
+		GpsScoredHypothesisPtr filteredHypothesis = boost::dynamic_pointer_cast<GpsScoredHypothesis>(pFilteredAlignment_);
+		ROS_ASSERT(filteredHypothesis);
 
-	ROS_DEBUG(
-			"Checking %ld new hypotheses. Current filtered alignment score: %f",
-			hypotheses.size(), mFilteredGpsHypothesis_.score);
+		// small degradation factor
+		filteredHypothesis->score *= kDecayFactor_;
+
+		ROS_DEBUG("Checking %ld new hypotheses. Current filtered alignment score: %f", hypotheses.size(),
+				filteredHypothesis->score);
+	} else {
+		ROS_DEBUG("Checking %ld new hypothesis. No current alignment available.", hypotheses.size());
+	}
 
 	// score all new hypotheses
 	for (HypothesesVect::const_iterator h = hypotheses.begin();
@@ -65,41 +70,50 @@ void GpsFilter::addHypotheses(const HypothesesVect &hypotheses) {
 
 		ROS_DEBUG("      -> Hypothesis has score: %f", scoredHypothesis.score);
 
-		if (scoredHypothesis.score > mFilteredGpsHypothesis_.score) {
-			// always prefer GPS-supported hypotheses
-			if (!mFilteredGpsHypothesis_.gpsSupported
-					|| scoredHypothesis.gpsSupported || !kPreferGpsSupported_) {
-				mFilteredGpsHypothesis_ = scoredHypothesis;
-				filteredHypothesisModified = true;
-				mReady_ = true;
+		if (preferHypothesis(scoredHypothesis)) {
+			pFilteredAlignment_ = boost::make_shared<GpsScoredHypothesis>(scoredHypothesis);
+			filteredHypothesisModified = true;
+			mReady_ = true;
 
-				if(mFilteredGpsHypothesis_.gpsSupported) {
-					pStatusPublisher_->setStatus(STATUS_VALIDATED_POS, mFilteredGpsHypothesis_.supportingHints);
-				} else {
-					pStatusPublisher_->setStatus(STATUS_POS);
-				}
-
-				mConstraintsMarker_ = hypothesisConstraints;
-				ROS_DEBUG("        -> New best alignment.");
+			if(scoredHypothesis.gpsSupported) {
+				pStatusPublisher_->setStatus(STATUS_VALIDATED_POS, scoredHypothesis.supportingHints);
 			} else {
-				ROS_DEBUG(
-						"        -> Rejected, because current filtered hypothesis is supported by GPS hints.");
+				pStatusPublisher_->setStatus(STATUS_POS);
 			}
+
+			mConstraintsMarker_ = hypothesisConstraints;
+			ROS_DEBUG("        -> New best alignment.");
 		}
 	}
 
 	if (filteredHypothesisModified) {
-		logAlignment(mFilteredGpsHypothesis_);
+		logAlignment(*pFilteredAlignment_);
 	}
 
 	mGpsConstraintsMarkerPublisher_.publish(mConstraintsMarker_);
 }
 
-const Alignment& GpsFilter::getAlignment() const {
-	if (!mReady_) {
-		throw AlignmentNotAvailable("Filtered hypothesis is not yet available");
+bool GpsFilter::preferHypothesis(const GpsScoredHypothesis &hypothesis) const {
+	if(!pFilteredAlignment_) {
+		// simple case: no filtered hypothesis available
+		return true;
 	}
-	return mFilteredGpsHypothesis_;
+
+	GpsScoredHypothesisConstPtr scoredFilteredHypothesis = boost::dynamic_pointer_cast<GpsScoredHypothesis>(pFilteredAlignment_);
+	ROS_ASSERT(scoredFilteredHypothesis);
+
+	if(hypothesis.score > scoredFilteredHypothesis->score) {
+		if(scoredFilteredHypothesis->gpsSupported) {
+			// either GPS supported too or don't prefer GPS supported hypotheses
+			return  hypothesis.gpsSupported || !kPreferGpsSupported_;
+		} else {
+			// higher score than the (not GPS supported) filtered hypothesis
+			return true;
+		}
+	}
+
+	// lower or equal score
+	return false;
 }
 
 geometry_msgs::Pose GpsFilter::estimatedRobotPose(const Alignment &alignment,

@@ -22,6 +22,7 @@ class Hypothesis: public StampedAlignment {
 public:
 	Hypothesis();
 	Hypothesis(const StampedAlignment &a, float score = 0.);
+	virtual ~Hypothesis();
 
 	/**
 	 * Greater-then check based on the scores.

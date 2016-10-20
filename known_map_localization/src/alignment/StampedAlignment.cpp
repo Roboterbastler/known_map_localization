@@ -17,6 +17,10 @@ StampedAlignment::StampedAlignment(const Alignment &a) :
 		Alignment(a), stamp(ros::Time::now()) {
 }
 
+StampedAlignment::~StampedAlignment() {
+
+}
+
 tf::StampedTransform StampedAlignment::toTfStampedTransform() const {
 	return tf::StampedTransform(toTfTransform(), stamp, from, to);
 }

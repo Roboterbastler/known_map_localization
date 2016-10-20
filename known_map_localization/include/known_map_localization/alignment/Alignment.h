@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
 #include <tf/transform_datatypes.h>
 
 namespace kml {
@@ -22,6 +24,7 @@ namespace kml {
 class Alignment {
 public:
 	Alignment();
+	virtual ~Alignment();
 
 	/**
 	 * Converts the alignment to a tf transform.
@@ -54,6 +57,9 @@ public:
 	 */
 	static Alignment getIdentity();
 };
+
+typedef boost::shared_ptr<Alignment> AlignmentPtr;
+typedef boost::shared_ptr<Alignment const> AlignmentConstPtr;
 
 } /* namespace kml */
 

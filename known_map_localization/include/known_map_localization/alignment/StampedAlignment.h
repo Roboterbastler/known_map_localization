@@ -22,6 +22,7 @@ class StampedAlignment: public Alignment {
 public:
 	StampedAlignment();
 	StampedAlignment(const Alignment &a);
+	virtual ~StampedAlignment();
 
 	/**
 	 * Converts the alignment to a stamped tf transform.

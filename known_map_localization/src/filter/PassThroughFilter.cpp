@@ -21,9 +21,9 @@ void PassThroughFilter::addHypotheses(const HypothesesVect &hypotheses) {
 		return;
 	}
 
-	mFilteredAlignment_ = hypotheses.front();
-	pSlamScaleManager_->updateSlamScale(mFilteredAlignment_.scale);
-	logAlignment(mFilteredAlignment_);
+	pFilteredAlignment_ = boost::make_shared<Alignment>(hypotheses.front());
+	pSlamScaleManager_->updateSlamScale(pFilteredAlignment_->scale);
+	logAlignment(*pFilteredAlignment_);
 	mReady_ = true;
 }
 

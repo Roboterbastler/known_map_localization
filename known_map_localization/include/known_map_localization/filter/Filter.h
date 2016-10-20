@@ -72,7 +72,7 @@ private:
 
 protected:
 	/// the current filtered alignment
-	Alignment mFilteredAlignment_;
+	AlignmentPtr pFilteredAlignment_;
 
 	/// flag indicating if filtered alignment is available
 	bool mReady_;
