@@ -49,7 +49,6 @@ void Filter::logAlignment(const Alignment &alignment) {
 void Filter::updateMapTransform() {
 	if(mReady_) {
 		// publish map transform
-		ROS_ERROR("Filter pub map transform frames %s -> %s", StampedAlignment(*pFilteredAlignment_).toTfStampedTransform().frame_id_.c_str(), StampedAlignment(*pFilteredAlignment_).toTfStampedTransform().child_frame_id_.c_str());
 		mBroadcaster_.sendTransform(StampedAlignment(*pFilteredAlignment_).toTfStampedTransform());
 	}
 }
