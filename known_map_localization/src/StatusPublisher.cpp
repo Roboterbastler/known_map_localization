@@ -15,6 +15,7 @@ StatusPublisher::StatusPublisher(DataLoggerPtr pDataLogger, float rate) :
 
 	ros::NodeHandle nh("~");
 	mStatusPublisher_ = nh.advertise<known_map_localization::Status>("status", 1);
+	mSlamStatusSubscriber_ = nh.subscribe("/orb_slam/state", 10, &StatusPublisher::receiveSlamState, this);
 	mTimer_ = nh.createWallTimer(ros::WallDuration(1. / rate), &StatusPublisher::tick, this);
 }
 
@@ -40,6 +41,15 @@ void StatusPublisher::publishStatus() const {
 
 	mStatusPublisher_.publish(status);
 	pDataLogger_->logStatus(status);
+}
+
+void StatusPublisher::receiveSlamState(orb_slam::ORBState state) {
+	if(state.state == 4) {
+		// SLAM lost tracking
+		mStatus_ == STATUS_NO_POS;
+		ROS_WARN_THROTTLE(1., "ORB_SLAM lost tracking. No position available.");
+		publishStatus();
+	}
 }
 
 } /* namespace kml */
