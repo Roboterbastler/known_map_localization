@@ -31,7 +31,7 @@ Localization::Localization(FilterConstPtr pFilter, SlamScaleManagerConstPtr pSla
 
 	ROS_INFO("    Rate: %d", localizationRate);
 
-	mBaseLinkPublisher_ = nh.advertise<geometry_msgs::TransformStamped>("base_link", 100);
+	mBaseLinkPublisher_ = nh.advertise<geometry_msgs::TransformStamped>("kml_base_link", 100);
 	mGeoPosePublisher_ = nh.advertise<known_map_localization::GeoPoseStamped>("geo_pose", 100);
 }
 

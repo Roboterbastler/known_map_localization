@@ -30,7 +30,7 @@ namespace kml {
  *
  * ## Subscribed Topics
  * - __/pose__: The ground truth pose, e.g. published by the MORSE simulator
- * - **base_link**: The localization base link used to compute the pose error
+ * - **kml_base_link**: The localization base link used to compute the pose error
  */
 class PoseErrorPublisher {
 public:

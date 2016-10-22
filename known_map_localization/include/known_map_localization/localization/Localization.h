@@ -27,7 +27,7 @@ namespace kml {
  *
  * ## Published topics
  * - **tf**: Base link from anchor frame to base_link frame
- * - **base_link**: Base Link from anchor frame to base_link frame
+ * - **kml_base_link**: Base Link from anchor frame to base_link frame
  * - **geo_pose**:
  */
 class Localization {

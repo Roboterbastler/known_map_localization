@@ -24,7 +24,7 @@ PoseErrorPublisher::PoseErrorPublisher(DataLoggerPtr pDataLogger) : mLastTime_(0
 
 	if(enabled) {
 		mGroundTruthSubscriber_ = nh.subscribe("/pose", 10, &PoseErrorPublisher::receiveGroundTruth, this);
-		mBaseLinkSubscriber_ = nh.subscribe("base_link", 10, &PoseErrorPublisher::receiveBaseLink, this);
+		mBaseLinkSubscriber_ = nh.subscribe("kml_base_link", 10, &PoseErrorPublisher::receiveBaseLink, this);
 		mPoseErrorPublisher_ = nh.advertise<known_map_localization::PoseError>("pose_error", 1000);
 	}
 }
@@ -59,7 +59,7 @@ void PoseErrorPublisher::receiveBaseLink(const geometry_msgs::TransformStamped &
 	tf::StampedTransform baseLink;
 	try {
 		mListener_.lookupTransform("anchor", "ground_truth", latestCommonTime, groundTruthPose);
-		mListener_.lookupTransform("anchor", "base_link", latestCommonTime, baseLink);
+		mListener_.lookupTransform("anchor", "kml_base_link", latestCommonTime, baseLink);
 	} catch(tf::TransformException &e) {
 		ROS_DEBUG("Pose error not updated: %s", e.what());
 		return;
