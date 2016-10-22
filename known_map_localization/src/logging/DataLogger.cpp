@@ -20,7 +20,8 @@ namespace kml {
 using namespace std;
 
 DataLogger::DataLogger() :
-		mComputationId_(0) {
+		mComputationId_(0),
+		mSeparationChar_('\t'){
 	ROS_INFO("Data logger initialization...");
 
 	ros::NodeHandle nh("~");
@@ -83,9 +84,9 @@ void DataLogger::logComputation(const HypothesesVect &hypotheses,
 	if (!mEnabled_)
 		return;
 
-	mComputationsFile_ << ros::WallTime::now().toSec() << '\t' << mComputationId_ << '\t'
-			<< duration.toSec() << '\t' << hypotheses.size() << '\t'
-			<< slamMap.height * slamMap.width << '\t'
+	mComputationsFile_ << ros::WallTime::now().toSec() << mSeparationChar_ << mComputationId_ << mSeparationChar_
+			<< duration.toSec() << mSeparationChar_ << hypotheses.size() << mSeparationChar_
+			<< slamMap.height * slamMap.width << mSeparationChar_
 			<< knownMap.height * knownMap.width << endl;
 
 	// log alignments
@@ -101,8 +102,8 @@ void DataLogger::logHypothesis(const Hypothesis &h) {
 	if (!mEnabled_)
 		return;
 
-	mAlignmentsFile_ << h.stamp.toSec() << '\t' << mComputationId_ << '\t'
-			<< h.x << '\t' << h.y << '\t' << h.theta << '\t' << h.scale << '\t'
+	mAlignmentsFile_ << h.stamp.toSec() << mSeparationChar_ << mComputationId_ << mSeparationChar_
+			<< h.x << mSeparationChar_ << h.y << mSeparationChar_ << h.theta << mSeparationChar_ << h.scale << mSeparationChar_
 			<< h.score << endl;
 }
 
@@ -110,8 +111,8 @@ void DataLogger::logError(const known_map_localization::PoseError &error) {
 	if (!mEnabled_)
 		return;
 
-	mErrorsFile_ << error.header.stamp.toSec() << '\t'
-			<< error.translational_error << '\t' << error.rotational_error
+	mErrorsFile_ << error.header.stamp.toSec() << mSeparationChar_
+			<< error.translational_error << mSeparationChar_ << error.rotational_error
 			<< endl;
 }
 
@@ -119,15 +120,15 @@ void DataLogger::logScale(float scale, int mode) {
 	if (!mEnabled_)
 		return;
 
-	mScalesFile_ << ros::WallTime::now().toSec() << '\t' << scale << '\t' << mode << endl;
+	mScalesFile_ << ros::WallTime::now().toSec() << mSeparationChar_ << scale << mSeparationChar_ << mode << endl;
 }
 
 void DataLogger::logFilter(const Alignment &filteredAlignment) {
 	if (!mEnabled_)
 		return;
 
-	mFilterFile_ << ros::WallTime::now().toSec() << '\t' << filteredAlignment.x << '\t'
-			<< filteredAlignment.y << '\t' << filteredAlignment.theta << '\t'
+	mFilterFile_ << ros::WallTime::now().toSec() << mSeparationChar_ << filteredAlignment.x << mSeparationChar_
+			<< filteredAlignment.y << mSeparationChar_ << filteredAlignment.theta << mSeparationChar_
 			<< filteredAlignment.scale << endl;
 }
 
@@ -135,8 +136,8 @@ void DataLogger::logStatus(const known_map_localization::Status &status) {
 	if (!mEnabled_)
 		return;
 
-	mStatusFile_ << ros::WallTime::now().toSec() << '\t'
-			<< (int)status.status << '\t'
+	mStatusFile_ << ros::WallTime::now().toSec() << mSeparationChar_
+			<< (int)status.status << mSeparationChar_
 			<< (unsigned int)status.n_supporting_positions << endl;
 }
 
@@ -152,8 +153,8 @@ void DataLogger::writeHeader() {
 void DataLogger::writeAlignmentsHeader() {
 	stringstream attributeNames; //, types, optionalElements;
 
-	attributeNames << "Timestamp\t" << "Computation ID\t" << "X Translation\t"
-			<< "Y Translation\t" << "Rotation\t" << "Scale\t" << "Score";
+	attributeNames << "Timestamp" << mSeparationChar_ << "Computation ID" << mSeparationChar_ << "X Translation" << mSeparationChar_
+			<< "Y Translation" << mSeparationChar_ << "Rotation" << mSeparationChar_ << "Scale" << mSeparationChar_ << "Score";
 
 	mAlignmentsFile_ << attributeNames.str() << endl;
 }
@@ -161,8 +162,8 @@ void DataLogger::writeAlignmentsHeader() {
 void DataLogger::writeComputationsHeader() {
 	stringstream attributeNames;
 
-	attributeNames << "Time\t" << "ID\t" << "Duration\t"
-			<< "Number of hypotheses\t" << "SLAM map size\t"
+	attributeNames << "Time" << mSeparationChar_ << "ID" << mSeparationChar_ << "Duration" << mSeparationChar_
+			<< "Number of hypotheses" << mSeparationChar_ << "SLAM map size" << mSeparationChar_
 			<< "Known map size";
 
 	mComputationsFile_ << attributeNames.str() << endl;
@@ -171,7 +172,7 @@ void DataLogger::writeComputationsHeader() {
 void DataLogger::writeErrorsHeader() {
 	stringstream attributeNames;
 
-	attributeNames << "Timestamp\t" << "Translational\t" << "Rotational";
+	attributeNames << "Timestamp" << mSeparationChar_ << "Translational" << mSeparationChar_ << "Rotational";
 
 	mErrorsFile_ << attributeNames.str() << endl;
 }
@@ -179,7 +180,7 @@ void DataLogger::writeErrorsHeader() {
 void DataLogger::writeScalesHeader() {
 	stringstream attributeNames;
 
-	attributeNames << "Time\t" << "Scale\t" << "Mode";
+	attributeNames << "Time" << mSeparationChar_ << "Scale" << mSeparationChar_ << "Mode";
 
 	mScalesFile_ << attributeNames.str() << endl;
 }
@@ -187,7 +188,7 @@ void DataLogger::writeScalesHeader() {
 void DataLogger::writeFilterHeader() {
 	stringstream attributeNames;
 
-	attributeNames << "Time\t" << "X\t" << "Y\t" << "Rotation\t" << "Scale";
+	attributeNames << "Time" << mSeparationChar_ << "X" << mSeparationChar_ << "Y" << mSeparationChar_ << "Rotation" << mSeparationChar_ << "Scale";
 
 	mFilterFile_ << attributeNames.str() << endl;
 }
@@ -195,7 +196,7 @@ void DataLogger::writeFilterHeader() {
 void DataLogger::writeStatusHeader() {
 	stringstream attributeNames;
 
-	attributeNames << "Time\t" << "Status\t" << "Supporting GPS hints";
+	attributeNames << "Time" << mSeparationChar_ << "Status" << mSeparationChar_ << "Supporting GPS hints";
 
 	mStatusFile_ << attributeNames.str() << endl;
 }

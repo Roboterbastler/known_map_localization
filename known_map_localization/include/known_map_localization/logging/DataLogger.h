@@ -105,6 +105,9 @@ private:
 
 	/// flag indicating if logging is enabled/disabled
 	bool mEnabled_;
+
+	/// Char used to separate values in the log file
+	char mSeparationChar_;
 };
 
 typedef boost::shared_ptr<DataLogger> DataLoggerPtr;
