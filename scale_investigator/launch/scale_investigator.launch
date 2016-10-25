@@ -1,8 +1,0 @@
-<launch>
-	<group ns="known_map_localization">
-		<node pkg="scale_investigator" type="scale_investigator_node" name="scale_investigator" output="screen">
-			<remap from="slam_map" to="/orb_slam/projected_map" />
-		</node>
-	</group>
-</launch>
-
