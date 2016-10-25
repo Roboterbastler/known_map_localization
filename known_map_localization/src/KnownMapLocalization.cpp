@@ -52,6 +52,8 @@ KmlFactoryConstPtr KnownMapLocalization::selectStrategy() const {
 		throw AlgorithmNotSpecified("Algorithm parameter is missing");
 	}
 
+	ROS_INFO("Algorithm: %s", algorithmSpecifier.c_str());
+
 	if(algorithmSpecifier == "mapmerge") {
 		return boost::make_shared<KmlMapmergeFactory>();
 	} if(algorithmSpecifier == "mapstitch") {
