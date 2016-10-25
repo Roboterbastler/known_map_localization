@@ -4,12 +4,13 @@ known_preprocessing_enabled: true
 known_map_config_file: data/known_maps/simple_indoor/simple_indoor.yaml
 
 # SLAM map unit size [meters]
-slam_scale_mode: gps #[parameter/alignment/gps]
-slam_map_scale: 1.35
+slam_scale_mode: parameter #[parameter/alignment/gps]
+slam_map_scale: 0.9726
 
 # algorithm parameters
 max_pairwise_distance: 5.0
 
 # filter parameters
+filter_use_gps: false
 gps_constraint_radius: 0.5
 aging_rate: 0.95
