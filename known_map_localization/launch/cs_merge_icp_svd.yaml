@@ -1,11 +1,11 @@
-algorithm: cs_merge_icp_gradient
+algorithm: cs_merge_icp_svd
 slam_preprocessing_enabled: true
 known_preprocessing_enabled: true
 known_map_config_file: data/known_maps/simple_indoor/simple_indoor.yaml
 
 # SLAM map unit size [meters]
 slam_scale_mode: parameter #[parameter/alignment/gps]
-slam_map_scale: 0.95 #.9726
+slam_map_scale: 0.9726
 
 # algorithm parameters are specified in launch file of the cs_merge nodes
 

@@ -12,14 +12,14 @@
 		<node pkg="cs_merge_methods" type="cs_merge_hough_corner" name="cs_merge_hough_corner">
 			<param name="threshold" value="0.0" />
 		</node>
-		<node pkg="cs_merge_methods" type="cs_merge_icp_gradient" name="cs_merge_icp_gradient">
-			<param name="ransac_amount" value="0.5" />
-			<param name="repetitions" value="25" />
+		<node pkg="cs_merge_methods" type="cs_merge_icp_gradient" name="cs_merge_icp_gradient" output="screen">
+			<param name="ransac_amount" value="1.0" />
+			<param name="repetitions" value="1" />
 		</node>
 		<node pkg="cs_merge_methods" type="cs_merge_icp_svd" name="cs_merge_icp_svd">
 			<param name="repetitions" value="25" />
-			<param name="fraction" value="0.5" />
-			<param name="startPos" value="0" />
+			<param name="fraction" value="0.1" />
+			<param name="startPos" value="50" />
 		</node>
 	</group>
 </launch>

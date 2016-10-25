@@ -8,8 +8,8 @@
 #include <factory/KmlCsMergeIcpGradientFactory.h>
 
 #include <aligning/CsMergeIcpGradientAligner.h>
-#include <preprocessing/EdgeDetectionKnownMapPreprocessor.h>
-#include <preprocessing/MapmergeSlamMapPreprocessor.h>
+#include <preprocessing/IcpKnownMapPreprocessor.h>
+#include <preprocessing/IcpSlamMapPreprocessor.h>
 #include <filter/GpsFilter.h>
 
 namespace kml {
@@ -21,11 +21,11 @@ AlignerPtr KmlCsMergeIcpGradientFactory::createAligner() const {
 }
 
 KnownMapPreprocessorPtr KmlCsMergeIcpGradientFactory::createKnownMapPreprocessor() const {
-	return make_shared<EdgeDetectionKnownMapPreprocessor>();
+	return make_shared<IcpKnownMapPreprocessor>();
 }
 
 SlamMapPreprocessorPtr KmlCsMergeIcpGradientFactory::createSlamMapPreprocessor(SlamScaleManagerConstPtr pSlamScaleManager, KnownMapServerConstPtr pKnownMapServer) const {
-	return make_shared<MapmergeSlamMapPreprocessor>(pSlamScaleManager, pKnownMapServer);
+	return make_shared<IcpSlamMapPreprocessor>(pSlamScaleManager, pKnownMapServer);
 }
 
 } /* namespace kml */

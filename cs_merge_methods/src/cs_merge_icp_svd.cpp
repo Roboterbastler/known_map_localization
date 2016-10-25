@@ -414,37 +414,37 @@ public:
         ROS_INFO("%.3f, %.1f, %.1f", res.result.rotation, res.result.dx, res.result.dy);
 
 
-        //DEBUG
-        double xtemp;
-        double ytemp;
-
-        for(std::vector<point>::iterator it = map2.pointsOccupied.begin(); it!=map2.pointsOccupied.end();it++)
-        {
-            xtemp = it->x;
-            ytemp = it->y;
-
-            it->x = xtemp * cos(res.result.rotation) - ytemp *sin(res.result.rotation) + res.result.dx;
-            it->y = xtemp * sin(res.result.rotation) + ytemp *cos(res.result.rotation) + res.result.dy;
-        }
-        for(std::vector<point>::iterator it = map2.pointsFree.begin(); it!=map2.pointsFree.end();it++)
-        {
-            xtemp = it->x;
-            ytemp = it->y;
-
-            it->x = xtemp * cos(res.result.rotation) - ytemp *sin(res.result.rotation) + res.result.dx;
-            it->y = xtemp * sin(res.result.rotation) + ytemp *cos(res.result.rotation) + res.result.dy;
-        }
-
-        std::vector<point> occ2;
-        occ2.reserve(map1.pointsOccupied.size() + map2.pointsOccupied.size());
-        occ2.insert(occ2.end(), map1.pointsOccupied.begin(), map1.pointsOccupied.end());
-        occ2.insert(occ2.end(), map2.pointsOccupied.begin(), map2.pointsOccupied.end());
-        std::vector<point> free2;
-        free2.reserve(map1.pointsFree.size() + map2.pointsFree.size());
-        free2.insert(free2.end(), map1.pointsFree.begin(), map1.pointsFree.end());
-        free2.insert(free2.end(), map2.pointsFree.begin(), map2.pointsFree.end());
-
-        drawMap(occ2,free2,"icp_svd", .05);
+//        //DEBUG
+//        double xtemp;
+//        double ytemp;
+//
+//        for(std::vector<point>::iterator it = map2.pointsOccupied.begin(); it!=map2.pointsOccupied.end();it++)
+//        {
+//            xtemp = it->x;
+//            ytemp = it->y;
+//
+//            it->x = xtemp * cos(res.result.rotation) - ytemp *sin(res.result.rotation) + res.result.dx;
+//            it->y = xtemp * sin(res.result.rotation) + ytemp *cos(res.result.rotation) + res.result.dy;
+//        }
+//        for(std::vector<point>::iterator it = map2.pointsFree.begin(); it!=map2.pointsFree.end();it++)
+//        {
+//            xtemp = it->x;
+//            ytemp = it->y;
+//
+//            it->x = xtemp * cos(res.result.rotation) - ytemp *sin(res.result.rotation) + res.result.dx;
+//            it->y = xtemp * sin(res.result.rotation) + ytemp *cos(res.result.rotation) + res.result.dy;
+//        }
+//
+//        std::vector<point> occ2;
+//        occ2.reserve(map1.pointsOccupied.size() + map2.pointsOccupied.size());
+//        occ2.insert(occ2.end(), map1.pointsOccupied.begin(), map1.pointsOccupied.end());
+//        occ2.insert(occ2.end(), map2.pointsOccupied.begin(), map2.pointsOccupied.end());
+//        std::vector<point> free2;
+//        free2.reserve(map1.pointsFree.size() + map2.pointsFree.size());
+//        free2.insert(free2.end(), map1.pointsFree.begin(), map1.pointsFree.end());
+//        free2.insert(free2.end(), map2.pointsFree.begin(), map2.pointsFree.end());
+//
+//        drawMap(occ2,free2,"icp_svd", .05);
 
         return true;
     }

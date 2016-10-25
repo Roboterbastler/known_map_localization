@@ -457,59 +457,59 @@ public:
 
         //Draw original for debug
 
-        std::vector<point> occ;
-        occ.reserve(map1.pointsOccupied.size() + map2.pointsOccupied.size());
-        occ.insert(occ.end(), map1.pointsOccupied.begin(), map1.pointsOccupied.end());
-        occ.insert(occ.end(), map2.pointsOccupied.begin(), map2.pointsOccupied.end());
-
-        std::vector<point> free;
-        free.reserve(map1.pointsFree.size() + map2.pointsFree.size());
-        free.insert(free.end(), map1.pointsFree.begin(), map1.pointsFree.end());
-        free.insert(free.end(), map2.pointsFree.begin(), map2.pointsFree.end());
-
-
-        drawMap(occ,free,"before", .05);
-
-        //Draw transformed
-
-        double xalt;
-        double yalt;
-
-        for(std::vector<point>::iterator it = map2.pointsOccupied.begin(); it!=map2.pointsOccupied.end();it++)
-        {
-            xalt = it->x;
-            yalt = it->y;
-
-            it->x = xalt * cos(response.rotation) - yalt *sin(response.rotation) + response.dx;
-            it->y = xalt * sin(response.rotation) + yalt *cos(response.rotation) + response.dy;
-        }
-        for(std::vector<point>::iterator it = map2.pointsFree.begin(); it!=map2.pointsFree.end();it++)
-        {
-            xalt = it->x;
-            yalt = it->y;
-
-            it->x = xalt * cos(response.rotation) - yalt *sin(response.rotation) + response.dx;
-            it->y = xalt * sin(response.rotation) + yalt *cos(response.rotation) + response.dy;
-        }
-
-        drawMap(map1.pointsOccupied,map1.pointsFree,"hough1", 10);
-        drawMap(map2.pointsOccupied,map2.pointsFree,"hough2", .05);
-
-
-        std::vector<point> occ2;
-        occ2.reserve(map1.pointsOccupied.size() + map2.pointsOccupied.size());
-        occ2.insert(occ2.end(), map1.pointsOccupied.begin(), map1.pointsOccupied.end());
-        occ2.insert(occ2.end(), map2.pointsOccupied.begin(), map2.pointsOccupied.end());
-        std::vector<point> free2;
-        free2.reserve(map1.pointsFree.size() + map2.pointsFree.size());
-        free2.insert(free2.end(), map1.pointsFree.begin(), map1.pointsFree.end());
-        free2.insert(free2.end(), map2.pointsFree.begin(), map2.pointsFree.end());
-
-
-
-
-        drawMap(occ2,free2,"after", .05);
-
+//        std::vector<point> occ;
+//        occ.reserve(map1.pointsOccupied.size() + map2.pointsOccupied.size());
+//        occ.insert(occ.end(), map1.pointsOccupied.begin(), map1.pointsOccupied.end());
+//        occ.insert(occ.end(), map2.pointsOccupied.begin(), map2.pointsOccupied.end());
+//
+//        std::vector<point> free;
+//        free.reserve(map1.pointsFree.size() + map2.pointsFree.size());
+//        free.insert(free.end(), map1.pointsFree.begin(), map1.pointsFree.end());
+//        free.insert(free.end(), map2.pointsFree.begin(), map2.pointsFree.end());
+//
+//
+//        drawMap(occ,free,"before", .05);
+//
+//        //Draw transformed
+//
+//        double xalt;
+//        double yalt;
+//
+//        for(std::vector<point>::iterator it = map2.pointsOccupied.begin(); it!=map2.pointsOccupied.end();it++)
+//        {
+//            xalt = it->x;
+//            yalt = it->y;
+//
+//            it->x = xalt * cos(response.rotation) - yalt *sin(response.rotation) + response.dx;
+//            it->y = xalt * sin(response.rotation) + yalt *cos(response.rotation) + response.dy;
+//        }
+//        for(std::vector<point>::iterator it = map2.pointsFree.begin(); it!=map2.pointsFree.end();it++)
+//        {
+//            xalt = it->x;
+//            yalt = it->y;
+//
+//            it->x = xalt * cos(response.rotation) - yalt *sin(response.rotation) + response.dx;
+//            it->y = xalt * sin(response.rotation) + yalt *cos(response.rotation) + response.dy;
+//        }
+//
+//        drawMap(map1.pointsOccupied,map1.pointsFree,"hough1", 10);
+//        drawMap(map2.pointsOccupied,map2.pointsFree,"hough2", .05);
+//
+//
+//        std::vector<point> occ2;
+//        occ2.reserve(map1.pointsOccupied.size() + map2.pointsOccupied.size());
+//        occ2.insert(occ2.end(), map1.pointsOccupied.begin(), map1.pointsOccupied.end());
+//        occ2.insert(occ2.end(), map2.pointsOccupied.begin(), map2.pointsOccupied.end());
+//        std::vector<point> free2;
+//        free2.reserve(map1.pointsFree.size() + map2.pointsFree.size());
+//        free2.insert(free2.end(), map1.pointsFree.begin(), map1.pointsFree.end());
+//        free2.insert(free2.end(), map2.pointsFree.begin(), map2.pointsFree.end());
+//
+//
+//
+//
+//        drawMap(occ2,free2,"after", .05);
+//
         //Evaluate
 
         double agr = 0;

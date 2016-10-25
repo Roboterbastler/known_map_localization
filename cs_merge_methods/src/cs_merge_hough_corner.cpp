@@ -554,35 +554,35 @@ public:
 
         //DEBUG
 
-        drawMap(map1.pointsOccupied, map2.pointsOccupied, "h2_before_tf", 0.05);
-
-        double oldx;
-        double oldy;
-
-        for(std::vector<point>::iterator it = map2.pointsOccupied.begin(); it != map2.pointsOccupied.end(); it++)
-        {
-            oldx = it->x;
-            oldy = it->y;
-
-            it->x = oldx*cos(result.rotation) - oldy*sin(result.rotation);
-            it->y = oldx*sin(result.rotation) + oldy*cos(result.rotation);
-        }
-
-
-        drawMap(map1.pointsOccupied, map2.pointsOccupied, "h2_after_rot", 0.05);
-
-
-
-        for(std::vector<point>::iterator it = map2.pointsOccupied.begin(); it != map2.pointsOccupied.end(); it++)
-        {
-            oldx = it->x;
-            oldy = it->y;
-
-            it->x += result.translation.x;
-            it->y += result.translation.y;
-        }
-
-        drawMap(map1.pointsOccupied, map2.pointsOccupied, "h2_after_tf", 0.05);
+//        drawMap(map1.pointsOccupied, map2.pointsOccupied, "h2_before_tf", 0.05);
+//
+//        double oldx;
+//        double oldy;
+//
+//        for(std::vector<point>::iterator it = map2.pointsOccupied.begin(); it != map2.pointsOccupied.end(); it++)
+//        {
+//            oldx = it->x;
+//            oldy = it->y;
+//
+//            it->x = oldx*cos(result.rotation) - oldy*sin(result.rotation);
+//            it->y = oldx*sin(result.rotation) + oldy*cos(result.rotation);
+//        }
+//
+//
+//        drawMap(map1.pointsOccupied, map2.pointsOccupied, "h2_after_rot", 0.05);
+//
+//
+//
+//        for(std::vector<point>::iterator it = map2.pointsOccupied.begin(); it != map2.pointsOccupied.end(); it++)
+//        {
+//            oldx = it->x;
+//            oldy = it->y;
+//
+//            it->x += result.translation.x;
+//            it->y += result.translation.y;
+//        }
+//
+//        drawMap(map1.pointsOccupied, map2.pointsOccupied, "h2_after_tf", 0.05);
 
 
 

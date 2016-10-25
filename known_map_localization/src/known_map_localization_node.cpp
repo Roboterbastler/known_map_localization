@@ -19,5 +19,6 @@ int main(int argc, char **argv) {
 
 	ROS_INFO_STREAM("---------- Known Map Localization initialization finished.");
 
-	ros::spin();
+	ros::MultiThreadedSpinner spinner;
+	spinner.spin();
 }

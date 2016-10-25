@@ -13,6 +13,8 @@
 #include <mapstitch/utils.h>
 #include <tf/transform_datatypes.h>
 
+#include <preprocessing/Thinning.h>
+
 namespace kml {
 
 MapPreprocessor::MapPreprocessor(std::string topicName, std::string paramName) :
@@ -128,30 +130,11 @@ void MapPreprocessor::morphologicalClose(cv::Mat &img, unsigned int kernelSize) 
 }
 
 void MapPreprocessor::morphologicalSkeleton(cv::Mat &img) {
-	// algorithm taken from http://felix.abecassis.me/2011/09/opencv-morphological-skeleton/
-
-	// invert
 	cv::threshold(img, img, 0, 255, cv::THRESH_BINARY_INV);
-	cv::Mat skel(img.size(), CV_8UC1, cv::Scalar(0));
-	cv::Mat temp;
-	cv::Mat eroded;
 
-	cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+	thinningZhangSuen(img);
 
-	bool done;
-	do
-	{
-	  cv::erode(img, eroded, element);
-	  cv::dilate(eroded, temp, element); // temp = open(img)
-	  cv::subtract(img, temp, temp);
-	  cv::bitwise_or(skel, temp, skel);
-	  eroded.copyTo(img);
-
-	  done = (cv::countNonZero(img) == 0);
-	} while (!done);
-
-	// invert
-	img = cv::Scalar::all(255) - skel;
+	cv::threshold(img, img, 0, 254, cv::THRESH_BINARY_INV);
 }
 
 void MapPreprocessor::morphologicalErode(cv::Mat &img, unsigned int kernelSize) {

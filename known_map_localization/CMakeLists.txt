@@ -165,6 +165,9 @@ add_library(known_map_localization
   src/preprocessing/MapstitchSlamMapPreprocessor.cpp
   src/preprocessing/EdgeDetectionKnownMapPreprocessor.cpp
   src/preprocessing/MapmergeSlamMapPreprocessor.cpp
+  src/preprocessing/IcpKnownMapPreprocessor.cpp
+  src/preprocessing/IcpSlamMapPreprocessor.cpp
+  src/preprocessing/Thinning.cpp
   src/known_map_server/KnownMapServer.cpp
   src/alignment/Alignment.cpp
   src/alignment/StampedAlignment.cpp
