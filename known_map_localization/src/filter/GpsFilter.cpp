@@ -34,10 +34,13 @@ GpsFilter::GpsFilter(GpsManagerConstPtr pGpsManager,
 	kDecayFactor_ = nh.param("aging_rate", 1.);
 	kConfirmationFactor_ = nh.param("gps_confirmation_factor", 1.05);
 	kPreferGpsSupported_ = nh.param("always_prefer_gps_supported", true);
+	kUseGps_ = nh.param("filter_use_gps", true);
 
 	ROS_INFO("    Constraint radius: %.2f", kGpsConstraintRadius_);
 	ROS_INFO("    Aging rate: %.2f", kDecayFactor_);
+	ROS_INFO("    GPS confirmation factor: %f", kConfirmationFactor_);
 	ROS_INFO("    Always prefer GPS supported: %s", kPreferGpsSupported_ ? "true" : "false");
+	ROS_INFO("    Use GPS: %s", kUseGps_ ? "true" : "false");
 }
 
 void GpsFilter::addHypotheses(const HypothesesVect &hypotheses) {
@@ -65,8 +68,10 @@ void GpsFilter::addHypotheses(const HypothesesVect &hypotheses) {
 
 		GpsScoredHypothesis scoredHypothesis(*h);
 
-		// try to validate hypothesis by checking GPS hints
-		validateHypothesis(scoredHypothesis, hypothesisConstraints);
+		if(kUseGps_) {
+			// try to validate hypothesis by checking GPS hints
+			validateHypothesis(scoredHypothesis, hypothesisConstraints);
+		}
 
 		ROS_DEBUG("      -> Hypothesis has score: %f", scoredHypothesis.score);
 
@@ -99,20 +104,23 @@ bool GpsFilter::preferHypothesis(const GpsScoredHypothesis &hypothesis) const {
 		return true;
 	}
 
-	GpsScoredHypothesisConstPtr scoredFilteredHypothesis = boost::dynamic_pointer_cast<GpsScoredHypothesis>(pFilteredAlignment_);
-	ROS_ASSERT(scoredFilteredHypothesis);
+	GpsScoredHypothesisConstPtr filteredHypothesis = boost::dynamic_pointer_cast<GpsScoredHypothesis>(pFilteredAlignment_);
+	ROS_ASSERT(filteredHypothesis);
 
-	if(hypothesis.score > scoredFilteredHypothesis->score) {
-		if(scoredFilteredHypothesis->gpsSupported) {
-			// either GPS supported too or don't prefer GPS supported hypotheses
-			return  hypothesis.gpsSupported || !kPreferGpsSupported_;
-		} else {
-			// higher score than the (not GPS supported) filtered hypothesis
-			return true;
-		}
+	if(hypothesis.supportingHints == filteredHypothesis->supportingHints || !kPreferGpsSupported_) {
+		// tie-break: use score
+		return hypothesis.score > filteredHypothesis->score;
 	}
 
-	// lower or equal score
+	if(hypothesis.supportingHints > filteredHypothesis->supportingHints) {
+		return true;
+	}
+
+	if(hypothesis.supportingHints < filteredHypothesis->supportingHints) {
+		return false;
+	}
+
+	// never reached
 	return false;
 }
 

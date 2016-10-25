@@ -22,6 +22,10 @@ namespace kml {
  *
  * ## Parameters
  * - **gps_constraint_radius**: The radius of the constraint given by a GPS fix
+ * - **aging_rate**: This factor is used to degrade the score of the currently used hypothesis in every filter step
+ * - **gps_confirmation_factor**: This factor is multiplied to the score of a hypothesis for each GPS position that supports it
+ * - **always_prefer_gps_supported**: Always prefer GPS supported hypotheses regardless of their score
+ * - **filter_use_gps**: Enables usage of GPS positions
  *
  * ## Subscribed topics
  * - __/robot/gps__: The GPS signal
@@ -93,6 +97,8 @@ private:
 	float kConfirmationFactor_;
 
 	bool kPreferGpsSupported_;
+
+	bool kUseGps_;
 
 private:
 	GpsManagerConstPtr pGpsManager_;
