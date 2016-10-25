@@ -18,9 +18,8 @@ bool EdgeDetectionKnownMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMe
 	// invert
 	img = cv::Scalar::all(255) - img;
 
-	// make edges thicker; edgeRadius is half the width of the edge in meters
-	float edgeRadius = 0.2;
-	unsigned int kernelRadius = std::max(1., floor(edgeRadius / mapMetaData.resolution));
+	// make edges thicker
+	unsigned int kernelRadius = 1;
 	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2*kernelRadius+1, 2*kernelRadius+1));
 	cv::erode(img, img, kernel);
 
