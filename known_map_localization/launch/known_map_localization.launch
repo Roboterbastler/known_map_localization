@@ -13,8 +13,8 @@
 			<param name="threshold" value="0.0" />
 		</node>
 		<node pkg="cs_merge_methods" type="cs_merge_icp_gradient" name="cs_merge_icp_gradient" output="screen">
-			<param name="ransac_amount" value="1.0" />
-			<param name="repetitions" value="1" />
+			<param name="ransac_amount" value="0.1" />
+			<param name="repetitions" value="25" />
 		</node>
 		<node pkg="cs_merge_methods" type="cs_merge_icp_svd" name="cs_merge_icp_svd">
 			<param name="repetitions" value="25" />

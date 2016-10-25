@@ -10,5 +10,6 @@ slam_map_scale: 0.9726
 # algorithm parameters are specified in launch file of the cs_merge nodes
 
 # filter parameters
+filter_use_gps: false
 gps_constraint_radius: 0.5
 aging_rate: 0.95
