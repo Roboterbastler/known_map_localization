@@ -103,6 +103,7 @@ void GpsManager::updateGpsHints(const ros::WallTimerEvent& event) {
 		modified = true;
 	}
 
+	publishGpsPositionMarker();
 	publishGpsHintMarker();
 
 	if (modified) {
