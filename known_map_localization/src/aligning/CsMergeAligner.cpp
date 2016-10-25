@@ -24,6 +24,7 @@ CsMergeAligner::~CsMergeAligner() {
 
 HypothesesVect CsMergeAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) {
 	ros::WallTime start = ros::WallTime::now();
+	ROS_INFO("Start aligning...");
 
 	cs_merge_msgs::getTransformRequest request;
 	request.map_one = *slamMap;

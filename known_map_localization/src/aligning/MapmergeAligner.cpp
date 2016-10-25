@@ -33,6 +33,7 @@ MapmergeAligner::MapmergeAligner() :
 
 HypothesesVect MapmergeAligner::align(nav_msgs::OccupancyGridConstPtr knownMap, nav_msgs::OccupancyGridConstPtr slamMap) {
 	ros::WallTime start = ros::WallTime::now();
+	ROS_INFO("Start aligning...");
 
 	HypothesesVect resultHypotheses;
 

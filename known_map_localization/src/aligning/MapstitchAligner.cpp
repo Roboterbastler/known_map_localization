@@ -25,7 +25,7 @@ HypothesesVect MapstitchAligner::align(nav_msgs::OccupancyGridConstPtr knownMap,
 
 	ros::WallTime startTime = ros::WallTime::now();
 
-	ROS_INFO("Alignment node: Start aligning...");
+	ROS_INFO("Start aligning...");
 
 	cv::Mat knownMapImg = occupancyGridToCvMat(knownMap.get());
 	cv::Mat slamMapImg = occupancyGridToCvMat(slamMap.get());
