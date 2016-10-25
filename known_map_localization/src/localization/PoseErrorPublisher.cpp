@@ -94,10 +94,13 @@ float poseToPoseAbsDistance(const tf::Pose &p1, const tf::Pose &p2) {
 }
 
 float orientationToOrientationAngle(const tf::Quaternion &q1, const tf::Quaternion &q2) {
-	// discard other angles
-	tf::Quaternion rot1 = tf::createQuaternionFromYaw(tf::getYaw(q1));
-	tf::Quaternion rot2 = tf::createQuaternionFromYaw(tf::getYaw(q2));
-	return radToDeg(rot1.angle(rot2) * 2.);
+	// discard other angles, only get yaw
+	double alpha = radToDeg(tf::getYaw(q1));
+	double beta = radToDeg(tf::getYaw(q2));
+	double error = std::fmod(std::abs(beta - alpha), 360.);
+	error = error > 180. ? 360. - error : error;
+
+	return error;
 }
 
 } /* namespace kml */
