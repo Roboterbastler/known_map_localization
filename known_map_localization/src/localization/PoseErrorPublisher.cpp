@@ -59,7 +59,13 @@ void PoseErrorPublisher::receiveBaseLink(const geometry_msgs::TransformStamped &
 	tf::StampedTransform baseLink;
 	try {
 		mListener_.lookupTransform("anchor", "ground_truth", latestCommonTime, groundTruthPose);
-		mListener_.lookupTransform("anchor", "kml_base_link", latestCommonTime, baseLink);
+
+		// use received if possible
+		if(latestCommonTime < baseLinkMsg.header.stamp) {
+			mListener_.lookupTransform("anchor", "kml_base_link", latestCommonTime, baseLink);
+		} else {
+			tf::transformStampedMsgToTF(baseLinkMsg, baseLink);
+		}
 	} catch(tf::TransformException &e) {
 		ROS_DEBUG("Pose error not updated: %s", e.what());
 		return;
