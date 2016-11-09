@@ -14,7 +14,7 @@
 #include <Exception.h>
 
 #define MAX_HINT_VECTOR_SIZE 100
-#define MAX_FIX_QUEUE_SIZE 10
+#define MAX_FIX_QUEUE_SIZE 100
 
 namespace kml {
 
