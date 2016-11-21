@@ -22,7 +22,7 @@ bool MapstitchSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaDat
 	}
 
 	// close small holes...
-	morphologicalOpen(img, 3);
+	morphologicalOpen(img, 2);
 
 	// ... and remove remaining noise
 	//morphologicalClose(img);
@@ -30,12 +30,10 @@ bool MapstitchSlamMapPreprocessor::processMap(cv::Mat &img, nav_msgs::MapMetaDat
 	// crop to region of interest
 	crop(img, mapMetaData);
 
-	// fill unknown regions with white (to avoid additional corners)
-	cv::threshold(img, img, 50, 254, cv::THRESH_BINARY);
+	// fill unknown regions with black (to avoid additional corners)
+	cv::threshold(img, img, 230, 254, cv::THRESH_BINARY);
 
-	//morphologicalErode(img);
-
-//	morphologicalClose(img);
+	morphologicalClose(img);
 
 	restoreMap(img);
 
