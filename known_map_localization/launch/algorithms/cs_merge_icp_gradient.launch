@@ -1,0 +1,7 @@
+<launch>
+    <!-- launch cs_merge ICP gradient node -->
+    <node pkg="cs_merge_methods" type="cs_merge_icp_gradient" name="cs_merge_icp_gradient">
+	    <param name="ransac_amount" value="0.1" />
+	    <param name="repetitions" value="25" />
+    </node>
+</launch>

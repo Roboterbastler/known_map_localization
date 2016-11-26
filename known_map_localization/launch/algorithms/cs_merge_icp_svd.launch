@@ -1,0 +1,8 @@
+<launch>
+    <!-- launch cs_merge ICP SVD node -->
+    <node pkg="cs_merge_methods" type="cs_merge_icp_svd" name="cs_merge_icp_svd">
+		<param name="repetitions" value="25" />
+		<param name="fraction" value="0.1" />
+		<param name="startPos" value="60" />
+	</node>
+</launch>

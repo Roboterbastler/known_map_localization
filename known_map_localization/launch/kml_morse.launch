@@ -1,0 +1,14 @@
+<launch>
+    <!-- YAML config file for the known map to be used -->
+    <arg name="known_map" />
+    <arg name="algorithm" />
+    
+	<group ns="known_map_localization">
+        <!-- connect input topics -->
+        <arg name="slam_map_topic" value="/orb_slam/projected_map" />
+        <arg name="gps_topic" value="/robot/gps" />
+
+		<!-- The main localization node -->
+        <include file="$(find known_map_localization)/launch/kml_node.launch" pass_all_args="true" />
+	</group>
+</launch>

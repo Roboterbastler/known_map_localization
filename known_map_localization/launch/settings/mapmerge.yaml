@@ -1,0 +1,3 @@
+use_randomized_hough_transform: false
+use_robust_algorithm: false
+number_of_hypotheses: 4

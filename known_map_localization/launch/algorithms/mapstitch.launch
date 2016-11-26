@@ -1,0 +1,4 @@
+<launch>
+    <!-- load mapstitch settings -->
+    <rosparam command="load" file="$(find known_map_localization)/launch/settings/mapstitch.yaml" />
+</launch>

@@ -1,0 +1,28 @@
+<launch>
+    <arg name="slam_map_topic" />
+    <arg name="gps_topic" />
+    <arg name="algorithm" default="mapmerge" />
+    <arg name="known_map" />
+
+	<!-- The main localization node -->
+	<node pkg="known_map_localization" type="known_map_localization_node" name="localization_node" output="screen" required="true">
+        <remap from="localization_node/slam_map" to="$(arg slam_map_topic)" />
+		<remap from="/gps_fix" to="$(arg gps_topic)" />
+
+        <!-- set algorithm parameter -->
+        <param name="algorithm" value="$(arg algorithm)" />
+        
+        <!-- known map config YAML file -->
+        <param name="known_map_config_file" value="$(arg known_map)" />
+
+        <!-- load general settings -->
+        <rosparam command="load" file="$(find known_map_localization)/launch/settings/general.yaml" />
+
+        <!-- load algorithm specific settings -->
+        <rosparam command="load" file="$(find known_map_localization)/launch/settings/$(arg algorithm).yaml" />
+	</node>
+
+    <!-- run algorithm specific launcher -->
+	<include file="$(find known_map_localization)/launch/algorithms/$(arg algorithm).launch" />
+</launch>
+
