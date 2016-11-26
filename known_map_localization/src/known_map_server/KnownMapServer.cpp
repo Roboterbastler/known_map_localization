@@ -8,7 +8,6 @@
 #include <libgen.h>
 #include <yaml-cpp/yaml.h>
 
-#include <ros/package.h>
 #include <nav_msgs/GetMap.h>
 #include <map_server/image_loader.h>
 #include <tf/transform_datatypes.h>
@@ -30,8 +29,6 @@ KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) : 
 	nh.getParam("known_map_config_file", fileName);
 
 	ROS_INFO("    file: %s", fileName.c_str());
-
-	fileName = ros::package::getPath("known_map_localization") + '/' + fileName;
 
 	ROS_INFO("    Load known map...");
 	if(!loadKnownMap(fileName)) {
