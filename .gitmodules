@@ -1,0 +1,3 @@
+[submodule "mapstitch"]
+	path = mapstitch
+	url = git@github.com:Roboterbastler/mapstitch.git
