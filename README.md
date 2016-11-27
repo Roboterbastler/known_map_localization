@@ -56,6 +56,10 @@ The following topics are used to publish the results of the localization:
 - `known_map_localization/localization_node/geo_pose`: The estimated robot pose
 - `known_map_localization/localization_node/kml_base_link`: The transform from the anchor to the robot pose
 
+## Documentation
+
+The known_map_localization code is documented using doxygen-style comments. Therefore documentation can be generated using doxygen.
+
 ## Resources
 [1] Stefano Carpin. *Fast and accurate map merging for multi-robot systems*. In: *Autonomous Robots* 25.3 (2008), S. 305-316
 
