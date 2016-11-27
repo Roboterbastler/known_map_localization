@@ -1,3 +1,0 @@
-- builder: doxygen
-  output_dir: doc/known_map_localization/
-  name: Known Map Localization
