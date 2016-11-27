@@ -50,6 +50,12 @@ A sample roslaunch call starting known_map_localization:
 roslaunch known_map_localization kml_node slam_map_topic:=/orb_slam/projected_map gps_topic:=/robot/gps known_map:=PATH_TO_YAML.yaml
 ```
 
+### Output
+The following topics are used to publish the results of the localization:
+
+- `known_map_localization/localization_node/geo_pose`: The estimated robot pose
+- `known_map_localization/localization_node/kml_base_link`: The transform from the anchor to the robot pose
+
 ## Resources
 [1] Stefano Carpin. *Fast and accurate map merging for multi-robot systems*. In: *Autonomous Robots* 25.3 (2008), S. 305-316
 
