@@ -47,7 +47,7 @@ The optional argument **algorithm** specifies which alignment algorithm to use. 
 A sample roslaunch call starting known_map_localization:
 
 ```
-roslaunch known_map_localization kml_node slam_map_topic:=/orb_slam/projected_map gps_topic:=/robot/gps known_map:=PATH_TO_YAML.yaml
+roslaunch known_map_localization kml_node.launch slam_map_topic:=/orb_slam/projected_map gps_topic:=/robot/gps known_map:=PATH_TO_YAML.yaml
 ```
 
 ### Output
