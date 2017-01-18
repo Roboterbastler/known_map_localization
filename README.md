@@ -1,6 +1,8 @@
 # known_map_localization
 ROS code related to my bachelor thesis "ROS-Modul zur Lokalisierung in a priori bekannten Karten".
 
+This work is related to the project EffFeu of the DAI-Labor at TU Berlin (http://www.dai-labor.de/cog/laufende_projekte/efffeu/). It has been supervised by Christopher-Eyk Hrabia.
+
 ## Content
 This repository consists of multiple packages
 
