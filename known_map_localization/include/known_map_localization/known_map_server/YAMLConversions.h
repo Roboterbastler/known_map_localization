@@ -36,8 +36,8 @@ struct convert<geographic_msgs::GeoPose> {
 	}
 
 	static bool decode(const Node& node, geographic_msgs::GeoPose& gp) {
-		if(!node.IsMap() || node.size() != 2 || !node["position"].IsMap() || node["orientation"].IsMap()) {
-			std::cerr << "Invalid input" << node.IsMap() << node.size() << std::endl;
+		if(!node.IsMap() || node.size() != 2 || !node["position"].IsMap() || node["heading"].IsMap()) {
+			ROS_ERROR("GeoPose node has invalid format");
 			return false;
 		}
 
@@ -50,7 +50,7 @@ struct convert<geographic_msgs::GeoPose> {
 
 			return true;
 		} catch (InvalidNode &in) {
-			std::cerr << "Invalid node: " << in.what() << std::endl;
+			ROS_ERROR_STREAM("Invalid node: " << in.what());
 			return false;
 		}
 	}
