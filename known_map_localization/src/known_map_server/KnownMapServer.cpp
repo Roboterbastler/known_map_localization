@@ -36,6 +36,8 @@ KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) : 
 		ROS_BREAK();
 		return;
 	}
+	
+	ROS_INFO("    anchor: %f N and %f E", mKnownMapAnchor_->position.latitude, mKnownMapAnchor_->position.longitude);
 
 	ROS_INFO("    Preprocessing of known map...");
 	ROS_ASSERT(mKnownMap_);
