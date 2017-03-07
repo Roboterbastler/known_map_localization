@@ -116,6 +116,7 @@ void KnownMapLocalization::receiveSlamMap(const nav_msgs::OccupancyGridConstPtr 
 		pDataLogger_->logComputation(hypotheses, duration, pKnownMapServer_->getKnownMap()->info, slamMapFixed->info);
 
 		pFilter_->addHypotheses(hypotheses);
+        ROS_DEBUG("Starting localization with hypotheses");
 		pLocalization_->localize();
 	} catch(AlignerInternalError &e) {
 		ROS_WARN_STREAM("Internal aligner error: " << e.what());
