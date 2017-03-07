@@ -12,7 +12,6 @@
 
 #include <ros/ros.h>
 #include <ros/wall_timer.h>
-#include <orb_slam/ORBState.h>
 
 #include <known_map_localization/Status.h>
 #include <logging/DataLogger.h>
@@ -32,8 +31,6 @@ typedef enum {
  * ## Published Topics
  * - **status**: The status uf the known map localization system
  *
- * ## Subscribed Topics
- * - __/orb_slam/state__: The state of the SLAM module, which is also affecting the known map localization status
  */
 class StatusPublisher {
 public:
@@ -45,7 +42,6 @@ public:
 private:
 	void tick(const ros::WallTimerEvent& event);
 	void publishStatus() const;
-	void receiveSlamState(orb_slam::ORBState state);
 
 private:
 	ros::Subscriber mSlamStatusSubscriber_;
