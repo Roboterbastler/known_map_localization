@@ -55,13 +55,6 @@ private:
 	void updateGpsHints(const ros::WallTimerEvent& event);
 
 	/**
-	 * Returns the SLAM base link for the requested time.
-	 * @param t The requested time
-	 * @return The transformation
-	 */
-	tf::StampedTransform getSlamBaseLink(ros::Time t);
-
-	/**
 	 * A GPS position is considered out of date when its age (the difference between the
 	 * current time and it's time stamp) is greater than the cache time of the tf listener.
 	 * @param pos The GPS position to be tested

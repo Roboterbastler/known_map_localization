@@ -83,7 +83,7 @@ void GpsManager::updateGpsHints(const ros::WallTimerEvent& event) {
 			hint.stamp = pos->stamp;
 			hint.gpsFix = pos->gpsFix;
 			hint.gpsPosition = pos->gpsPosition;
-			hint.baseLink = getSlamBaseLink(hint.stamp);
+			hint.baseLink = pKnownMapServer_->getSlamBaseLink(hint.stamp);
 
 			// add new key point
 			mHints_.push_back(hint);
@@ -111,13 +111,6 @@ void GpsManager::updateGpsHints(const ros::WallTimerEvent& event) {
 	}
 
 	ROS_DEBUG("Key points: %ld", mHints_.size());
-}
-
-tf::StampedTransform GpsManager::getSlamBaseLink(ros::Time t) {
-	tf::StampedTransform slamBaseLink;
-	mListener_.lookupTransform("orb_slam/map", "ORB_base_link", t,
-			slamBaseLink);
-	return slamBaseLink;
 }
 
 geometry_msgs::Point GpsManager::convertGPSPositionToAnchorFrame(

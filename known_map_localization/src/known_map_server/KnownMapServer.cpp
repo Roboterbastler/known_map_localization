@@ -30,6 +30,12 @@ KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) : 
 
 	ROS_INFO("    file: %s", fileName.c_str());
 
+        nh.param<std::string>("frame_map", mFrame_base,"map");
+        nh.param<std::string>("frame_base", mFrame_map,"base_link");
+
+        ROS_INFO("    frame_base: %s", mFrame_base.c_str());
+        ROS_INFO("    frame_map: %s", mFrame_map.c_str());
+
 	ROS_INFO("    Load known map...");
 	if(!loadKnownMap(fileName)) {
 		ROS_FATAL("Known map could not be loaded: %s", fileName.c_str());
@@ -48,6 +54,13 @@ KnownMapServer::KnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) : 
 	}
 
 	mKnownMapPublisher_.publish(mKnownMap_);
+}
+
+tf::StampedTransform KnownMapServer::getSlamBaseLink(ros::Time t) const{
+        tf::StampedTransform slamBaseLink;
+        mListener_.lookupTransform(mFrame_map, mFrame_base, t,
+                        slamBaseLink);
+        return slamBaseLink;
 }
 
 bool KnownMapServer::loadKnownMap(std::string fileName) {
