@@ -18,6 +18,8 @@
 
 namespace kml {
 
+using boost::make_shared;
+
 KnownMapLocalization::KnownMapLocalization() : mRate_(2.0), mLastProcessing_(0) {
 	// create factory accordingly
 	KmlFactoryConstPtr factory = selectStrategy();
@@ -28,8 +30,8 @@ KnownMapLocalization::KnownMapLocalization() : mRate_(2.0), mLastProcessing_(0) 
 	pKnownMapPreprocessor_ = factory->createKnownMapPreprocessor();
 	pAligner_ = factory->createAligner();
 	pKnownMapServer_ = factory->createKnownMapServer(pKnownMapPreprocessor_);
-	pGpsManager_ = factory->createGpsManager(pKnownMapServer_);
-	pSlamScaleManager_ = factory->createSlamScaleManager(pGpsManager_, pDataLogger_);
+	pGpsManager_ = factory->createGpsManager(pKnownMapServer_, pSlamScaleManager_);
+	pSlamScaleManager_.reset(factory->createSlamScaleManager(pGpsManager_, pDataLogger_).get());
 	pSlamMapPreprocessor_ = factory->createSlamMapPreprocessor(pSlamScaleManager_, pKnownMapServer_);
 	pFilter_ = factory->createFilter(pGpsManager_, pKnownMapServer_, pSlamScaleManager_, pStatusPublisher_, pDataLogger_);
 	pLocalization_ = factory->createLocalization(pFilter_, pSlamScaleManager_, pKnownMapServer_);

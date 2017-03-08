@@ -11,6 +11,8 @@
 #include <geodesy/wgs84.h>
 #include <visualization_msgs/Marker.h>
 
+#include <SlamScaleManager.h>
+
 #include <Exception.h>
 
 #define MAX_HINT_VECTOR_SIZE 100
@@ -18,8 +20,8 @@
 
 namespace kml {
 
-GpsManager::GpsManager(KnownMapServerConstPtr pKnownMapServer) :
-		pKnownMapServer_(pKnownMapServer) {
+GpsManager::GpsManager(KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerConstPtr pSlamScaleManager) :
+		pKnownMapServer_(pKnownMapServer), pSlamScaleManager_(pSlamScaleManager) {
 	ROS_ASSERT(pKnownMapServer_);
 
 	ROS_INFO("GPS manager initialization...");
@@ -83,7 +85,7 @@ void GpsManager::updateGpsHints(const ros::WallTimerEvent& event) {
 			hint.stamp = pos->stamp;
 			hint.gpsFix = pos->gpsFix;
 			hint.gpsPosition = pos->gpsPosition;
-			hint.baseLink = pKnownMapServer_->getSlamBaseLink(hint.stamp);
+			hint.baseLink = pSlamScaleManager_->getSlamBaseLinkToMap(hint.stamp);
 
 			// add new key point
 			mHints_.push_back(hint);

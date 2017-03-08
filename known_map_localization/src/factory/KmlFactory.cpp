@@ -37,8 +37,8 @@ DataLoggerPtr KmlFactory::createDataLogger() const {
 	return make_shared<DataLogger>();
 }
 
-GpsManagerPtr KmlFactory::createGpsManager(KnownMapServerConstPtr pKnownMapServer) const {
-	return make_shared<GpsManager>(pKnownMapServer);
+GpsManagerPtr KmlFactory::createGpsManager(KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerPtr pSlamScaleManager) const {
+	return make_shared<GpsManager>(pKnownMapServer, pSlamScaleManager);
 }
 
 SlamScaleManagerPtr KmlFactory::createSlamScaleManager(GpsManagerConstPtr pGpsManager, DataLoggerPtr pDataLogger) const {

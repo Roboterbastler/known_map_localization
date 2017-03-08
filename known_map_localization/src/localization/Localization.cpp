@@ -71,13 +71,10 @@ tf::Stamped<tf::Pose> Localization::localizeWithAlignment(const Alignment &align
 	tf::Transform slamF_to_knownF = alignment.toTfTransform();
 
 	// SLAM map frame -> SLAM base link
-        tf::StampedTransform slamF_to_slamBL = 	pKnownMapServer_->getSlamBaseLink(time);
+        tf::StampedTransform slamF_to_slamBL = 	pSlamScaleManager_->getSlamBaseLinkToMap(time);
 
 	// discard z component
 	slamF_to_slamBL.getOrigin().setZ(0);
-
-	// convert pose to real world scale
-	slamF_to_slamBL = pSlamScaleManager_->convertTransform(slamF_to_slamBL);
 
 	tf::Stamped<tf::Pose> pose;
 	pose.stamp_ = slamF_to_slamBL.stamp_;

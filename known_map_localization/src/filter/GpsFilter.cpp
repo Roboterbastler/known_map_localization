@@ -129,8 +129,7 @@ geometry_msgs::Pose GpsFilter::estimatedRobotPose(const Alignment &alignment,
 	tf::Transform slamMapFrame_to_knownMapFrame = alignment.toTfTransform();
 
 	// convert pose to real world scale
-	tf::Transform slamMapFrame_to_slamBaseLink =
-			pSlamScaleManager_->convertTransform(hint.baseLink);
+	tf::Transform slamMapFrame_to_slamBaseLink = hint.baseLink;
 
 	tf::Pose pose;
 	pose.setIdentity();

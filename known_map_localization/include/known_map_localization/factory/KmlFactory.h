@@ -36,7 +36,7 @@ public:
 	virtual PoseErrorPublisherPtr createPoseErrorPublisher(DataLoggerPtr pDataLogger) const;
 	virtual KnownMapServerPtr createKnownMapServer(KnownMapPreprocessorPtr pKnownMapPreprocessor) const;
 	virtual DataLoggerPtr createDataLogger() const;
-	virtual GpsManagerPtr createGpsManager(KnownMapServerConstPtr pKnownMapServer) const;
+	virtual GpsManagerPtr createGpsManager(KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerPtr pSlamScaleManager) const;
 	virtual SlamScaleManagerPtr createSlamScaleManager(GpsManagerConstPtr pGpsManager, DataLoggerPtr pDataLogger = DataLoggerPtr()) const;
 	virtual StatusPublisherPtr createStatusPublisher(DataLoggerPtr pDataLogger, float rate = 10) const;
 };

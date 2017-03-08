@@ -48,13 +48,6 @@ public:
 	 */
 	geographic_msgs::GeoPoseConstPtr getAnchor() const;
 
-        /**
-         * Returns the SLAM base link for the requested time.
-         * @param t The requested time
-         * @return The transformation
-         */
-        tf::StampedTransform getSlamBaseLink(ros::Time t) const;
-
 private:
 	/**
 	 * Loads the known map from disc.
@@ -87,9 +80,6 @@ private:
 
         /// Transform listener
         tf::TransformListener mListener_;
-
-        std::string mFrame_base;
-        std::string mFrame_map;
 
 private:
 	KnownMapPreprocessorPtr pKnownMapPreprocessor_;

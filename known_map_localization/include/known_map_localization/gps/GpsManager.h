@@ -21,6 +21,9 @@
 
 namespace kml {
 
+class SlamScaleManager;
+typedef boost::shared_ptr<SlamScaleManager const> SlamScaleManagerConstPtr;
+
 /**
  * # GPS Manager
  *
@@ -33,7 +36,7 @@ namespace kml {
  */
 class GpsManager {
 public:
-	GpsManager(KnownMapServerConstPtr pKnownMapServer);
+	GpsManager(KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerConstPtr pSlamScaleManager);
 
 	/**
 	 * Gives read-only access to the stored GPS position/SLAM base link hints.
@@ -105,6 +108,7 @@ private:
 
 private:
 	KnownMapServerConstPtr pKnownMapServer_;
+	SlamScaleManagerConstPtr pSlamScaleManager_;
 };
 
 typedef boost::shared_ptr<GpsManager> GpsManagerPtr;
