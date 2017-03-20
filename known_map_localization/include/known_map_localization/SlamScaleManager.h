@@ -45,6 +45,13 @@ class SlamScaleManager {
 public:
 	SlamScaleManager(GpsManagerConstPtr pGpsManager, DataLoggerPtr pDataLogger = DataLoggerPtr());
 
+        /**
+         * Returns the SLAM base link transformation in the SLAM map for the requested time.
+         * @param t The requested time
+         * @return The already scaled transformation
+         */
+        tf::StampedTransform getSlamBaseLinkToMap(ros::Time t) const;
+
 	/**
 	 * Gets the SLAM scale
 	 * @return SLAM scale
@@ -66,21 +73,21 @@ public:
 	void updateSlamScale(float scale);
 
 	/**
-	 * Converts a transformation from ORB SLAM's coordinate system to real world coordinates.
+	 * Converts a transformation from SLAM coordinate system to real world coordinates.
 	 * @param transform The transformation to convert
 	 * @return The converted transformation
 	 */
 	tf::Transform convertTransform(tf::Transform transform) const;
 
 	/**
-	 * Converts a transformation from ORB SLAM's coordinate system to real world coordinates.
+	 * Converts a transformation from SLAM coordinate system to real world coordinates.
 	 * @param transform The transformation to convert
 	 * @return The converted transformation
 	 */
 	tf::StampedTransform convertTransform(tf::StampedTransform transform) const;
 
 	/**
-	 * Converts a pose from ORB SLAM's coordinate system to real world coordinates.
+	 * Converts a pose from SLAM coordinate system to real world coordinates.
 	 * @param pose The pose to be converted
 	 * @return The resulting pose
 	 */
@@ -121,6 +128,12 @@ private:
 
 	/// Signals that the GPS hints have been updated
 	ros::Subscriber mGpsHintsUpdatedSubscriber_;
+
+	///The name of the robot base frame in the slam map/world
+    std::string mFrame_base;
+
+    ///The name of the world or map created by the slam
+    std::string mFrame_map;
 
 private:
 	DataLoggerPtr pDataLogger_;

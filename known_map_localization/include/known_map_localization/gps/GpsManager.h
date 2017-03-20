@@ -21,6 +21,9 @@
 
 namespace kml {
 
+class SlamScaleManager;
+typedef boost::shared_ptr<SlamScaleManager const> SlamScaleManagerConstPtr;
+
 /**
  * # GPS Manager
  *
@@ -33,7 +36,7 @@ namespace kml {
  */
 class GpsManager {
 public:
-	GpsManager(KnownMapServerConstPtr pKnownMapServer);
+	GpsManager(KnownMapServerConstPtr pKnownMapServer, SlamScaleManagerConstPtr pSlamScaleManager);
 
 	/**
 	 * Gives read-only access to the stored GPS position/SLAM base link hints.
@@ -53,13 +56,6 @@ private:
 	 * @param event
 	 */
 	void updateGpsHints(const ros::WallTimerEvent& event);
-
-	/**
-	 * Returns the SLAM base link for the requested time.
-	 * @param t The requested time
-	 * @return The transformation
-	 */
-	tf::StampedTransform getSlamBaseLink(ros::Time t);
 
 	/**
 	 * A GPS position is considered out of date when its age (the difference between the
@@ -112,6 +108,7 @@ private:
 
 private:
 	KnownMapServerConstPtr pKnownMapServer_;
+	SlamScaleManagerConstPtr pSlamScaleManager_;
 };
 
 typedef boost::shared_ptr<GpsManager> GpsManagerPtr;

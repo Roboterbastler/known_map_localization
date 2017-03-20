@@ -1,10 +1,14 @@
+#transformation frames used to determine the localization of the robot within the slam map
+frame_map: map
+frame_base: base_link
+
 # preprocessing
 slam_preprocessing_enabled: true
 known_preprocessing_enabled: true
 
 # SLAM map scaling settings
-slam_scale_mode: gps #[parameter/gps]
-slam_map_scale: 2.26
+slam_scale_mode: parameter #[parameter/gps]
+slam_map_scale: 1.0
 
 # filter parameters
 filter_use_gps: false

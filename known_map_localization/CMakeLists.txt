@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   mapstitch
   mapmerge
-  orb_slam
   geographic_msgs
   geodesy
   message_generation

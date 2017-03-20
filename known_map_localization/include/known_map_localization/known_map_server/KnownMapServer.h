@@ -13,6 +13,7 @@
 #include <ros/ros.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <geographic_msgs/GeoPose.h>
+#include <tf/transform_listener.h>
 
 #include <preprocessing/KnownMapPreprocessor.h>
 
@@ -76,6 +77,9 @@ private:
 
 	/// The anchor of the known map
 	geographic_msgs::GeoPosePtr mKnownMapAnchor_;
+
+        /// Transform listener
+        tf::TransformListener mListener_;
 
 private:
 	KnownMapPreprocessorPtr pKnownMapPreprocessor_;

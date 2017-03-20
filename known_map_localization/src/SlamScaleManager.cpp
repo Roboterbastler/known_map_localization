@@ -30,6 +30,12 @@ SlamScaleManager::SlamScaleManager(GpsManagerConstPtr pGpsManager,
 
 	ROS_INFO("SLAM scale manager initialization...");
 
+        nh.param<std::string>("frame_map", mFrame_base,"map");
+        nh.param<std::string>("frame_base", mFrame_map,"base_link");
+
+        ROS_INFO("    frame_base: %s", mFrame_base.c_str());
+        ROS_INFO("    frame_map: %s", mFrame_map.c_str());
+
 	switch (mMode_) {
 	case PARAMETER:
 		ROS_INFO("    Mode: PARAMETER");
@@ -58,6 +64,13 @@ SlamScaleManager::SlamScaleManager(GpsManagerConstPtr pGpsManager,
 		ROS_BREAK();
 		return;
 	}
+}
+
+tf::StampedTransform SlamScaleManager::getSlamBaseLinkToMap(ros::Time t) const{
+        tf::StampedTransform slamBaseLink;
+        mListener_.lookupTransform(mFrame_map, mFrame_base, t,
+                        slamBaseLink);
+        return convertTransform(slamBaseLink);
 }
 
 SlamScaleMode SlamScaleManager::getMode() const {
