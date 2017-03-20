@@ -18,7 +18,6 @@ Additionally to standard ROS packages and the packages from this repository the 
 - map_server
 - geodesy
 - geographic_msgs
-- orb_slam (a modified version of ORB-SLAM from https://github.com/cehberlin/ORB_SLAM)
 - Boost
 - OpenCV
 
